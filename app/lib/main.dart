@@ -1,24 +1,32 @@
+import 'package:feature_auth/feature_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:emobin/app/router/app_router.dart';
+import 'package:emobin/router/app_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:ui_theme/ui_theme.dart';
 
-import 'di/di.dart';
+import 'core/di/di.dart';
+import 'core/toast/toast_helper.dart';
 
 void main() {
   configureDependencies();
-  runApp(MyApp());
+  runApp(MainApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'EmoBin',
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
-      routerConfig: AppRouter().config(),
+    return BlocProvider(
+      create: (_) => GetIt.instance<AuthBloc>()..add(AuthEvent.started()),
+      child: MaterialApp.router(
+        title: 'EmoBin',
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: ThemeMode.system,
+        routerConfig: AppRouter(navigatorKey: toastNavigatorKey).config(),
+      ),
     );
   }
 }

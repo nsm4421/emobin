@@ -1,11 +1,14 @@
 import 'package:injectable/injectable.dart';
 
+import 'package:feature_auth/core/errors/auth_failure.dart';
+import 'package:feature_auth/core/errors/auth_failure_mapper.dart';
 import 'package:feature_auth/data/datasource/auth_datasource.dart';
 import 'package:feature_auth/data/mapper/auth_user_mapper.dart';
 import 'package:feature_auth/data/mapper/profile_mapper.dart';
 import 'package:feature_auth/domain/entity/auth_user.dart';
 import 'package:feature_auth/domain/entity/profile.dart';
 import 'package:feature_auth/domain/repository/auth_repository.dart';
+import 'package:fpdart/fpdart.dart';
 
 @LazySingleton(as: AuthRepository)
 class AuthRepositoryImpl implements AuthRepository {
@@ -21,45 +24,70 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthUser> signUpWithEmail({
+  Future<Either<AuthFailure, AuthUser>> signUpWithEmail({
     required String email,
     required String password,
   }) async {
-    final model = await _dataSource.signUpWithEmail(
-      email: email,
-      password: password,
-    );
-    return model.toEntity();
+    try {
+      final model = await _dataSource.signUpWithEmail(
+        email: email,
+        password: password,
+      );
+      return Right(model.toEntity());
+    } catch (error, stackTrace) {
+      return Left(error.toAuthFailure(stackTrace));
+    }
   }
 
   @override
-  Future<AuthUser> signInWithEmail({
+  Future<Either<AuthFailure, AuthUser>> signInWithEmail({
     required String email,
     required String password,
   }) async {
-    final model = await _dataSource.signInWithEmail(
-      email: email,
-      password: password,
-    );
-    return model.toEntity();
+    try {
+      final model = await _dataSource.signInWithEmail(
+        email: email,
+        password: password,
+      );
+      return Right(model.toEntity());
+    } catch (error, stackTrace) {
+      return Left(error.toAuthFailure(stackTrace));
+    }
   }
 
   @override
-  Future<void> signOut() {
-    return _dataSource.signOut();
+  Future<Either<AuthFailure, void>> signOut() async {
+    try {
+      await _dataSource.signOut();
+      return const Right(null);
+    } catch (error, stackTrace) {
+      return Left(error.toAuthFailure(stackTrace));
+    }
   }
 
   @override
-  Future<void> deleteAccount() {
-    return _dataSource.deleteAccount();
+  Future<Either<AuthFailure, void>> deleteAccount() async {
+    try {
+      await _dataSource.deleteAccount();
+      return const Right(null);
+    } catch (error, stackTrace) {
+      return Left(error.toAuthFailure(stackTrace));
+    }
   }
 
   @override
-  Future<Profile> updateProfile({String? bio, String? avatarUrl}) async {
-    final model = await _dataSource.updateProfile(
-      bio: bio,
-      avatarUrl: avatarUrl,
-    );
-    return model.toEntity();
+  Future<Either<AuthFailure, Profile>> updateProfile({
+    String? bio,
+    String? avatarUrl,
+  }) async {
+    try {
+      final model = await _dataSource.updateProfile(
+        bio: bio,
+        avatarUrl: avatarUrl,
+      );
+      return Right(model.toEntity());
+    } catch (error, stackTrace) {
+      return Left(error.toAuthFailure(stackTrace));
+    }
   }
 }

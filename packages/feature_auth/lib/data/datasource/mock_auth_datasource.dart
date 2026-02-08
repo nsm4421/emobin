@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:injectable/injectable.dart';
 
 import 'package:feature_auth/core/constants/auth_status.dart';
+import 'package:feature_auth/core/errors/auth_exception.dart';
 import 'package:feature_auth/data/datasource/auth_datasource.dart';
 import 'package:feature_auth/data/model/auth_user_model.dart';
 import 'package:feature_auth/data/model/profile_model.dart';
@@ -34,7 +35,7 @@ class MockAuthDataSource implements AuthDataSource {
 
     final existing = _accountsByEmail[normalizedEmail];
     if (existing != null) {
-      throw StateError('Email already in use.');
+      throw const AuthException.emailAlreadyInUse();
     }
 
     final now = DateTime.now();
@@ -77,13 +78,13 @@ class MockAuthDataSource implements AuthDataSource {
     final normalizedEmail = _normalizeEmail(email);
     final account = _accountsByEmail[normalizedEmail];
     if (account == null) {
-      throw StateError('Account not found.');
+      throw const AuthException.accountNotFound();
     }
     if (account.deletedAt != null) {
-      throw StateError('Account is deleted.');
+      throw const AuthException.accountDeleted();
     }
     if (account.password != password) {
-      throw StateError('Invalid credentials.');
+      throw const AuthException.invalidCredentials();
     }
 
     _currentAccount = account;
@@ -101,10 +102,10 @@ class MockAuthDataSource implements AuthDataSource {
   Future<void> deleteAccount() async {
     final account = _currentAccount;
     if (account == null) {
-      throw StateError('Not authenticated.');
+      throw const AuthException.notAuthenticated();
     }
     if (account.deletedAt != null) {
-      throw StateError('Account already deleted.');
+      throw const AuthException.accountDeleted();
     }
 
     final now = DateTime.now();
@@ -118,10 +119,10 @@ class MockAuthDataSource implements AuthDataSource {
   Future<ProfileModel> updateProfile({String? bio, String? avatarUrl}) async {
     final account = _currentAccount;
     if (account == null) {
-      throw StateError('Not authenticated.');
+      throw const AuthException.notAuthenticated();
     }
     if (account.deletedAt != null) {
-      throw StateError('Account is deleted.');
+      throw const AuthException.accountDeleted();
     }
 
     final now = DateTime.now();
@@ -144,13 +145,13 @@ class MockAuthDataSource implements AuthDataSource {
 
   void _assertEmail(String email) {
     if (email.isEmpty || !email.contains('@')) {
-      throw ArgumentError.value(email, 'email', 'Invalid email.');
+      throw const AuthException.invalidEmail();
     }
   }
 
   void _assertPassword(String password) {
     if (password.isEmpty) {
-      throw ArgumentError.value(password, 'password', 'Invalid password.');
+      throw const AuthException.invalidPassword();
     }
   }
 

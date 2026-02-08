@@ -5,12 +5,16 @@ import 'package:feature_auth/domain/entity/auth_user.dart';
 import 'package:feature_auth/domain/repository/auth_repository.dart';
 import 'package:feature_auth/domain/usecase/auth_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:feature_auth/core/constants/auth_status.dart';
 
-import 'auth_event.dart';
-import 'auth_state.dart';
+part 'auth_state.dart';
+
+part 'auth_event.dart';
+
+part 'auth_bloc.freezed.dart';
 
 @lazySingleton
 class AuthBloc extends Bloc<AuthEvent, AuthState> {

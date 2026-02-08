@@ -1,10 +1,4 @@
-import 'package:feature_auth/data/model/auth_user_model.dart';
-import 'package:feature_auth/domain/entity/auth_user.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-import 'package:feature_auth/core/constants/auth_status.dart';
-
-part 'auth_state.freezed.dart';
+part of 'auth_bloc.dart';
 
 @freezed
 class AuthState with _$AuthState {

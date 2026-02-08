@@ -40,10 +40,7 @@ class AppLogger {
     }
   }
 
-  static String _format(
-    String message, {
-    required LogLevel level,
-  }) {
+  static String _format(String message, {required LogLevel level}) {
     return '[${level.label}] $message';
   }
 }

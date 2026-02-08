@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:emobin/app/resources/assets.dart';
-import 'package:emobin/app/router/app_router.dart';
+import 'package:emobin/core/constants/assets.dart';
+import 'package:emobin/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future<void>.delayed(const Duration(seconds: 3), () {
       if (!mounted) return;
-      context.router.replace(const EntryRoute());
+      context.router.replace(const AuthEntryRoute());
     });
   }
 

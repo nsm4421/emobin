@@ -16,6 +16,10 @@ import 'package:feature_auth/domain/usecase/auth_use_case.dart' as _i814;
 import 'package:feature_auth/domain/usecase/scenario/observe_auth_state_use_case.dart'
     as _i357;
 import 'package:feature_auth/presentation/bloc/auth/auth_bloc.dart' as _i656;
+import 'package:feature_auth/presentation/cubit/sign_in/sign_in_cubit.dart'
+    as _i1013;
+import 'package:feature_auth/presentation/cubit/sign_up/sign_up_cubit.dart'
+    as _i190;
 import 'package:injectable/injectable.dart' as _i526;
 
 class FeatureAuthPackageModule extends _i526.MicroPackageModule {
@@ -29,6 +33,10 @@ class FeatureAuthPackageModule extends _i526.MicroPackageModule {
         () => _i357.ObserveAuthStateUseCase(gh<_i180.AuthRepository>()));
     gh.lazySingleton<_i814.AuthUseCase>(
         () => _i814.AuthUseCase(gh<_i180.AuthRepository>()));
+    gh.lazySingleton<_i1013.SignInCubit>(
+        () => _i1013.SignInCubit(gh<_i814.AuthUseCase>()));
+    gh.lazySingleton<_i190.SignUpCubit>(
+        () => _i190.SignUpCubit(gh<_i814.AuthUseCase>()));
     gh.lazySingleton<_i656.AuthBloc>(
         () => _i656.AuthBloc(gh<_i814.AuthUseCase>()));
   }
