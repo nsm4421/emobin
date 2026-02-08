@@ -1,0 +1,9 @@
+import 'package:feature_auth/domain/repository/auth_repository.dart';
+
+class DeleteAccountUseCase {
+  final AuthRepository _repository;
+
+  const DeleteAccountUseCase(this._repository);
+
+  Future<void> call() => _repository.deleteAccount();
+}

@@ -25,11 +25,13 @@ Flutter 모노레포(Feature 패키지 구조)이며 Melos로 공통 의존성 �
 
 ## Melos 스크립트
 - `dart run melos get`
+- `dart run melos bootstrap:features`
 - `dart run melos clean`
 - `dart run melos analyze`
 - `dart run melos test`
 - `dart run melos format`
 - `dart run melos format:check`
+- `dart run melos codegen` (build_runner 일괄 실행)
 
 ## 새 패키지 추가
 1. `app` 또는 `packages/*`에 패키지 생성

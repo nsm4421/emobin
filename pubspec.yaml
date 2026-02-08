@@ -1,0 +1,38 @@
+name: emobin_workspace
+description: Monorepo workspace for the emobin Flutter app and feature packages.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+workspace:
+  - app
+  - packages/core
+  - packages/feature_auth
+  - packages/ui_theme
+
+dev_dependencies:
+  melos: ^7.0.0
+
+melos:
+  command:
+    bootstrap:
+      environment:
+        sdk: ^3.9.2
+      dependencies:
+        flutter_bloc: ^8.1.6
+        get_it: ^7.7.0
+        injectable: ^2.5.2
+      dev_dependencies:
+        build_runner: ^2.10.5
+        flutter_lints: ^5.0.0
+        injectable_generator: ^2.10.0
+  scripts:
+    get: melos exec -- flutter pub get
+    bootstrap:features: melos bootstrap --scope="feature_*"
+    clean: melos exec -- flutter clean
+    analyze: melos exec -- flutter analyze
+    test: melos exec -- flutter test
+    format: melos exec -- dart format .
+    format:check: melos exec -- dart format --set-exit-if-changed .
+    codegen: melos exec --depends-on=build_runner -- flutter pub run build_runner build --delete-conflicting-outputs
