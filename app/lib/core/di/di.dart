@@ -1,12 +1,16 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:feature_auth/feature_auth.dart';
+import 'package:feature_feed/feature_feed.dart';
 
 import 'di.config.dart';
 
 @InjectableInit(
   preferRelativeImports: true,
   includeMicroPackages: true,
-  externalPackageModulesBefore: [ExternalModule(FeatureAuthPackageModule)],
+  externalPackageModulesBefore: [
+    ExternalModule(FeatureAuthPackageModule),
+    ExternalModule(FeatureFeedPackageModule),
+  ],
 )
 void configureDependencies() => GetIt.instance.init();
