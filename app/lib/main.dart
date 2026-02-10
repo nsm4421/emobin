@@ -8,9 +8,10 @@ import 'package:get_it/get_it.dart';
 import 'core/di/di.dart';
 import 'core/toast/toast_helper.dart';
 
-void main() {
-  configureDependencies();
-  runApp(MainApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await configureDependencies();
+  runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
@@ -18,7 +19,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final router = AppRouter(navigatorKey: toastNavigatorKey);
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -36,7 +36,7 @@ class MainApp extends StatelessWidget {
             theme: cubit.lightThemeData,
             darkTheme: cubit.darkThemeData,
             themeMode: state,
-            routerConfig: router.config(),
+            routerConfig: AppRouter(navigatorKey: toastNavigatorKey).config(),
           );
         },
       ),
