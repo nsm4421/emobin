@@ -50,6 +50,11 @@ class _SignUpScreenState extends State<_SignUpScreen> {
           loading: () => true,
           orElse: () => false,
         );
+        final isButtonDisabled = state.maybeWhen(
+          loading: () => true,
+          failure: (_) => true,
+          orElse: () => false,
+        );
 
         return Scaffold(
           appBar: AppBar(title: const Text('Sign Up')),
@@ -59,20 +64,15 @@ class _SignUpScreenState extends State<_SignUpScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  Text(
-                    'Create account',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Start your journey with Emobin.',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  const AppFormHeader(
+                    title: 'Create account',
+                    subtitle: 'Start your journey with Emobin.',
                   ),
                   const SizedBox(height: 32),
-                  TextFormField(
+                  AppTextField(
                     controller: _usernameController,
                     textInputAction: TextInputAction.next,
-                    decoration: const InputDecoration(labelText: 'Username'),
+                    label: 'Username',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Enter your username.';
@@ -85,11 +85,11 @@ class _SignUpScreenState extends State<_SignUpScreen> {
                     enabled: !isLoading,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
+                  AppTextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
-                    decoration: const InputDecoration(labelText: 'Email'),
+                    label: 'Email',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Enter your email.';
@@ -102,11 +102,10 @@ class _SignUpScreenState extends State<_SignUpScreen> {
                     enabled: !isLoading,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
+                  AppPasswordField(
                     controller: _passwordController,
-                    obscureText: true,
                     textInputAction: TextInputAction.next,
-                    decoration: const InputDecoration(labelText: 'Password'),
+                    label: 'Password',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Enter a password.';
@@ -120,13 +119,10 @@ class _SignUpScreenState extends State<_SignUpScreen> {
                     enabled: !isLoading,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
+                  AppPasswordField(
                     controller: _confirmPasswordController,
-                    obscureText: true,
                     textInputAction: TextInputAction.done,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirm Password',
-                    ),
+                    label: 'Confirm Password',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Confirm your password.';
@@ -140,20 +136,15 @@ class _SignUpScreenState extends State<_SignUpScreen> {
                     enabled: !isLoading,
                   ),
                   const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: isLoading ? null : _onSubmit,
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Sign Up'),
+                  AppPrimaryButton(
+                    label: 'Sign Up',
+                    onPressed: isButtonDisabled ? null : _onSubmit,
+                    isLoading: isLoading,
                   ),
                   const SizedBox(height: 12),
-                  TextButton(
+                  AppTextButton(
+                    label: 'Back',
                     onPressed: isLoading ? null : () => context.router.pop(),
-                    child: const Text('Back'),
                   ),
                 ],
               ),

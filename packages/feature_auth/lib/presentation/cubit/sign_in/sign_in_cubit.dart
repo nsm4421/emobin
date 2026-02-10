@@ -11,7 +11,7 @@ part 'sign_in_state.dart';
 
 part 'sign_in_cubit.freezed.dart';
 
-@lazySingleton
+@injectable
 class SignInCubit extends Cubit<SignInState> {
   late final SignInWithEmailUseCase _useCase;
 
@@ -26,5 +26,9 @@ class SignInCubit extends Cubit<SignInState> {
       (failure) => emit(SignInState.failure(failure)),
       (user) => emit(SignInState.success(user)),
     );
+  }
+
+  void reset() {
+    emit(const SignInState.initial());
   }
 }

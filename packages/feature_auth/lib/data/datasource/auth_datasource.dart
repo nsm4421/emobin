@@ -8,6 +8,7 @@ abstract class AuthDataSource {
   Future<AuthUserModel> signUpWithEmail({
     required String email,
     required String password,
+    required String username,
   });
 
   Future<AuthUserModel> signInWithEmail({

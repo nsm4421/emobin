@@ -27,11 +27,13 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<AuthFailure, AuthUser>> signUpWithEmail({
     required String email,
     required String password,
+    required String username,
   }) async {
     try {
       final model = await _dataSource.signUpWithEmail(
         email: email,
         password: password,
+        username: username,
       );
       return Right(model.toEntity());
     } catch (error, stackTrace) {

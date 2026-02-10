@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:core/core.dart';
 import 'package:emobin/core/toast/toast_helper.dart';
 import 'package:emobin/router/app_router.dart';
 import 'package:feature_auth/feature_auth.dart';
@@ -20,7 +21,13 @@ class SignInPage extends StatelessWidget {
         listener: (context, state) {
           state.whenOrNull(
             success: (_) => context.router.replaceAll([const HomeRoute()]),
-            failure: (failure) => ToastHelper.error(failure.message),
+            failure: (failure) {
+              ToastHelper.error(failure.message);
+              Future.delayed(const Duration(seconds: 1), () {
+                if (!context.mounted) return;
+                context.read<SignInCubit>().reset();
+              });
+            },
           );
         },
         child: const _SignInScreen(),

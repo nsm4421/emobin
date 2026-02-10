@@ -15,8 +15,18 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes => [
     AutoRoute(page: SplashRoute.page, initial: true),
     AutoRoute(page: AuthEntryRoute.page),
-    AutoRoute(page: SignInRoute.page),
-    AutoRoute(page: SignUpRoute.page),
+    CustomRoute(
+      page: SignInRoute.page,
+      transitionsBuilder: TransitionsBuilders.slideRight,
+      duration: Duration(milliseconds: 280),
+      reverseDuration: Duration(milliseconds: 280),
+    ),
+    CustomRoute(
+      page: SignUpRoute.page,
+      transitionsBuilder: TransitionsBuilders.slideRight,
+      duration: Duration(milliseconds: 280),
+      reverseDuration: Duration(milliseconds: 280),
+    ),
     AutoRoute(page: HomeRoute.page),
   ];
 }

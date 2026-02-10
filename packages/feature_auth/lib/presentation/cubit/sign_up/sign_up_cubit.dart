@@ -10,7 +10,7 @@ part 'sign_up_state.dart';
 
 part 'sign_up_cubit.freezed.dart';
 
-@lazySingleton
+@injectable
 class SignUpCubit extends Cubit<SignUpState> {
   late final SignUpWithEmailUseCase _useCase;
 
@@ -24,10 +24,17 @@ class SignUpCubit extends Cubit<SignUpState> {
     required String password,
   }) async {
     emit(const SignUpState.loading());
-    final result = await _useCase.call(email: email, password: password);
-    result.fold(
-      (failure) => emit(SignUpState.failure(failure)),
-      (user) => emit(SignUpState.success(user)),
-    );
+    await _useCase
+        .call(email: email, password: password, username: username)
+        .then(
+          (res) => res.fold(
+            (failure) => emit(SignUpState.failure(failure)),
+            (user) => emit(SignUpState.success(user)),
+          ),
+        );
+  }
+
+  void reset() {
+    emit(const SignUpState.initial());
   }
 }
