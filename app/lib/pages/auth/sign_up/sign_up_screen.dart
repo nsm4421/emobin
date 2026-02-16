@@ -1,7 +1,7 @@
 part of 'sign_up_page.dart';
 
 class _SignUpScreen extends StatefulWidget {
-  const _SignUpScreen({super.key});
+  const _SignUpScreen();
 
   @override
   State<_SignUpScreen> createState() => _SignUpScreenState();
@@ -57,6 +57,7 @@ class _SignUpScreenState extends State<_SignUpScreen> {
         );
 
         return Scaffold(
+          resizeToAvoidBottomInset: true,
           appBar: AppBar(title: const Text('Sign Up')),
           body: SafeArea(
             child: Form(

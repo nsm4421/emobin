@@ -15,10 +15,8 @@ class AuthEntryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
-      body: AuthEntryBackgroundSection(
+      body: _AuthEntryBackgroundSection(
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -30,40 +28,40 @@ class AuthEntryScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: colorScheme.surface,
+                      color: context.colorScheme.surface,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: colorScheme.outlineVariant,
+                        color: context.colorScheme.outlineVariant,
                       ),
                       boxShadow: [
                         BoxShadow(
                           blurRadius: 24,
                           offset: const Offset(0, 10),
-                          color: colorScheme.shadow.withAlpha(31),
+                          color: context.colorScheme.shadow.withAlpha(31),
                         ),
                       ],
                     ),
                     child: Icon(
                       Icons.favorite_rounded,
                       size: 36,
-                      color: colorScheme.primary,
+                      color: context.colorScheme.primary,
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
                 Text(
                   'Welcome to Emobin',
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  style: context.textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'Sign in or create an account to continue.',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: context.textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-                const AuthEntryFeaturesSection(),
+                const _AuthEntryFeaturesSection(),
                 const Spacer(),
                 AppPrimaryButton(
                   label: 'Sign In',
@@ -78,7 +76,7 @@ class AuthEntryScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   'Create an account in under a minute.',
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: context.textTheme.bodySmall,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),

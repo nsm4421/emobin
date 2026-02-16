@@ -1,5 +1,6 @@
 import 'package:emobin/providers/cubit/app_theme/app_theme_cubit.dart';
 import 'package:feature_auth/feature_auth.dart';
+import 'package:feature_security/feature_security.dart';
 import 'package:flutter/material.dart';
 import 'package:emobin/router/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,10 +20,15 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appRouterConfig = AppRouter(navigatorKey: toastNavigatorKey).config();
     return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (_) => GetIt.instance<AuthBloc>()..add(AuthEvent.started()),
+        ),
+        BlocProvider(
+          create: (_) =>
+              GetIt.instance<SecurityBloc>()..add(SecurityEvent.started()),
         ),
         BlocProvider(
           create: (_) => GetIt.instance<AppThemeModeCubit>()..initialize(),
@@ -36,7 +42,7 @@ class MainApp extends StatelessWidget {
             theme: cubit.lightThemeData,
             darkTheme: cubit.darkThemeData,
             themeMode: state,
-            routerConfig: AppRouter(navigatorKey: toastNavigatorKey).config(),
+            routerConfig: appRouterConfig,
           );
         },
       ),

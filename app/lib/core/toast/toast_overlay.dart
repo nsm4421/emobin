@@ -44,9 +44,8 @@ class _ToastOverlayState extends State<_ToastOverlay>
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final (background, foreground, iconData, border) = _styleFor(
-      scheme,
+      context.colorScheme,
       widget.type,
     );
 

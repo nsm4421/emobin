@@ -1,35 +1,15 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:emobin/core/constants/assets.dart';
-import 'package:emobin/router/app_router.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+part of 'splash_page.dart';
 
-@RoutePage()
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future<void>.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      context.router.replace(const AuthEntryRoute());
-    });
-  }
+class _SplashScreen extends StatelessWidget {
+  const _SplashScreen();
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    final assetPath = AppAssets.splash(brightness);
-
-    final gradientColors = brightness == Brightness.dark
-        ? const [Color(0xFF0B0D12), Color(0xFF151A23)]
-        : const [Color(0xFFF7F9FE), Color(0xFFE9EEF8)];
+    final assetPath = AppAssets.splash(context.theme.brightness);
+    final gradientColors = [
+      context.colorScheme.surface,
+      context.colorScheme.surfaceContainerHighest,
+    ];
 
     return Scaffold(
       body: DecoratedBox(
@@ -65,19 +45,17 @@ class _SplashScreenState extends State<SplashScreen> {
                       children: [
                         Text(
                           'Emobin',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w700),
+                          style: context.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 6),
                         Text(
                           'Move smart. Move light.',
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withAlpha(60),
-                              ),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: context.colorScheme.onSurface.withAlpha(60),
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],

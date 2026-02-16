@@ -1,7 +1,7 @@
 part of 'sign_in_page.dart';
 
 class _SignInScreen extends StatefulWidget {
-  const _SignInScreen({super.key});
+  const _SignInScreen();
 
   @override
   State<_SignInScreen> createState() => _SignInScreenState();
@@ -30,9 +30,9 @@ class _SignInScreenState extends State<_SignInScreen> {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
     context.read<SignInCubit>().submit(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
   }
 
   @override
@@ -50,6 +50,7 @@ class _SignInScreenState extends State<_SignInScreen> {
         );
 
         return Scaffold(
+          resizeToAvoidBottomInset: true,
           appBar: AppBar(title: const Text('Sign In')),
           body: SafeArea(
             child: Form(

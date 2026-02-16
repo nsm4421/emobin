@@ -20,7 +20,7 @@ class SignUpPage extends StatelessWidget {
       child: BlocListener<SignUpCubit, SignUpState>(
         listener: (context, state) {
           state.whenOrNull(
-            success: (_) => context.router.replaceAll([const HomeRoute()]),
+            success: (_) => context.router.replaceAll([const EntryRoute()]),
             failure: (failure) {
               ToastHelper.error(failure.message);
               Future.delayed(const Duration(seconds: 1), () {
