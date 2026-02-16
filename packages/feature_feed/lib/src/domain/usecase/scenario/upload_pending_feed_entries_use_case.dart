@@ -1,0 +1,13 @@
+import 'package:feature_feed/src/core/errors/feed_failure.dart';
+import 'package:feature_feed/src/domain/repository/feed_repository.dart';
+import 'package:fpdart/fpdart.dart';
+
+class SyncPendingLocalFeedEntriesToRemoteUseCase {
+  final FeedRepository _repository;
+
+  SyncPendingLocalFeedEntriesToRemoteUseCase(this._repository);
+
+  Future<Either<FeedFailure, int>> call() {
+    return _repository.syncPendingLocalEntriesToRemote();
+  }
+}
