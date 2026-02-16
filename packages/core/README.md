@@ -1,52 +1,47 @@
 # core
 
-`core`는 앱 전역에서 공통으로 사용하는 유틸리티, 에러 타입, 로깅, 확장 메서드, 공용 위젯을 제공하는 패키지입니다.
+`core`는 앱/기능 패키지 전반에서 공통으로 사용하는 타입, 로깅, 확장, UI 컴포넌트를 제공하는 기반 패키지입니다.
 
 ## 책임 범위
-- 안전 캐스팅, 디바운서, 공통 typedef 제공
-- 앱 공통 로깅(`AppLogger`) 제공
-- `String`, `Iterable`, `BuildContext` 확장 제공
-- 공통 에러/실패 타입 제공
-- 공통 UI 위젯 및 display bloc 제공
+- 공통 에러/실패 타입
+- 공통 로깅(`AppLogger`)
+- 공통 확장 메서드(`BuildContext`, `String`, `Iterable`)
+- 공통 위젯(`AppPrimaryButton`, `AppPasswordField` 등)
+- 공통 상태표현용 `DisplayBloc`
 
-## 디렉터리
-```text
-lib/
-  core.dart
-  src/
-    utils/
-    logging/
-    extensions/
-    errors/
-    bloc/display/
-    widgets/
-    value_objects/
-test/
-```
+## 아키텍처 위치
+- 특정 기능의 `data/domain/presentation`을 가지는 패키지가 아니라,
+  여러 마이크로 패키지가 공유하는 공통 레이어입니다.
 
-## 사용 예시
-```dart
-import 'package:core/core.dart';
+## 주요 파일과 역할
+- `lib/src/errors/*`: `AppException`, `Failure`
+- `lib/src/logging/logging.dart`: 로그 레벨/출력
+- `lib/src/extensions/build_context_extensions.dart`: theme/color/text 접근 단축
+- `lib/src/widgets/*`: 재사용 UI 위젯 세트
+- `lib/src/bloc/display/display_bloc.dart`: 로딩/데이터/에러 표현용 범용 bloc
 
-final asMap = castOrNull<Map<String, dynamic>>({'ok': true});
-AppLogger.log('hello', level: LogLevel.info);
+## Bloc/Cubit
+- `DisplayBloc`
+  - 공용 화면 상태(`loading/success/failure`) 표현에 사용
 
-final title = 'hello'.capitalize();
-final chunks = [1, 2, 3, 4].chunked(2);
-
-final maybeBlank = '   '.nullIfBlank;
-```
+## 테스트 코드
+- 현재 `test/` 없음
+- 권장 추가 범위:
+  - extension 유틸 함수 테스트
+  - display bloc 상태 전이 테스트
 
 ## 개발 명령어
 ```bash
 cd packages/core
-flutter test
+flutter analyze
 ```
 
 ## 연관 패키지
 - `app`
 - `feature_auth`
 - `feature_feed`
+- `feature_security`
 
 ## 상태
-- 운영 중이며 공통 타입/도구를 지속 확장하는 기반 패키지입니다.
+- 공통 기반 패키지로 운영 중
+- 기능 패키지 증가에 따라 공용 타입/컴포넌트 확장 예정

@@ -1,36 +1,46 @@
 # feature_security
 
-`feature_security`는 기기 로컬에 민감 값을 안전 저장하기 위한 최소 보안 저장소를 제공합니다.
+`feature_security`는 **로컬 앱 잠금 비밀번호** 저장/검증/삭제를 담당하는 기능 패키지입니다.
+원격 계정 인증(`feature_auth`)과 분리된, 디바이스 내부 보안 레이어입니다.
 
 ## 책임 범위
-- `FlutterSecureStorage` 기반 비밀번호 저장/조회/삭제 제공
-- 저장 여부 확인(`hasPassword`) 제공
-- 기본 저장 키(`local_password`) 상수 제공
+- 로컬 비밀번호 저장/검증/삭제/존재확인 유스케이스 제공
+- `SecurityBloc` 기반 잠금 상태(`locked` / `unlocked`) 관리
+- `SecurityDataSource` 추상화와 실패 타입 제공
 
-## 디렉터리
-```text
-lib/
-  feature_security.dart
-  src/
-    local_password_storage.dart
-test/
-  feature_security_test.dart
-```
+## Clean Architecture 구조
+- `data`
+  - `datasource/security_datasource.dart`: 로컬 보안 저장소 인터페이스
+  - `datasource/secure_storage_security_datasource.dart`: `flutter_secure_storage` 구현
+  - `repository_impl/security_repository_impl.dart`
+- `domain`
+  - `repository/security_repository.dart`
+  - `usecase/security_use_case.dart` + scenario usecase들
+- `presentation`
+  - `bloc/security/security_bloc.dart`: 보안 상태 전환 이벤트 처리
 
-## 사용 예시
-```dart
-import 'package:feature_security/feature_security.dart';
+## 주요 파일과 역할
+- `lib/src/presentation/bloc/security/security_bloc.dart`
+  - 시작 시 비밀번호 존재 확인
+  - 저장/검증/삭제 이벤트 처리
+- `lib/src/domain/usecase/security_use_case.dart`
+  - save/verify/delete/has usecase 집합
+- `lib/src/data/datasource/secure_storage_security_datasource.dart`
+  - 실제 기기 보안 저장소 접근
 
-final storage = LocalPasswordStorage();
+## Bloc/Cubit
+- `SecurityBloc`
+  - `started`, `savePasswordRequested`, `verifyPasswordRequested`, `deletePasswordRequested` 이벤트 처리
+  - `loading`, `locked`, `unlocked` 상태 발행
 
-await storage.savePassword('1234');
-final saved = await storage.readPassword();
-final exists = await storage.hasPassword();
+## 테스트 코드
+- `test/feature_security_test.dart`
+  - `SecureStorageSecurityDataSource` 테스트
+  - 저장/검증/예외(empty password) 시나리오 검증
 
-if (!exists || saved == null) {
-  // 비밀번호 미설정 상태 처리
-}
-```
+## feature_auth vs feature_security
+- `feature_auth`: Supabase 기반 **원격 계정 인증**
+- `feature_security`: Secure Storage 기반 **로컬 앱 잠금 인증**
 
 ## 개발 명령어
 ```bash
@@ -39,7 +49,9 @@ flutter test
 ```
 
 ## 연관 패키지
-- 현재 workspace 내부 직접 의존 패키지 없음
+- `core`
+- `app`
 
 ## 상태
-- 단일 책임(로컬 비밀번호 저장소)에 집중된 경량 패키지입니다.
+- 로컬 비밀번호 플로우 동작 중
+- 네트워크와 무관한 로컬 보안 기능 패키지

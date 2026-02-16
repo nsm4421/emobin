@@ -1,40 +1,42 @@
 # emobin
 
-Flutter 모노레포(Feature 패키지 구조)이며 Melos로 공통 의존성 버전과 작업 스크립트를 관리합니다.
+`emobin`은 Flutter 모노레포이며, `app`과 여러 기능/인프라 패키지를 Melos 워크스페이스로 관리합니다.
 
-## 구조
-- `app` (Flutter 앱)
-- `packages/feature_counter` (예시 Feature 패키지)
+## 워크스페이스 구성
+- `app`: 실제 Flutter 앱
+- `packages/core`: 공통 유틸/에러/위젯
+- `packages/feature_auth`: 인증 도메인
+- `packages/feature_feed`: 피드 도메인
+- `packages/feature_security`: 로컬 보안 저장소
+- `packages/infra_drift`: Drift 기반 로컬 인프라
+- `packages/infra_supabase`: Supabase 기반 원격 인프라
+- `packages/ui_theme`: 전역 테마
 
-## Melos 설정 위치
-- 루트 `pubspec.yaml`의 `melos:` 섹션
-- 공통 의존성 버전 관리 위치
-- `melos.command.bootstrap.dependencies`
-- `melos.command.bootstrap.dev_dependencies`
+## 빠른 시작
+```bash
+dart run melos get
+dart run melos bootstrap
+cd app && flutter run
+```
 
-## 사용법
-1. 워크스페이스 부트스트랩
-   - `dart run melos bootstrap`
-2. 앱 실행
-   - `cd app && flutter run`
+## 주요 명령어
+- 의존성 설치: `dart run melos get`
+- 워크스페이스 부트스트랩: `dart run melos bootstrap`
+- 정적 분석: `dart run melos analyze`
+- 테스트: `dart run melos test`
+- 포맷 적용: `dart run melos format`
+- 포맷 검사: `dart run melos format:check`
 
-## 공통 의존성 버전 관리
-1. 여러 패키지에서 공통으로 쓰는 모듈만 루트 `pubspec.yaml`의 `melos.command.bootstrap.*`에 추가/수정
-2. `dart run melos bootstrap` 실행
-3. 각 패키지 `pubspec.yaml`의 버전이 동기화됨
-
-## Melos 스크립트
-- `dart run melos get`
-- `dart run melos bootstrap:features`
-- `dart run melos clean`
-- `dart run melos analyze`
-- `dart run melos test`
-- `dart run melos format`
-- `dart run melos format:check`
-- `dart run melos codegen` (build_runner 일괄 실행)
+## 코드 생성
+```bash
+dart run melos codegen
+```
 
 ## 새 패키지 추가
-1. `app` 또는 `packages/*`에 패키지 생성
-2. 루트 `pubspec.yaml`의 `workspace:`에 경로 추가
-3. 새 패키지 `pubspec.yaml`에 `resolution: workspace` 추가
-4. `dart run melos bootstrap`
+1. `packages/<name>` 또는 `app` 하위에 패키지를 생성합니다.
+2. 루트 `pubspec.yaml`의 `workspace:`에 경로를 추가합니다.
+3. 새 패키지 `pubspec.yaml`에 `resolution: workspace`를 설정합니다.
+4. `dart run melos bootstrap`을 실행합니다.
+
+## 문서 규칙
+README 표준화 규칙은 `docs/plan.md`의 `README 표준화 규칙 (v1.0)` 섹션을 따릅니다.

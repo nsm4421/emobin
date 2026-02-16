@@ -13,3 +13,4 @@ export 'src/domain/entity/feed_profile.dart';
 export 'src/domain/usecase/feed_use_case.dart';
 export 'src/presentation/bloc/display_feed_list/display_feed_list_bloc.dart';
 export 'src/presentation/cubit/create_feed/create_feed_cubit.dart';
+export 'src/data/datasource/feed_local_datasource.dart';
