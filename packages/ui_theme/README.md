@@ -1,17 +1,27 @@
 # ui_theme
 
-`ui_theme`는 앱 전역에서 공통으로 사용하는 색상 팔레트와 `ThemeData`를 제공하는 패키지입니다.
+`ui_theme`는 앱 전역에서 사용하는 색상/타이포그래피/ThemeData를 제공하는 패키지입니다.
 
-## 구성
+## 책임 범위
+- 공통 팔레트(`AppPalette`) 제공
+- 라이트/다크 컬러 스킴(`AppColorSchemes`) 제공
+- 공통 텍스트 테마(`AppTextThemes`) 제공
+- Material 3 기반 테마(`AppTheme.light`, `AppTheme.dark`) 제공
 
-- 팔레트: `AppPalette` (차가운 블루-그레이 톤 기반)
-- 컬러 스킴: `AppColorSchemes` (light / dark)
-- 텍스트 테마: `AppTextThemes` (한국어에 맞춘 폰트 설정 포함)
-- 테마 데이터: `AppTheme` (Material 3 기준)
+## 디렉터리
+```text
+lib/
+  ui_theme.dart
+  src/
+    palette.dart
+    color_scheme.dart
+    text_theme.dart
+    theme_data.dart
+```
 
-## 사용 방법
-
+## 사용 예시
 ```dart
+import 'package:flutter/material.dart';
 import 'package:ui_theme/ui_theme.dart';
 
 MaterialApp(
@@ -21,19 +31,14 @@ MaterialApp(
 );
 ```
 
-## 폰트 설정
+## 개발 명령어
+```bash
+cd packages/ui_theme
+flutter test
+```
 
-텍스트 테마는 기본적으로 `Noto Sans KR`을 사용하며, 시스템 폰트로 다음 폴백을 지정해두었습니다.
+## 연관 패키지
+- `app`
 
-- `Apple SD Gothic Neo`
-- `Noto Sans CJK KR`
-- `Malgun Gothic`
-
-앱에서 폰트 파일을 직접 포함해 사용하고 싶다면,
-`pubspec.yaml`의 `fonts` 섹션에 등록한 뒤 `AppTextThemes`의 `fontFamily`를 변경하세요.
-
-## 커스텀 컬러 조정
-
-브랜드 톤을 바꾸고 싶다면 `AppPalette`의 `primary/secondary/tertiary` 및
-관련 `onPrimary`, `container` 계열 값을 수정하면 됩니다.
-
+## 상태
+- 디자인 토큰과 앱 기본 테마를 제공하는 안정 단계 패키지입니다.

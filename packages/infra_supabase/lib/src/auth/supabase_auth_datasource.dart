@@ -1,8 +1,11 @@
-import 'package:feature_auth/core/constants/auth_status.dart';
-import 'package:feature_auth/core/errors/auth_exception.dart';
-import 'package:feature_auth/data/datasource/auth_datasource.dart';
-import 'package:feature_auth/data/model/auth_user_model.dart';
-import 'package:feature_auth/data/model/profile_model.dart';
+import 'package:feature_auth/feature_auth.dart'
+    show
+        AuthDataSource,
+        AuthException,
+        AuthStatus,
+        AuthUserModel,
+        DataSourceAuthStreamPayload,
+        ProfileModel;
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
