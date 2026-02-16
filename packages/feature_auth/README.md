@@ -1,39 +1,67 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# feature_auth
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+`feature_auth`는 인증/회원 관련 도메인 로직과 상태 관리를 담당하는 패키지입니다.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
+## 책임 범위
+- `AuthRepository` 인터페이스와 인증 유스케이스 묶음(`AuthUseCase`) 제공
+- 인증 도메인 엔티티(`AuthUser`, `Profile`) 제공
+- 인증 상태 관리(`AuthBloc`, `SignInCubit`, `SignUpCubit`) 제공
+- DI 마이크로 패키지 초기화(`initFeatureAuthPackage`) 제공
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
+## 디렉터리
+```text
+lib/
+  feature_auth.dart
+  core/
+    constants/
+    errors/
+    di/
+  data/
+    datasource/
+    mapper/
+    model/
+    repository_impl/
+  domain/
+    entity/
+    repository/
+    usecase/
+  presentation/
+    bloc/
+    cubit/
+test/
+  domain/usecase/
 ```
 
-## Additional information
+## 사용 예시
+```dart
+import 'package:feature_auth/feature_auth.dart';
+import 'package:get_it/get_it.dart';
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+final authUseCase = GetIt.I<AuthUseCase>();
+
+final signIn = await authUseCase.signInWithEmail(
+  email: 'user@example.com',
+  password: 'pw123456',
+);
+
+await authUseCase.signOut();
+
+authUseCase.observeAuthState().listen((payload) {
+  // payload.status, payload.user
+});
+```
+
+## 개발 명령어
+```bash
+cd packages/feature_auth
+flutter test test/domain/usecase
+dart run build_runner build --delete-conflicting-outputs
+```
+
+## 연관 패키지
+- `core`
+- `infra_supabase` (AuthDataSource 구현 제공)
+
+## 상태
+- 도메인/유스케이스/상태관리 흐름은 사용 중입니다.
+- 데이터소스 구현체는 외부 인프라 패키지에서 주입받는 구조입니다.
