@@ -8,6 +8,8 @@ class DisplayFeedListState with _$DisplayFeedListState {
     this.status = DisplayFeedListStatus.initial,
     this.entries = const <FeedEntry>[],
     this.failure,
+    this.hasMore = false,
+    this.isLoadingMore = false,
   });
 
   @override
@@ -18,4 +20,10 @@ class DisplayFeedListState with _$DisplayFeedListState {
 
   @override
   final FeedFailure? failure;
+
+  @override
+  final bool hasMore;
+
+  @override
+  final bool isLoadingMore;
 }

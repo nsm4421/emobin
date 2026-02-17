@@ -1,7 +1,3 @@
-import 'dart:async';
-
-import 'package:feature_feed/src/core/errors/feed_error.dart';
-import 'package:feature_feed/src/core/errors/feed_exception.dart';
 import 'package:feature_feed/src/core/errors/feed_failure.dart';
 import 'package:feature_feed/src/domain/entity/feed_entry.dart';
 import 'package:feature_feed/src/domain/usecase/feed_use_case.dart';
@@ -29,46 +25,74 @@ void main() {
       await bloc.close();
     });
 
-    test('started 후 목록 조회 및 스트림 변경 반영', () async {
-      final initialEntries = <FeedEntry>[buildFeedEntry(id: 'entry_1')];
-      final updatedEntries = <FeedEntry>[
-        buildFeedEntry(id: 'entry_2'),
-        buildFeedEntry(id: 'entry_1'),
-      ];
-      final controller = StreamController<List<FeedEntry>>();
+    test('started 시 첫 페이지를 조회한다', () async {
+      final firstPage = List<FeedEntry>.generate(
+        20,
+        (index) => buildFeedEntry(id: 'entry_$index'),
+      );
 
       when(
-        () => repository.fetchLocalEntries(),
-      ).thenAnswer((_) async => Right(initialEntries));
-      when(
-        () => repository.watchLocalEntries(),
-      ).thenAnswer((_) => controller.stream);
+        () => repository.fetchLocalEntries(limit: 20, offset: 0),
+      ).thenAnswer((_) async => Right(firstPage));
 
       final emitted = <DisplayFeedListState>[];
       final subscription = bloc.stream.listen(emitted.add);
 
       bloc.add(const DisplayFeedListEvent.started());
       await Future<void>.delayed(Duration.zero);
-      controller.add(updatedEntries);
-      await Future<void>.delayed(Duration.zero);
 
       expect(bloc.state.status, DisplayFeedListStatus.success);
-      expect(bloc.state.entries, updatedEntries);
+      expect(bloc.state.entries, firstPage);
+      expect(bloc.state.hasMore, isTrue);
       expect(emitted.first.status, DisplayFeedListStatus.loading);
-      verify(() => repository.fetchLocalEntries()).called(1);
-      verify(() => repository.watchLocalEntries()).called(1);
+      verify(
+        () => repository.fetchLocalEntries(limit: 20, offset: 0),
+      ).called(1);
       verifyNoMoreInteractions(repository);
 
       await subscription.cancel();
-      await controller.close();
+    });
+
+    test('loadMoreRequested 시 다음 페이지를 이어붙인다', () async {
+      final firstPage = List<FeedEntry>.generate(
+        20,
+        (index) => buildFeedEntry(id: 'entry_$index'),
+      );
+      final secondPage = List<FeedEntry>.generate(
+        7,
+        (index) => buildFeedEntry(id: 'entry_${index + 20}'),
+      );
+
+      when(
+        () => repository.fetchLocalEntries(limit: 20, offset: 0),
+      ).thenAnswer((_) async => Right(firstPage));
+      when(
+        () => repository.fetchLocalEntries(limit: 20, offset: 20),
+      ).thenAnswer((_) async => Right(secondPage));
+
+      bloc.add(const DisplayFeedListEvent.started());
+      await Future<void>.delayed(Duration.zero);
+      bloc.add(const DisplayFeedListEvent.loadMoreRequested());
+      await Future<void>.delayed(Duration.zero);
+
+      expect(bloc.state.status, DisplayFeedListStatus.success);
+      expect(bloc.state.entries.length, 27);
+      expect(bloc.state.hasMore, isFalse);
+      verify(
+        () => repository.fetchLocalEntries(limit: 20, offset: 0),
+      ).called(1);
+      verify(
+        () => repository.fetchLocalEntries(limit: 20, offset: 20),
+      ).called(1);
+      verifyNoMoreInteractions(repository);
     });
 
     test('refreshRequested 실패 시 failure 상태로 전환', () async {
       const failure = FeedFailure.storageFailure();
 
-      when(() => repository.fetchLocalEntries()).thenAnswer((_) async {
-        return const Left(failure);
-      });
+      when(
+        () => repository.fetchLocalEntries(limit: 20, offset: 0),
+      ).thenAnswer((_) async => const Left(failure));
 
       final emitted = <DisplayFeedListState>[];
       final subscription = bloc.stream.listen(emitted.add);
@@ -76,42 +100,15 @@ void main() {
       bloc.add(const DisplayFeedListEvent.refreshRequested());
       await Future<void>.delayed(Duration.zero);
 
-      expect(emitted.first.status, DisplayFeedListStatus.loading);
       expect(bloc.state.status, DisplayFeedListStatus.failure);
       expect(bloc.state.failure?.code, failure.code);
-      verify(() => repository.fetchLocalEntries()).called(1);
+      expect(emitted.first.status, DisplayFeedListStatus.loading);
+      verify(
+        () => repository.fetchLocalEntries(limit: 20, offset: 0),
+      ).called(1);
       verifyNoMoreInteractions(repository);
 
       await subscription.cancel();
-    });
-
-    test('스트림 에러를 FeedFailure로 매핑한다', () async {
-      final controller = StreamController<List<FeedEntry>>();
-
-      when(
-        () => repository.fetchLocalEntries(),
-      ).thenAnswer((_) async => Right(<FeedEntry>[]));
-      when(
-        () => repository.watchLocalEntries(),
-      ).thenAnswer((_) => controller.stream);
-
-      final emitted = <DisplayFeedListState>[];
-      final subscription = bloc.stream.listen(emitted.add);
-
-      bloc.add(const DisplayFeedListEvent.started());
-      await Future<void>.delayed(Duration.zero);
-      controller.addError(const FeedException.storageFailure());
-      await Future<void>.delayed(Duration.zero);
-
-      expect(bloc.state.status, DisplayFeedListStatus.failure);
-      expect(bloc.state.failure?.error, FeedError.storageFailure);
-      expect(emitted.last.status, DisplayFeedListStatus.failure);
-      verify(() => repository.fetchLocalEntries()).called(1);
-      verify(() => repository.watchLocalEntries()).called(1);
-      verifyNoMoreInteractions(repository);
-
-      await subscription.cancel();
-      await controller.close();
     });
   });
 }

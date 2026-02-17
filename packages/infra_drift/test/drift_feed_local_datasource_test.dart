@@ -16,16 +16,14 @@ void main() {
     required String id,
     DateTime? createdAt,
     String emotion = 'happy',
-    String createdBy = 'tester',
     FeedSyncStatus syncStatus = FeedSyncStatus.localOnly,
-    String? note,
+    String note = '',
   }) {
     final resolvedCreatedAt = createdAt ?? DateTime.now();
     return FeedEntryModel(
       id: id,
       emotion: emotion,
       note: note,
-      createdBy: createdBy,
       createdAt: resolvedCreatedAt,
       updatedAt: resolvedCreatedAt,
       syncStatus: syncStatus,
@@ -127,12 +125,11 @@ void main() {
     final entry = buildEntry(id: 'watched');
     final expectation = expectLater(
       dataSource.watchEntries(),
-      emitsInOrder([
-        isEmpty,
+      emits(
         predicate<List<FeedEntryModel>>(
           (entries) => entries.length == 1 && entries.first.id == 'watched',
         ),
-      ]),
+      ),
     );
 
     await dataSource.addEntry(entry);

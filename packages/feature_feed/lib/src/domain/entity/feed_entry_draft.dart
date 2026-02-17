@@ -1,28 +1,34 @@
-import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'package:feature_feed/src/domain/entity/feed_profile.dart';
+part 'feed_entry_draft.freezed.dart';
 
-@immutable
-class FeedEntryDraft {
-  final String emotion;
-  final String? note;
+@freezed
+class FeedEntryDraft with _$FeedEntryDraft {
+  @override
+  final String? emotion;
+  @override
+  final String note;
+  @override
   final String? imageLocalPath;
+  @override
   final String? imageRemotePath;
+  @override
   final String? imageRemoteUrl;
-  final int? intensity;
+  @override
+  final int intensity;
+  @override
   final DateTime? createdAt;
-  final String createdBy;
-  final FeedProfile? profile;
+  @override
+  final bool isDraft;
 
-  const FeedEntryDraft({
-    required this.emotion,
-    this.note,
+  FeedEntryDraft({
+    this.emotion,
+    this.note = '',
     this.imageLocalPath,
     this.imageRemotePath,
     this.imageRemoteUrl,
-    this.intensity,
+    this.intensity = 0,
     this.createdAt,
-    required this.createdBy,
-    this.profile,
+    this.isDraft = false,
   });
 }

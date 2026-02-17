@@ -16,14 +16,26 @@ class DriftFeedLocalDataSource
   @override
   Stream<FeedStreamPayload> watchEntries() {
     final query = _database.select(_database.feedEntries)
-      ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)]);
+      ..orderBy([
+        (tbl) =>
+            OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc),
+      ]);
     return query.watch().map(mapRows);
   }
 
   @override
-  Future<List<FeedEntryModel>> fetchEntries() async {
+  Future<List<FeedEntryModel>> fetchEntries({
+    int? limit,
+    int offset = 0,
+  }) async {
     final query = _database.select(_database.feedEntries)
-      ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)]);
+      ..orderBy([
+        (tbl) =>
+            OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc),
+      ]);
+    if (limit != null) {
+      query.limit(limit, offset: offset);
+    }
     final rows = await query.get();
     return mapRows(rows);
   }
@@ -74,7 +86,10 @@ class DriftFeedLocalDataSource
     final values = statuses.map((status) => status.value).toList();
     final query = _database.select(_database.feedEntries)
       ..where((tbl) => tbl.syncStatus.isIn(values))
-      ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)]);
+      ..orderBy([
+        (tbl) =>
+            OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc),
+      ]);
     final rows = await query.get();
     return mapRows(rows);
   }
@@ -82,7 +97,7 @@ class DriftFeedLocalDataSource
   @override
   Future<void> upsertEntries(List<FeedEntryModel> entries) async {
     if (entries.isEmpty) return;
-    final companions = entries.map(toCompanion).toList();
+    final companions = entries.map(toCompanion).toList(growable: false);
     await _database.batch((batch) {
       batch.insertAll(
         _database.feedEntries,

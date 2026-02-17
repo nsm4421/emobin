@@ -6,27 +6,19 @@ class FeedEntries extends Table {
 
   TextColumn get serverId => text().nullable()();
 
-  TextColumn get emotion => text()();
+  TextColumn get emotion => text().nullable()();
 
   TextColumn get note => text().nullable()();
 
   IntColumn get intensity => integer().nullable()();
 
-  TextColumn get createdBy => text()();
-
-  TextColumn get profileId => text().nullable()();
-
-  TextColumn get profileUsername => text().nullable()();
-
-  TextColumn get profileAvatarUrl => text().nullable()();
-
   DateTimeColumn get createdAt => dateTime()();
 
   DateTimeColumn get updatedAt => dateTime().nullable()();
 
-  DateTimeColumn get resolvedAt => dateTime().nullable()();
-
   DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  BoolColumn get isDraft => boolean().withDefault(const Constant(false))();
 
   TextColumn get syncStatus => text()();
 

@@ -1,4 +1,5 @@
-import 'package:feature_feed/src/core/errors/feed_failure.dart';
+import 'package:feature_feed/src/core/errors/feed_error.dart';
+import 'package:feature_feed/src/domain/entity/feed_entry_draft.dart';
 import 'package:feature_feed/src/domain/usecase/feed_use_case.dart';
 import 'package:feature_feed/src/presentation/cubit/create_feed/create_feed_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,6 +15,10 @@ void main() {
     late FeedUseCase feedUseCase;
     late CreateFeedCubit cubit;
 
+    setUpAll(() {
+      registerFallbackValue(FeedEntryDraft(emotion: 'fallback'));
+    });
+
     setUp(() {
       repository = MockFeedRepository();
       feedUseCase = FeedUseCase(repository);
@@ -24,70 +29,125 @@ void main() {
       await cubit.close();
     });
 
-    test('submit 성공 시 success 상태와 생성 엔트리를 보관한다', () async {
-      final draft = buildFeedEntryDraft();
+    test('createEntry가 성공하면 created 상태를 방출한다', () async {
       final createdEntry = buildFeedEntry(id: 'entry_created');
 
       when(
-        () => repository.createLocalEntry(draft),
+        () => repository.createLocalEntry(any()),
       ).thenAnswer((_) async => Right(createdEntry));
+
+      cubit.emit(
+        CreateFeedState.editing((emotion: 'joy', intensity: 3, note: 'note')),
+      );
 
       final emitted = <CreateFeedState>[];
       final subscription = cubit.stream.listen(emitted.add);
 
-      await cubit.submit(draft);
+      await cubit.saveEntry();
       await Future<void>.delayed(Duration.zero);
 
-      expect(emitted.first.status, CreateFeedStatus.submitting);
-      expect(cubit.state.status, CreateFeedStatus.success);
-      expect(cubit.state.createdEntry, createdEntry);
-      expect(cubit.state.failure, isNull);
-      verify(() => repository.createLocalEntry(draft)).called(1);
+      expect(emitted.first.whenOrNull(loading: (_) => true), isTrue);
+      expect(
+        emitted.last.maybeWhen(
+          created: (isDraft, created) =>
+              !isDraft && identical(created, createdEntry),
+          orElse: () => false,
+        ),
+        isTrue,
+      );
+      verify(() => repository.createLocalEntry(any())).called(1);
       verifyNoMoreInteractions(repository);
 
       await subscription.cancel();
     });
 
-    test('submit 실패 시 failure 상태와 FeedFailure를 보관한다', () async {
-      final draft = buildFeedEntryDraft();
-      const failure = FeedFailure.storageFailure();
+    test('createEntry는 emotion이 없어도 성공한다', () async {
+      final createdEntry = buildFeedEntry(id: 'entry_without_emotion');
 
       when(
-        () => repository.createLocalEntry(draft),
-      ).thenAnswer((_) async => const Left(failure));
+        () => repository.createLocalEntry(any()),
+      ).thenAnswer((_) async => Right(createdEntry));
+
+      cubit.emit(
+        CreateFeedState.editing((emotion: null, intensity: 0, note: 'note')),
+      );
 
       final emitted = <CreateFeedState>[];
       final subscription = cubit.stream.listen(emitted.add);
 
-      await cubit.submit(draft);
+      await cubit.saveEntry();
       await Future<void>.delayed(Duration.zero);
 
-      expect(emitted.first.status, CreateFeedStatus.submitting);
-      expect(cubit.state.status, CreateFeedStatus.failure);
-      expect(cubit.state.createdEntry, isNull);
-      expect(cubit.state.failure?.code, failure.code);
-      verify(() => repository.createLocalEntry(draft)).called(1);
+      expect(emitted.first.whenOrNull(loading: (_) => true), isTrue);
+      expect(
+        emitted.last.maybeWhen(
+          created: (isDraft, created) =>
+              !isDraft && identical(created, createdEntry),
+          orElse: () => false,
+        ),
+        isTrue,
+      );
+      verify(() => repository.createLocalEntry(any())).called(1);
       verifyNoMoreInteractions(repository);
 
       await subscription.cancel();
     });
 
-    test('reset 호출 시 initial 상태로 초기화한다', () async {
-      final draft = buildFeedEntryDraft();
-      final createdEntry = buildFeedEntry(id: 'entry_created');
+    test('createEntry는 note가 비어있으면 실패한다', () async {
+      cubit.emit(
+        CreateFeedState.editing((emotion: null, intensity: 0, note: '')),
+      );
+
+      final emitted = <CreateFeedState>[];
+      final subscription = cubit.stream.listen(emitted.add);
+
+      await cubit.saveEntry();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(
+        emitted.last.maybeWhen(
+          editing: (_, failure) => failure?.error == FeedError.invalidEntry,
+          orElse: () => false,
+        ),
+        isTrue,
+      );
+      verifyNever(() => repository.createLocalEntry(any()));
+
+      await subscription.cancel();
+    });
+
+    test('createDraft가 성공하면 draft created 상태를 방출한다', () async {
+      final createdDraftEntry = buildFeedEntry(
+        id: 'draft_created',
+        isDraft: true,
+      );
 
       when(
-        () => repository.createLocalEntry(draft),
-      ).thenAnswer((_) async => Right(createdEntry));
+        () => repository.createLocalEntry(any()),
+      ).thenAnswer((_) async => Right(createdDraftEntry));
 
-      await cubit.submit(draft);
-      expect(cubit.state.status, CreateFeedStatus.success);
+      cubit.emit(
+        CreateFeedState.editing((emotion: null, intensity: 0, note: 'temp')),
+      );
 
-      cubit.reset();
+      final emitted = <CreateFeedState>[];
+      final subscription = cubit.stream.listen(emitted.add);
 
-      expect(cubit.state, const CreateFeedState());
-      verify(() => repository.createLocalEntry(draft)).called(1);
+      await cubit.saveDraft();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(emitted.first.whenOrNull(loading: (_) => true), isTrue);
+      expect(
+        emitted.last.maybeWhen(
+          created: (isDraft, _) => isDraft,
+          orElse: () => false,
+        ),
+        isTrue,
+      );
+      verify(() => repository.createLocalEntry(any())).called(1);
       verifyNoMoreInteractions(repository);
+
+      await subscription.cancel();
     });
   });
 }

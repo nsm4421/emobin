@@ -8,7 +8,13 @@ class FetchLocalFeedEntriesUseCase {
 
   FetchLocalFeedEntriesUseCase(this._repository);
 
-  Future<Either<FeedFailure, List<FeedEntry>>> call() {
-    return _repository.fetchLocalEntries();
+  Future<Either<FeedFailure, List<FeedEntry>>> call({
+    int? limit,
+    int offset = 0,
+  }) {
+    if (limit == null && offset == 0) {
+      return _repository.fetchLocalEntries();
+    }
+    return _repository.fetchLocalEntries(limit: limit, offset: offset);
   }
 }

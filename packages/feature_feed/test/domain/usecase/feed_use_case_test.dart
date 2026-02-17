@@ -1,7 +1,7 @@
 import 'package:feature_feed/src/core/errors/feed_failure.dart';
 import 'package:feature_feed/src/domain/entity/feed_entry.dart';
 import 'package:feature_feed/src/domain/usecase/feed_use_case.dart';
-import 'package:feature_feed/src/domain/usecase/scenario/add_feed_entry_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/create_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/delete_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/observe_feed_use_case.dart';

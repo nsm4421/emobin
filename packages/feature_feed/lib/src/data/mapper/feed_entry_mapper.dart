@@ -1,6 +1,5 @@
 import 'package:feature_feed/src/core/constants/feed_sync_status.dart';
 import 'package:feature_feed/src/data/model/feed_entry_model.dart';
-import 'package:feature_feed/src/data/mapper/feed_profile_mapper.dart';
 import 'package:feature_feed/src/domain/entity/feed_entry.dart';
 import 'package:feature_feed/src/domain/entity/feed_entry_draft.dart';
 
@@ -15,12 +14,10 @@ extension FeedEntryModelX on FeedEntryModel {
       imageRemotePath: imageRemotePath,
       imageRemoteUrl: imageRemoteUrl,
       intensity: intensity,
-      createdBy: createdBy,
-      profile: profile?.toEntity(),
       createdAt: createdAt,
       updatedAt: updatedAt,
-      resolvedAt: resolvedAt,
       deletedAt: deletedAt,
+      isDraft: isDraft,
       syncStatus: syncStatus,
       lastSyncedAt: lastSyncedAt,
     );
@@ -38,12 +35,10 @@ extension FeedEntryX on FeedEntry {
       imageRemotePath: imageRemotePath,
       imageRemoteUrl: imageRemoteUrl,
       intensity: intensity,
-      createdBy: createdBy,
-      profile: profile?.toModel(),
       createdAt: createdAt,
       updatedAt: updatedAt,
-      resolvedAt: resolvedAt,
       deletedAt: deletedAt,
+      isDraft: isDraft,
       syncStatus: syncStatus,
       lastSyncedAt: lastSyncedAt,
     );
@@ -66,10 +61,9 @@ extension FeedEntryDraftX on FeedEntryDraft {
       imageRemotePath: imageRemotePath,
       imageRemoteUrl: imageRemoteUrl,
       intensity: intensity,
-      createdBy: createdBy,
-      profile: profile?.toModel(),
       createdAt: resolvedCreatedAt,
       updatedAt: resolvedCreatedAt,
+      isDraft: isDraft,
       syncStatus: syncStatus,
     );
   }

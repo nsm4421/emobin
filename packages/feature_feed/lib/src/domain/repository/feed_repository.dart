@@ -6,7 +6,10 @@ import 'package:fpdart/fpdart.dart';
 abstract class FeedRepository {
   Stream<List<FeedEntry>> watchLocalEntries();
 
-  Future<Either<FeedFailure, List<FeedEntry>>> fetchLocalEntries();
+  Future<Either<FeedFailure, List<FeedEntry>>> fetchLocalEntries({
+    int? limit,
+    int offset = 0,
+  });
 
   Future<Either<FeedFailure, FeedEntry>> createLocalEntry(FeedEntryDraft draft);
 

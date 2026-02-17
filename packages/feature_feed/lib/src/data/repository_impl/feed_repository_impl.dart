@@ -30,9 +30,15 @@ class FeedRepositoryImpl
   }
 
   @override
-  Future<Either<FeedFailure, List<FeedEntry>>> fetchLocalEntries() async {
+  Future<Either<FeedFailure, List<FeedEntry>>> fetchLocalEntries({
+    int? limit,
+    int offset = 0,
+  }) async {
     try {
-      final entries = await _localDataSource.fetchEntries();
+      final entries = await _localDataSource.fetchEntries(
+        limit: limit,
+        offset: offset,
+      );
       final entities = entries.map((entry) => entry.toEntity()).toList();
       return Right(entities);
     } catch (error, stackTrace) {
@@ -46,10 +52,10 @@ class FeedRepositoryImpl
   ) async {
     try {
       final id = nextId();
-      final model = draft.toModel(
-        id: id,
-        syncStatus: FeedSyncStatus.pendingUpload,
-      );
+      final initialSyncStatus = draft.isDraft
+          ? FeedSyncStatus.localOnly
+          : FeedSyncStatus.pendingUpload;
+      final model = draft.toModel(id: id, syncStatus: initialSyncStatus);
       final stored = await _localDataSource.addEntry(model);
       return Right(stored.toEntity());
     } catch (error, stackTrace) {

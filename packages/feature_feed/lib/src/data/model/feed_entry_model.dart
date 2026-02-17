@@ -1,95 +1,55 @@
-import 'package:flutter/foundation.dart';
-
 import 'package:feature_feed/src/core/constants/feed_sync_status.dart';
-import 'package:feature_feed/src/data/model/feed_profile_model.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-@immutable
-class FeedEntryModel {
+part 'feed_entry_model.freezed.dart';
+
+@freezed
+class FeedEntryModel with _$FeedEntryModel {
+  @override
   final String id;
+  @override
   final String? serverId;
-  final String emotion;
-  final String? note;
+  @override
+  final String? emotion;
+  @override
+  final String note;
+  @override
   final String? imageLocalPath;
+  @override
   final String? imageRemotePath;
+  @override
   final String? imageRemoteUrl;
-  final int? intensity;
-  final String createdBy;
-  final FeedProfileModel? profile;
+  @override
+  final int intensity;
+  @override
   final DateTime createdAt;
+  @override
   final DateTime? updatedAt;
-  final DateTime? resolvedAt;
+  @override
   final DateTime? deletedAt;
+  @override
+  final bool isDraft;
+  @override
   final FeedSyncStatus syncStatus;
+  @override
   final DateTime? lastSyncedAt;
 
-  const FeedEntryModel({
+  FeedEntryModel({
     required this.id,
     this.serverId,
-    required this.emotion,
-    this.note,
+    this.emotion,
+    this.note = '',
     this.imageLocalPath,
     this.imageRemotePath,
     this.imageRemoteUrl,
-    this.intensity,
-    required this.createdBy,
-    this.profile,
+    this.intensity = 0,
     required this.createdAt,
     this.updatedAt,
-    this.resolvedAt,
     this.deletedAt,
+    this.isDraft = false,
     this.syncStatus = FeedSyncStatus.localOnly,
     this.lastSyncedAt,
   });
-
-  static const Object _unset = Object();
-
-  FeedEntryModel copyWith({
-    String? id,
-    Object? serverId = _unset,
-    String? emotion,
-    Object? note = _unset,
-    Object? imageLocalPath = _unset,
-    Object? imageRemotePath = _unset,
-    Object? imageRemoteUrl = _unset,
-    Object? intensity = _unset,
-    String? createdBy,
-    Object? profile = _unset,
-    DateTime? createdAt,
-    Object? updatedAt = _unset,
-    Object? resolvedAt = _unset,
-    Object? deletedAt = _unset,
-    FeedSyncStatus? syncStatus,
-    Object? lastSyncedAt = _unset,
-  }) {
-    return FeedEntryModel(
-      id: id ?? this.id,
-      serverId: serverId == _unset ? this.serverId : serverId as String?,
-      emotion: emotion ?? this.emotion,
-      note: note == _unset ? this.note : note as String?,
-      imageLocalPath: imageLocalPath == _unset
-          ? this.imageLocalPath
-          : imageLocalPath as String?,
-      imageRemotePath: imageRemotePath == _unset
-          ? this.imageRemotePath
-          : imageRemotePath as String?,
-      imageRemoteUrl: imageRemoteUrl == _unset
-          ? this.imageRemoteUrl
-          : imageRemoteUrl as String?,
-      intensity: intensity == _unset ? this.intensity : intensity as int?,
-      createdBy: createdBy ?? this.createdBy,
-      profile: profile == _unset ? this.profile : profile as FeedProfileModel?,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt == _unset ? this.updatedAt : updatedAt as DateTime?,
-      resolvedAt: resolvedAt == _unset
-          ? this.resolvedAt
-          : resolvedAt as DateTime?,
-      deletedAt: deletedAt == _unset ? this.deletedAt : deletedAt as DateTime?,
-      syncStatus: syncStatus ?? this.syncStatus,
-      lastSyncedAt: lastSyncedAt == _unset
-          ? this.lastSyncedAt
-          : lastSyncedAt as DateTime?,
-    );
-  }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -101,23 +61,16 @@ class FeedEntryModel {
       'image_remote_path': imageRemotePath,
       'image_remote_url': imageRemoteUrl,
       'intensity': intensity,
-      'created_by': createdBy,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
-      'resolved_at': resolvedAt?.toIso8601String(),
       'deleted_at': deletedAt?.toIso8601String(),
+      'is_draft': isDraft,
       'sync_status': syncStatus.value,
       'last_synced_at': lastSyncedAt?.toIso8601String(),
     };
   }
 
   factory FeedEntryModel.fromMap(Map<String, dynamic> map) {
-    final profilePayload = map['profile'] ?? map['profiles'];
-    FeedProfileModel? profile;
-    if (profilePayload is Map<String, dynamic>) {
-      profile = FeedProfileModel.fromMap(profilePayload);
-    }
-
     DateTime parseRequiredDate(dynamic value) {
       if (value is DateTime) return value;
       return DateTime.parse(value as String);
@@ -131,18 +84,28 @@ class FeedEntryModel {
       return DateTime.tryParse(raw);
     }
 
+    bool parseBool(dynamic value, {required bool fallback}) {
+      if (value == null) return fallback;
+      if (value is bool) return value;
+      if (value is num) return value != 0;
+      final raw = value.toString().trim().toLowerCase();
+      if (raw == '1' || raw == 'true') return true;
+      if (raw == '0' || raw == 'false') return false;
+      return fallback;
+    }
+
     final createdAtValue = map['created_at'] ?? map['createdAt'];
     final updatedAtValue = map['updated_at'] ?? map['updatedAt'];
-    final resolvedAtValue = map['resolved_at'] ?? map['resolvedAt'];
     final deletedAtValue = map['deleted_at'] ?? map['deletedAt'];
+    final isDraftValue = map['is_draft'] ?? map['isDraft'];
     final lastSyncedAtValue = map['last_synced_at'] ?? map['lastSyncedAt'];
     final syncStatusValue = map['sync_status'] ?? map['syncStatus'];
 
     return FeedEntryModel(
       id: map['id'] as String,
       serverId: map['server_id'] as String? ?? map['serverId'] as String?,
-      emotion: map['emotion'] as String? ?? '',
-      note: map['note'] as String?,
+      emotion: map['emotion'] as String?,
+      note: map['note'] as String? ?? '',
       imageLocalPath:
           map['image_local_path'] as String? ??
           map['imageLocalPath'] as String?,
@@ -152,60 +115,15 @@ class FeedEntryModel {
       imageRemoteUrl:
           map['image_remote_url'] as String? ??
           map['imageRemoteUrl'] as String?,
-      intensity: map['intensity'] as int?,
-      createdBy:
-          map['created_by'] as String? ?? map['createdBy'] as String? ?? '',
-      profile: profile,
+      intensity: map['intensity'] as int? ?? 0,
       createdAt: parseRequiredDate(createdAtValue),
       updatedAt: parseOptionalDate(updatedAtValue),
-      resolvedAt: parseOptionalDate(resolvedAtValue),
       deletedAt: parseOptionalDate(deletedAtValue),
+      isDraft: parseBool(isDraftValue, fallback: false),
       syncStatus: syncStatusValue is FeedSyncStatus
           ? syncStatusValue
           : FeedSyncStatus.fromString(syncStatusValue as String?),
       lastSyncedAt: parseOptionalDate(lastSyncedAtValue),
     );
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is FeedEntryModel &&
-        other.id == id &&
-        other.serverId == serverId &&
-        other.emotion == emotion &&
-        other.note == note &&
-        other.imageLocalPath == imageLocalPath &&
-        other.imageRemotePath == imageRemotePath &&
-        other.imageRemoteUrl == imageRemoteUrl &&
-        other.intensity == intensity &&
-        other.createdBy == createdBy &&
-        other.profile == profile &&
-        other.createdAt == createdAt &&
-        other.updatedAt == updatedAt &&
-        other.resolvedAt == resolvedAt &&
-        other.deletedAt == deletedAt &&
-        other.syncStatus == syncStatus &&
-        other.lastSyncedAt == lastSyncedAt;
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    serverId,
-    emotion,
-    note,
-    imageLocalPath,
-    imageRemotePath,
-    imageRemoteUrl,
-    intensity,
-    createdBy,
-    profile,
-    createdAt,
-    updatedAt,
-    resolvedAt,
-    deletedAt,
-    syncStatus,
-    lastSyncedAt,
-  );
 }

@@ -15,4 +15,6 @@ class DisplayFeedListEvent with _$DisplayFeedListEvent {
     Object error,
     StackTrace stackTrace,
   ) = _StreamErrorOccurred;
+
+  const factory DisplayFeedListEvent.loadMoreRequested() = _LoadMoreRequested;
 }

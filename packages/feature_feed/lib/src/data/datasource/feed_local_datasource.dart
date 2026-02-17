@@ -5,7 +5,7 @@ import 'package:feature_feed/src/data/model/feed_entry_model.dart';
 abstract class FeedLocalDataSource {
   Stream<FeedStreamPayload> watchEntries();
 
-  Future<List<FeedEntryModel>> fetchEntries();
+  Future<List<FeedEntryModel>> fetchEntries({int? limit, int offset = 0});
 
   Future<FeedEntryModel?> fetchEntry(String id);
 
