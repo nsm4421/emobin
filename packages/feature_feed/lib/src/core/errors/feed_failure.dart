@@ -7,16 +7,11 @@ class FeedFailure extends Failure {
 
   const FeedFailure._(
     this.error, {
-    required String message,
-    required String code,
-    Object? cause,
-    StackTrace? stackTrace,
-  }) : super(
-         message: message,
-         code: code,
-         cause: cause,
-         stackTrace: stackTrace,
-       );
+    required super.message,
+    required super.code,
+    super.cause,
+    super.stackTrace,
+  });
 
   const FeedFailure.invalidEntry({Object? cause, StackTrace? stackTrace})
     : this._(

@@ -1,4 +1,3 @@
-import 'package:feature_auth/src/domain/entity/profile.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'profile_model.freezed.dart';

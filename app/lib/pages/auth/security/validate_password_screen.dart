@@ -37,9 +37,12 @@ class _ValidatePasswordScreenState extends State<ValidatePasswordScreen> {
 
   String? _validatePassword(String? value) {
     final input = (value ?? '').trim();
-    if (input.isEmpty) return 'Please enter a password.';
-    if (input.length < _minPasswordLength)
+    if (input.isEmpty) {
+      return 'Please enter a password.';
+    }
+    if (input.length < _minPasswordLength) {
       return 'Use at least $_minPasswordLength characters.';
+    }
     return null;
   }
 

@@ -1,5 +1,3 @@
-library feature_auth;
-
 export 'src/core/di/di.module.dart';
 export 'src/core/constants/auth_status.dart';
 export 'src/core/errors/auth_error.dart';

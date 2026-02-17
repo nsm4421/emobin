@@ -118,12 +118,12 @@ class FeedEntryModel {
       profile = FeedProfileModel.fromMap(profilePayload);
     }
 
-    DateTime _parseRequiredDate(dynamic value) {
+    DateTime parseRequiredDate(dynamic value) {
       if (value is DateTime) return value;
       return DateTime.parse(value as String);
     }
 
-    DateTime? _parseOptionalDate(dynamic value) {
+    DateTime? parseOptionalDate(dynamic value) {
       if (value == null) return null;
       if (value is DateTime) return value;
       final raw = value as String;
@@ -156,14 +156,14 @@ class FeedEntryModel {
       createdBy:
           map['created_by'] as String? ?? map['createdBy'] as String? ?? '',
       profile: profile,
-      createdAt: _parseRequiredDate(createdAtValue),
-      updatedAt: _parseOptionalDate(updatedAtValue),
-      resolvedAt: _parseOptionalDate(resolvedAtValue),
-      deletedAt: _parseOptionalDate(deletedAtValue),
+      createdAt: parseRequiredDate(createdAtValue),
+      updatedAt: parseOptionalDate(updatedAtValue),
+      resolvedAt: parseOptionalDate(resolvedAtValue),
+      deletedAt: parseOptionalDate(deletedAtValue),
       syncStatus: syncStatusValue is FeedSyncStatus
           ? syncStatusValue
           : FeedSyncStatus.fromString(syncStatusValue as String?),
-      lastSyncedAt: _parseOptionalDate(lastSyncedAtValue),
+      lastSyncedAt: parseOptionalDate(lastSyncedAtValue),
     );
   }
 

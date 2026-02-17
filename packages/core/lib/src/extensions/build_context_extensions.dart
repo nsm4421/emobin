@@ -25,5 +25,5 @@ extension BuildContextX on BuildContext {
   Color get tertiaryColor => colorScheme.tertiary;
   Color get onTertiaryColor => colorScheme.onTertiary;
   Color get surfaceColor => colorScheme.surface;
-  Color get backgroundColor => colorScheme.background;
+  Color get backgroundColor => colorScheme.surface;
 }

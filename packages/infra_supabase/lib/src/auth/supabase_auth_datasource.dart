@@ -134,6 +134,7 @@ class SupabaseAuthDataSource
     );
   }
 
+  @override
   AuthException _mapPostgrestException(
     sb.PostgrestException error,
     StackTrace? stackTrace,

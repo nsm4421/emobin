@@ -19,7 +19,7 @@ typedef DisplayFetchResult<T extends BaseEntity, C> = ({
 
 abstract class DisplayBloc<T extends BaseEntity, C>
     extends Bloc<DisplayEvent, DisplayState<T, C>> {
-  DisplayBloc() : super(DisplayState()) {}
+  DisplayBloc() : super(DisplayState());
 
   @protected
   TaskEither<Failure, DisplayFetchResult<T, C>> fetch({C? cursor});

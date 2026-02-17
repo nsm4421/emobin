@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:feature_feed/src/core/constants/feed_sync_status.dart';
-import 'package:feature_feed/src/data/model/feed_entry_model.dart';
-import 'package:feature_feed/src/data/model/feed_profile_model.dart';
+import 'package:feature_feed/feature_feed.dart'
+    show FeedEntryModel, FeedProfileModel, FeedSyncStatus;
 
 import '../core/database/drift_database.dart';
 

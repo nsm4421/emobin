@@ -1,5 +1,3 @@
-library core_widgets;
-
 export 'app_buttons.dart';
 export 'app_expandable_text.dart';
 export 'app_form_header.dart';

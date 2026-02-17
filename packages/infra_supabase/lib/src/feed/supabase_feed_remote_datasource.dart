@@ -9,8 +9,13 @@ class SupabaseFeedRemoteDataSource implements FeedRemoteDataSource {
 
   final sb.SupabaseClient _client;
 
+  void _ensureClientReady() {
+    _client.auth;
+  }
+
   @override
   Future<List<FeedEntryModel>> fetchEntries({DateTime? since}) {
+    _ensureClientReady();
     throw UnimplementedError(
       'SupabaseFeedRemoteDataSource is not implemented yet.',
     );
@@ -18,6 +23,7 @@ class SupabaseFeedRemoteDataSource implements FeedRemoteDataSource {
 
   @override
   Future<FeedEntryModel> upsertEntry(FeedEntryModel entry) {
+    _ensureClientReady();
     throw UnimplementedError(
       'SupabaseFeedRemoteDataSource is not implemented yet.',
     );
