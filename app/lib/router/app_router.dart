@@ -7,7 +7,11 @@ import 'package:emobin/pages/entry/entry_screen.dart';
 import 'package:emobin/pages/entry/feed/feed_entry_page.dart';
 import 'package:emobin/pages/entry/home/home_screen.dart';
 import 'package:emobin/pages/entry/setting/setting_entry_screen.dart';
+import 'package:emobin/pages/feed/create/create_feed_page.dart';
+import 'package:emobin/pages/feed/emotion/edit_emotion_page.dart';
 import 'package:emobin/pages/splash/splash_page.dart';
+import 'package:feature_setting/feature_setting.dart';
+import 'package:flutter/material.dart' show Key;
 
 part 'app_router.gr.dart';
 
@@ -23,6 +27,7 @@ class AppRouter extends RootStackRouter {
     ..._authRoutes,
     _homeRoute,
     _securityRoute,
+    ..._feedRoutes,
   ];
 
   Iterable<AutoRoute> get _authRoutes => [
@@ -51,4 +56,19 @@ class AppRouter extends RootStackRouter {
   );
 
   AutoRoute get _securityRoute => AutoRoute(page: ValidatePasswordRoute.page);
+
+  Iterable<AutoRoute> get _feedRoutes => [
+    CustomRoute(
+      page: CreateFeedRoute.page,
+      transitionsBuilder: TransitionsBuilders.slideRight,
+      duration: _transitionDuration,
+      reverseDuration: _transitionDuration,
+    ),
+    CustomRoute(
+      page: EditEmotionRoute.page,
+      transitionsBuilder: TransitionsBuilders.slideRight,
+      duration: _transitionDuration,
+      reverseDuration: _transitionDuration,
+    ),
+  ];
 }

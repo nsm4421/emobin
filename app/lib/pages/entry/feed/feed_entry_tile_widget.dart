@@ -7,8 +7,11 @@ class _FeedEntryTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final note = entry.note?.trim();
-    final username = entry.profile?.username ?? entry.createdBy;
+    final note = entry.note.trim();
+    final emotion = entry.emotion?.trim();
+    final emotionLabel = emotion == null || emotion.isEmpty
+        ? 'Unknown'
+        : emotion;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -28,7 +31,7 @@ class _FeedEntryTileWidget extends StatelessWidget {
                 radius: 20,
                 backgroundColor: context.colorScheme.primary.withAlpha(24),
                 child: Text(
-                  _emotionShortLabel(entry.emotion),
+                  _emotionShortLabel(emotionLabel),
                   style: context.textTheme.labelLarge?.copyWith(
                     color: context.colorScheme.primary,
                     fontWeight: FontWeight.w700,
@@ -41,17 +44,10 @@ class _FeedEntryTileWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      entry.emotion,
+                      emotionLabel,
                       style: context.textTheme.titleSmall?.copyWith(
                         color: context.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      username,
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: context.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -60,7 +56,7 @@ class _FeedEntryTileWidget extends StatelessWidget {
               _FeedSyncStatusChipWidget(status: entry.syncStatus),
             ],
           ),
-          if (note != null && note.isNotEmpty) ...[
+          if (note.isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
               note,
@@ -87,53 +83,6 @@ class _FeedEntryTileWidget extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _FeedSyncStatusChipWidget extends StatelessWidget {
-  const _FeedSyncStatusChipWidget({required this.status});
-
-  final FeedSyncStatus status;
-
-  @override
-  Widget build(BuildContext context) {
-    final (backgroundColor, foregroundColor, label) = switch (status) {
-      FeedSyncStatus.synced => (
-        context.colorScheme.primary.withAlpha(20),
-        context.colorScheme.primary,
-        'Synced',
-      ),
-      FeedSyncStatus.pendingUpload => (
-        context.colorScheme.tertiary.withAlpha(18),
-        context.colorScheme.tertiary,
-        'Pending',
-      ),
-      FeedSyncStatus.conflict => (
-        context.colorScheme.errorContainer,
-        context.colorScheme.onErrorContainer,
-        'Conflict',
-      ),
-      FeedSyncStatus.localOnly => (
-        context.colorScheme.surfaceContainerHighest,
-        context.colorScheme.onSurfaceVariant,
-        'Local',
-      ),
-    };
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(99),
-      ),
-      child: Text(
-        label,
-        style: context.textTheme.labelSmall?.copyWith(
-          color: foregroundColor,
-          fontWeight: FontWeight.w600,
-        ),
       ),
     );
   }

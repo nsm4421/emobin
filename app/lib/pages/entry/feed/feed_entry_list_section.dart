@@ -1,7 +1,41 @@
 part of 'feed_entry_page.dart';
 
-class _FeedEntryListSection extends StatelessWidget {
+class _FeedEntryListSection extends StatefulWidget {
   const _FeedEntryListSection();
+
+  @override
+  State<_FeedEntryListSection> createState() => _FeedEntryListSectionState();
+}
+
+class _FeedEntryListSectionState extends State<_FeedEntryListSection> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()..addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+    final position = _scrollController.position;
+    final reachedThreshold = position.pixels >= position.maxScrollExtent - 160;
+    if (reachedThreshold) {
+      context.read<DisplayFeedListBloc>().add(
+        const DisplayFeedListEvent.loadMoreRequested(),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +63,7 @@ class _FeedEntryListSection extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: () => _requestRefresh(context, showLoading: true),
           child: ListView(
+            controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
             children: [
@@ -47,6 +82,20 @@ class _FeedEntryListSection extends StatelessWidget {
               ],
               if (entries.isEmpty) const _FeedEntryEmptySection(),
               ...entries.map((entry) => _FeedEntryTileWidget(entry: entry)),
+              if (state.isLoadingMore) ...[
+                const SizedBox(height: 12),
+                const Center(child: CircularProgressIndicator()),
+              ] else if (state.hasMore) ...[
+                const SizedBox(height: 12),
+                Center(
+                  child: Text(
+                    '스크롤해서 더 보기',
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: context.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         );

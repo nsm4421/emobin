@@ -2,8 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:feature_setting/feature_setting.dart';
 
-import 'package:emobin/providers/cubit/app_theme/app_theme_cubit.dart';
 import 'package:emobin/router/app_router.dart';
 
 part 'auth_entry_background_section.dart';

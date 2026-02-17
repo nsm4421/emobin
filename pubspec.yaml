@@ -11,6 +11,7 @@ workspace:
   - packages/feature_auth
   - packages/feature_feed
   - packages/feature_security
+  - packages/feature_setting
   - packages/infra_drift
   - packages/infra_supabase
   - packages/ui_theme

@@ -8,6 +8,7 @@ import 'package:get_it/get_it.dart';
 part 'feed_entry_screen.dart';
 part 'feed_entry_list_section.dart';
 part 'feed_entry_tile_widget.dart';
+part 'feed_sync_status_chip_widget.dart';
 part 'feed_entry_failure_section.dart';
 part 'feed_entry_error_banner_widget.dart';
 part 'feed_entry_empty_section.dart';

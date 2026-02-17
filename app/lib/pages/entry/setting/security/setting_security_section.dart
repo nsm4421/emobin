@@ -22,9 +22,7 @@ class _SettingSecuritySection extends StatelessWidget {
         return _SettingSectionCardWidget(
           title: 'Security',
           children: [
-            hasPassword
-                ? _HasPasswordWidget()
-                : _HasNotPasswordWidget(),
+            hasPassword ? _HasPasswordWidget() : _HasNotPasswordWidget(),
           ],
         );
       },

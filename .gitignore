@@ -16,10 +16,12 @@ migrate_working_dir/
 **.freezed.dart
 **.g.dart
 **.config.dart
+**/di.module.dart
 CHANGELOG.md
 supabase/
 .env.local
 build/
+emobin.sqlite
 
 # IntelliJ related
 *.iml
