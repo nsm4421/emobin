@@ -1,0 +1,28 @@
+name: feature_setting
+description: "Feature package for app settings."
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: ^3.9.2
+  flutter: ">=1.17.0"
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.6
+  freezed_annotation: ^3.1.0
+  injectable: ^2.5.2
+  shared_preferences: ^2.2.2
+  ui_theme: ^0.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.10.5
+  flutter_lints: ^5.0.0
+  freezed: ^3.2.5
+  injectable_generator: ^2.10.0
+
+flutter:

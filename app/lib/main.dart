@@ -1,10 +1,10 @@
-import 'package:emobin/providers/cubit/app_theme/app_theme_cubit.dart';
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_security/feature_security.dart';
 import 'package:flutter/material.dart';
 import 'package:emobin/router/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:feature_setting/feature_setting.dart';
 
 import 'core/di/di.dart';
 import 'core/toast/toast_helper.dart';
