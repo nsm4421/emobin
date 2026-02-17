@@ -32,6 +32,11 @@ cd app && flutter run
 dart run melos codegen
 ```
 
+## 피드 더미 데이터 시드
+```bash
+dart run scripts/seed_fake_feed.dart --db-path /path/to/emobin.sqlite --count 50 --clear
+```
+
 ## 새 패키지 추가
 1. `packages/<name>` 또는 `app` 하위에 패키지를 생성합니다.
 2. 루트 `pubspec.yaml`의 `workspace:`에 경로를 추가합니다.
