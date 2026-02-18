@@ -11,6 +11,8 @@ abstract class FeedRepository {
     int offset = 0,
   });
 
+  Future<Either<FeedFailure, FeedEntry?>> getById(String id);
+
   Future<Either<FeedFailure, FeedEntry>> createLocalEntry(FeedEntryDraft draft);
 
   Future<Either<FeedFailure, FeedEntry>> updateLocalEntry(FeedEntry entry);

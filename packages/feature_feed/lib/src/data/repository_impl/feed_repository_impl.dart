@@ -47,6 +47,16 @@ class FeedRepositoryImpl
   }
 
   @override
+  Future<Either<FeedFailure, FeedEntry?>> getById(String id) async {
+    try {
+      final entry = await _localDataSource.getById(id);
+      return Right(entry?.toEntity());
+    } catch (error, stackTrace) {
+      return Left(error.toFeedFailure(stackTrace));
+    }
+  }
+
+  @override
   Future<Either<FeedFailure, FeedEntry>> createLocalEntry(
     FeedEntryDraft draft,
   ) async {
@@ -83,7 +93,7 @@ class FeedRepositoryImpl
   @override
   Future<Either<FeedFailure, void>> deleteLocalEntry(String id) async {
     try {
-      final existing = await _localDataSource.fetchEntry(id);
+      final existing = await _localDataSource.getById(id);
       if (existing == null) {
         throw const FeedException.entryNotFound();
       }

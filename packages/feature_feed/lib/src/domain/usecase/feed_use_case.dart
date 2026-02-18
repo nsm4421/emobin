@@ -4,6 +4,7 @@ import 'package:feature_feed/src/domain/repository/feed_repository.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/create_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/delete_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/get_feed_entry_by_id_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/observe_feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/update_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/upload_pending_feed_entries_use_case.dart';
@@ -19,6 +20,9 @@ class FeedUseCase {
 
   FetchLocalFeedEntriesUseCase get fetchLocalEntries =>
       FetchLocalFeedEntriesUseCase(_repository);
+
+  GetLocalFeedEntryByIdUseCase get getById =>
+      GetLocalFeedEntryByIdUseCase(_repository);
 
   CreateLocalFeedEntryUseCase get createLocalEntry =>
       CreateLocalFeedEntryUseCase(_repository);

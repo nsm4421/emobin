@@ -57,7 +57,7 @@ void main() {
     final updated = entry.copyWith(note: 'updated');
     await dataSource.updateEntry(updated);
 
-    final stored = await dataSource.fetchEntry('entry');
+    final stored = await dataSource.getById('entry');
     expect(stored?.note, 'updated');
   });
 
@@ -114,8 +114,8 @@ void main() {
     final another = buildEntry(id: 'another');
     await dataSource.upsertEntries([updated, another]);
 
-    final stored = await dataSource.fetchEntry('entry');
-    final storedAnother = await dataSource.fetchEntry('another');
+    final stored = await dataSource.getById('entry');
+    final storedAnother = await dataSource.getById('another');
 
     expect(stored?.note, 'updated');
     expect(storedAnother?.id, 'another');

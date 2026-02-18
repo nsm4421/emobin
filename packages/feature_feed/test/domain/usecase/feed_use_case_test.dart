@@ -4,6 +4,7 @@ import 'package:feature_feed/src/domain/usecase/feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/create_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/delete_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/get_feed_entry_by_id_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/observe_feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/update_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/upload_pending_feed_entries_use_case.dart';
@@ -33,6 +34,7 @@ void main() {
         feedUseCase.fetchLocalEntries,
         isA<FetchLocalFeedEntriesUseCase>(),
       );
+      expect(feedUseCase.getById, isA<GetLocalFeedEntryByIdUseCase>());
       expect(feedUseCase.createLocalEntry, isA<CreateLocalFeedEntryUseCase>());
       expect(feedUseCase.updateLocalEntry, isA<UpdateLocalFeedEntryUseCase>());
       expect(feedUseCase.deleteLocalEntry, isA<DeleteLocalFeedEntryUseCase>());
@@ -48,6 +50,7 @@ void main() {
       final entries = <FeedEntry>[entry];
 
       final fetchResult = Right<FeedFailure, List<FeedEntry>>(entries);
+      final getByIdResult = Right<FeedFailure, FeedEntry?>(entry);
       final createResult = Right<FeedFailure, FeedEntry>(entry);
       final updateResult = Right<FeedFailure, FeedEntry>(entry);
       final deleteResult = Right<FeedFailure, void>(null);
@@ -59,6 +62,9 @@ void main() {
       when(
         () => repository.fetchLocalEntries(),
       ).thenAnswer((_) async => fetchResult);
+      when(
+        () => repository.getById(entry.id),
+      ).thenAnswer((_) async => getByIdResult);
       when(
         () => repository.createLocalEntry(draft),
       ).thenAnswer((_) async => createResult);
@@ -74,6 +80,7 @@ void main() {
 
       await expectLater(feedUseCase.observeLocalEntries(), emits(entries));
       await feedUseCase.fetchLocalEntries();
+      await feedUseCase.getById(entry.id);
       await feedUseCase.createLocalEntry(draft);
       await feedUseCase.updateLocalEntry(entry);
       await feedUseCase.deleteLocalEntry(entry.id);
@@ -81,6 +88,7 @@ void main() {
 
       verify(() => repository.watchLocalEntries()).called(1);
       verify(() => repository.fetchLocalEntries()).called(1);
+      verify(() => repository.getById(entry.id)).called(1);
       verify(() => repository.createLocalEntry(draft)).called(1);
       verify(() => repository.updateLocalEntry(entry)).called(1);
       verify(() => repository.deleteLocalEntry(entry.id)).called(1);

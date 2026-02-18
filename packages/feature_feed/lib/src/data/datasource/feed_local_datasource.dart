@@ -7,7 +7,7 @@ abstract class FeedLocalDataSource {
 
   Future<List<FeedEntryModel>> fetchEntries({int? limit, int offset = 0});
 
-  Future<FeedEntryModel?> fetchEntry(String id);
+  Future<FeedEntryModel?> getById(String id);
 
   Future<FeedEntryModel> addEntry(FeedEntryModel entry);
 

@@ -41,7 +41,7 @@ class DriftFeedLocalDataSource
   }
 
   @override
-  Future<FeedEntryModel?> fetchEntry(String id) async {
+  Future<FeedEntryModel?> getById(String id) async {
     final query = _database.select(_database.feedEntries)
       ..where((tbl) => tbl.id.equals(id))
       ..limit(1);
