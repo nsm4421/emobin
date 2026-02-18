@@ -6,7 +6,10 @@ class _EditFeed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Feed')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text('Edit Feed'),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
@@ -14,6 +17,8 @@ class _EditFeed extends StatelessWidget {
             _EditFeedIntro(),
             SizedBox(height: 16),
             _EditFeedNote(),
+            SizedBox(height: 10),
+            _EditFeedImage(),
             SizedBox(height: 10),
             _EditFeedHashtag(),
           ],

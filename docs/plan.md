@@ -70,6 +70,85 @@
 - 라우팅 진입 class 외에는 private(`_`)로 선언하고 `part/part of` 연결을 유지한다.
 - 기존 규칙과 충돌하는 구조(`pages` 경로, `view/sections/widgets` 역할 폴더 분리)는 신규 코드에서 사용하지 않는다.
 
+## 이미지 업로드 네이티브 설정 메모 (Android/iOS)
+- 목적: 피드 작성/수정에서 갤러리 이미지 1장 선택 + 로컬 압축 저장 기능 지원
+
+Android
+- 파일: `app/android/app/build.gradle.kts`
+- 반영 내용:
+- `dependencies`에 `implementation("androidx.activity:activity:1.9.3")` 추가
+- 이유: `image_picker`의 Android Photo Picker 브릿지 채널 안정성 확보
+
+iOS
+- 파일: `app/ios/Runner/Info.plist`
+- 반영 내용:
+- `NSPhotoLibraryUsageDescription` 키 추가
+- 값: `피드에 이미지를 첨부하기 위해 사진 라이브러리 접근 권한이 필요합니다.`
+- 이유: 갤러리 접근 권한 안내 문구(권한 요청 시 시스템에서 표시)
+
+## 이미지 업로드 코드 구현 상세
+- 대상 정책: `최대 1장`, `로컬 저장`, `압축 저장`, `탭으로 업로드/교체`
+
+핵심 UI 위젯
+- 파일: `app/lib/features/feed/create/wd_feed_editor_image.dart`
+- `FeedEditorImage`:
+- 입력: `imageLocalPath`, `onChanged`, `onError`
+- 동작:
+- 프리뷰 영역 탭 -> `_pickAndStoreImage()`
+- 이미지 제거 버튼 탭 -> `onChanged(null)`
+- 처리 중 오버레이 스피너 노출 (`_isProcessing`)
+- `_pickAndStoreImage()`:
+- `ImagePicker().pickImage(source: ImageSource.gallery)`로 갤러리 1장 선택
+- 선택 성공 시 `_compressAndStore()` 호출
+- 저장된 경로를 `onChanged(savedPath)`로 상위에 전달
+- `_compressAndStore()`:
+- 앱 문서 디렉터리 하위 `feed_images/` 생성
+- 파일명: `feed_<timestamp>.jpg`
+- `FlutterImageCompress.compressAndGetFile(...)`로 JPEG 압축 저장
+- 압축 옵션: `quality: 78`, `minWidth: 1440`, `minHeight: 1440`
+- 오류 처리:
+- `MissingPluginException` / `PlatformException`을 사용자 메시지로 변환
+- 디버그 로그 출력: `FeedEditorImage error: ...`
+- `_ImagePreview`:
+- 미선택 높이 `96`, 선택 높이 `172` (톤다운된 카드 UI)
+- 안내 라벨: `Tap to upload` / `Tap to replace`
+- 선택 상태에서 우상단 `X`로 제거 가능
+
+Create/Edit 화면 연결
+- 작성 연결 파일: `app/lib/features/feed/create/fg_create_feed_image.dart`
+- `CreateFeedState.data.imageLocalPath`를 `FeedEditorImage`로 전달
+- 변경 시 `CreateFeedCubit.setImageLocalPath(path)` 호출
+- 수정 연결 파일: `app/lib/features/feed/edit/fg_edit_feed_image.dart`
+- `EditFeedState.data.imageLocalPath`를 `FeedEditorImage`로 전달
+- 변경 시 `EditFeedCubit.setImageLocalPath(path)` 호출
+
+화면 배치 반영
+- 작성 화면: `app/lib/features/feed/create/sc_create_feed.dart`
+- 순서: `Intro -> Note -> Image -> Hashtag`
+- 수정 화면: `app/lib/features/feed/edit/sc_edit_feed.dart`
+- 순서: `Intro -> Note -> Image -> Hashtag`
+
+페이지 import/part 연결
+- 작성 페이지: `app/lib/features/feed/create/pg_create_feed.dart`
+- `wd_feed_editor_image.dart` import
+- `part 'fg_create_feed_image.dart';` 추가
+- 수정 페이지: `app/lib/features/feed/edit/pg_edit_feed.dart`
+- `wd_feed_editor_image.dart` import
+- `part 'fg_edit_feed_image.dart';` 추가
+
+패키지 의존성
+- 파일: `app/pubspec.yaml`
+- 추가:
+- `image_picker: ^1.1.2`
+- `flutter_image_compress: ^2.4.0`
+- `path_provider: ^2.1.2`
+
+안정화 메모
+- Android `ImagePickerApi.pickImages` 채널 에러 대응으로 `androidx.activity` 명시:
+- 파일: `app/android/app/build.gradle.kts`
+- `implementation("androidx.activity:activity:1.9.3")`
+- 플러그인 추가/업데이트 직후에는 `hot reload` 대신 앱 완전 재실행 필요
+
 ---
 
 # 감정 쓰레기통 앱 기획 (v0.2)

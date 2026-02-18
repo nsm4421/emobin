@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:core/core.dart';
 import 'package:emobin/core/toast/toast_helper.dart';
 import 'package:emobin/features/feed/create/wd_feed_editor_hashtag.dart';
+import 'package:emobin/features/feed/create/wd_feed_editor_image.dart';
 import 'package:emobin/features/feed/create/wd_feed_editor_note.dart';
 import 'package:emobin/router/app_router.dart';
 import 'package:feature_feed/feature_feed.dart';
@@ -14,6 +15,7 @@ part 'sc_edit_feed.dart';
 part 'fg_edit_feed_intro.dart';
 part 'fg_edit_feed_hashtag.dart';
 part 'fg_edit_feed_note.dart';
+part 'fg_edit_feed_image.dart';
 part 'wd_edit_feed_submit.dart';
 
 @RoutePage(name: 'EditFeedRoute')

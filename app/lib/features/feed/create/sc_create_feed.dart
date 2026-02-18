@@ -6,7 +6,10 @@ class _CreateFeed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Feed')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text('Create Feed'),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
@@ -14,6 +17,8 @@ class _CreateFeed extends StatelessWidget {
             const _CreateFeedIntro(),
             const SizedBox(height: 16),
             _CreateFeedNote(),
+            const SizedBox(height: 10),
+            _CreateFeedImage(),
             const SizedBox(height: 10),
             _CreateFeedHashtag(),
           ],

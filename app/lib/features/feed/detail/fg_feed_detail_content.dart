@@ -9,6 +9,7 @@ class _FeedDetailContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final note = entry.note.trim();
     final hashtags = _normalizeHashtags(entry.hashtags);
+    final hasMedia = _hasMedia(entry);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
@@ -71,7 +72,7 @@ class _FeedDetailContent extends StatelessWidget {
                   ],
                 ),
               ),
-              _FeedDetailMedia(entry: entry),
+              if (hasMedia) _FeedDetailMedia(entry: entry),
               Padding(
                 padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
                 child: Column(
@@ -242,8 +243,11 @@ class _FeedDetailMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localPath = _displayNullableText(entry.imageLocalPath);
-    final remoteUrl = _displayNullableText(entry.imageRemoteUrl);
+    final localPath = _normalizeNullableText(entry.imageLocalPath);
+    final remoteUrl = _normalizeNullableText(entry.imageRemoteUrl);
+    if (localPath == null && remoteUrl == null) {
+      return const SizedBox.shrink();
+    }
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
@@ -253,8 +257,8 @@ class _FeedDetailMedia extends StatelessWidget {
           color: context.colorScheme.surfaceContainerHighest.withAlpha(120),
           child: _buildContent(
             context: context,
-            localPath: localPath == '-' ? null : localPath,
-            remoteUrl: remoteUrl == '-' ? null : remoteUrl,
+            localPath: localPath,
+            remoteUrl: remoteUrl,
           ),
         ),
       ),
@@ -365,4 +369,15 @@ String _displayNullableText(String? value) {
   final normalized = value?.trim();
   if (normalized == null || normalized.isEmpty) return '-';
   return normalized;
+}
+
+String? _normalizeNullableText(String? value) {
+  final normalized = value?.trim();
+  if (normalized == null || normalized.isEmpty) return null;
+  return normalized;
+}
+
+bool _hasMedia(FeedEntry entry) {
+  return _normalizeNullableText(entry.imageLocalPath) != null ||
+      _normalizeNullableText(entry.imageRemoteUrl) != null;
 }
