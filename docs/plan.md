@@ -43,18 +43,32 @@
 - `연관 패키지`는 workspace 내부 의존성만 기재한다.
 - `상태`에는 안정/개선중/미구현 정보를 한 줄 이상 반드시 작성한다.
 
-## UI 파일/클래스 네이밍 규칙 (v1.1)
-- 대상: `app/lib/pages/**`
-- 파일 suffix는 아래 4가지를 기본으로 사용한다.
-- `*_page.dart`: 라우트 진입 페이지
-- `*_screen.dart`: 라우트 화면(또는 페이지 내부 최상위 화면)
-- `*_section.dart`: 화면의 레이아웃 단위 블록
-- `*_widget.dart`: 재사용 가능한 UI 조각
-- `*_state.dart`,  `*_card.dart` 같은 UI suffix는 신규 사용하지 않는다.
-- 접근제어 규칙:
-- `@RoutePage`가 붙는 외부 노출 클래스(`Page`/`Screen`)만 public 허용
-- 나머지 UI 클래스/enum/헬퍼 함수는 모두 private(`_`)로 선언
-- 목적: 파일/클래스 중복 충돌을 줄이고, 외부 공개 API 범위를 명확히 유지
+## app 패키지 UI 폴더 구조/네이밍 규칙 (v1.4)
+- 대상: `app/lib/features/**`
+- 기존 `app/lib/pages/**` 구조는 사용하지 않고, 신규 UI 코드는 모두 `features` 하위에 배치한다.
+- 현재 최상위 feature 폴더 표준: `auth`, `entry`, `feed`, `splash`
+- 역할별 폴더(`view`, `sections`, `widgets`) 분리는 신규 코드에서 사용하지 않는다.
+- 신규 UI 파일은 기능 폴더 내부에서 `prefix`로 분류한다.
+- `pg_*.dart`: 라우트 진입 파일
+- `sc_*.dart`: 화면 조합 파일
+- `fg_*.dart`: 화면 블록 파일 (기존 Section 대체)
+- `wd_*.dart`: 재사용 UI 파일
+- 클래스 네이밍 규칙:
+- `Section` 명칭은 사용하지 않는다.
+- 파일 prefix로 역할이 구분되므로 class명에 `Page/Screen/Fragment/Widget` suffix를 붙이지 않는다.
+- 라우터에서 직접 참조되는 진입 class만 public 허용
+- 그 외 class와 헬퍼 함수는 private(`_`)를 기본으로 한다.
+- `part/part of` 규칙:
+- 기능 루트의 `pg_*.dart`에서 `part`로 `sc_/fg_/wd_` 파일을 연결
+- 하위 파일은 해당 `pg_*.dart`를 `part of`로 참조
+
+## UI 코드 작성 체크리스트 (필수)
+- 새 UI 파일 생성 시 먼저 기능 경로(`app/lib/features/<feature>/...`)가 맞는지 확인한다.
+- 파일 역할에 맞는 prefix(`pg_`, `sc_`, `fg_`, `wd_`)를 선택한다.
+- `Section` 명칭은 사용하지 않는다.
+- class명에 `Page/Screen/Fragment/Widget` suffix를 붙이지 않는다.
+- 라우팅 진입 class 외에는 private(`_`)로 선언하고 `part/part of` 연결을 유지한다.
+- 기존 규칙과 충돌하는 구조(`pages` 경로, `view/sections/widgets` 역할 폴더 분리)는 신규 코드에서 사용하지 않는다.
 
 ---
 

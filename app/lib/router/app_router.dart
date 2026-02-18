@@ -1,21 +1,22 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:emobin/pages/auth/auth_entry_screen.dart';
-import 'package:emobin/pages/auth/security/validate_password_screen.dart';
-import 'package:emobin/pages/auth/sign_in/sign_in_page.dart';
-import 'package:emobin/pages/auth/sign_up/sign_up_page.dart';
-import 'package:emobin/pages/entry/entry_screen.dart';
-import 'package:emobin/pages/entry/feed/feed_entry_page.dart';
-import 'package:emobin/pages/entry/home/home_screen.dart';
-import 'package:emobin/pages/entry/setting/setting_entry_screen.dart';
-import 'package:emobin/pages/feed/create/create_feed_page.dart';
-import 'package:emobin/pages/feed/emotion/edit_emotion_page.dart';
-import 'package:emobin/pages/splash/splash_page.dart';
+import 'package:emobin/features/auth/entry/pg_auth_entry.dart';
+import 'package:emobin/features/auth/validate_password/pg_validate_password.dart';
+import 'package:emobin/features/auth/sign_in/pg_sign_in.dart';
+import 'package:emobin/features/auth/sign_up/pg_sign_up.dart';
+import 'package:emobin/features/entry/root/pg_entry.dart';
+import 'package:emobin/features/entry/feed/pg_feed_entry.dart';
+import 'package:emobin/features/entry/home/pg_home_entry.dart';
+import 'package:emobin/features/entry/setting/pg_setting_entry.dart';
+import 'package:emobin/features/feed/create/pg_create_feed.dart';
+import 'package:emobin/features/feed/edit/pg_edit_feed.dart';
+import 'package:emobin/features/feed/emotion/pg_edit_emotion.dart';
+import 'package:emobin/features/splash/pg_splash.dart';
 import 'package:feature_setting/feature_setting.dart';
 import 'package:flutter/material.dart' show Key;
 
 part 'app_router.gr.dart';
 
-@AutoRouterConfig(replaceInRouteName: 'Page|Screen,Route')
+@AutoRouterConfig(replaceInRouteName: 'Page,Route')
 class AppRouter extends RootStackRouter {
   AppRouter({super.navigatorKey});
 
@@ -60,6 +61,12 @@ class AppRouter extends RootStackRouter {
   Iterable<AutoRoute> get _feedRoutes => [
     CustomRoute(
       page: CreateFeedRoute.page,
+      transitionsBuilder: TransitionsBuilders.slideRight,
+      duration: _transitionDuration,
+      reverseDuration: _transitionDuration,
+    ),
+    CustomRoute(
+      page: EditFeedRoute.page,
       transitionsBuilder: TransitionsBuilders.slideRight,
       duration: _transitionDuration,
       reverseDuration: _transitionDuration,
