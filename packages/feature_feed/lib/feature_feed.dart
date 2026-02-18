@@ -12,5 +12,6 @@ export 'src/domain/entity/feed_entry_draft.dart';
 export 'src/domain/usecase/feed_use_case.dart';
 export 'src/presentation/bloc/display_feed_list/display_feed_list_bloc.dart';
 export 'src/presentation/cubit/create_feed/create_feed_cubit.dart';
+export 'src/presentation/cubit/detail_feed/detail_feed_cubit.dart';
 export 'src/presentation/cubit/edit_feed/edit_feed_cubit.dart';
 export 'src/data/datasource/feed_local_datasource.dart';

@@ -15,6 +15,7 @@ void main() {
   FeedEntryModel buildEntry({
     required String id,
     DateTime? createdAt,
+    DateTime? deletedAt,
     String emotion = 'happy',
     FeedSyncStatus syncStatus = FeedSyncStatus.localOnly,
     String note = '',
@@ -26,6 +27,7 @@ void main() {
       note: note,
       createdAt: resolvedCreatedAt,
       updatedAt: resolvedCreatedAt,
+      deletedAt: deletedAt,
       syncStatus: syncStatus,
     );
   }
@@ -76,9 +78,9 @@ void main() {
     );
   });
 
-  test('deleteEntry throws when entry does not exist', () async {
+  test('hardDeleteEntry throws when entry does not exist', () async {
     expect(
-      () => dataSource.deleteEntry('missing'),
+      () => dataSource.hardDeleteEntry('missing'),
       throwsA(
         isA<FeedException>().having(
           (exception) => exception.error,
@@ -87,6 +89,17 @@ void main() {
         ),
       ),
     );
+  });
+
+  test('fetchEntries excludes soft-deleted rows', () async {
+    final active = buildEntry(id: 'active');
+    final deleted = buildEntry(id: 'deleted', deletedAt: DateTime(2024, 1, 1));
+
+    await dataSource.addEntry(active);
+    await dataSource.addEntry(deleted);
+
+    final entries = await dataSource.fetchEntries();
+    expect(entries.map((entry) => entry.id).toList(), ['active']);
   });
 
   test('fetchEntriesBySyncStatus filters by status', () async {

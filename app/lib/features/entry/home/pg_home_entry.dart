@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
+part 'sc_home_entry.dart';
 part 'fg_home_feed_status.dart';
 part 'fg_home_write_entry.dart';
 part 'fg_home_sync_backup.dart';
@@ -20,22 +21,11 @@ class HomeEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('HOME')),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-          children: const [
-            _HomeFeedStatus(),
-            SizedBox(height: 16),
-            _HomeWriteEntry(),
-            SizedBox(height: 16),
-            _HomeSyncBackup(),
-            SizedBox(height: 16),
-            _HomeQuickActions(),
-          ],
-        ),
-      ),
+    return BlocProvider(
+      create: (_) =>
+          GetIt.instance<DisplayFeedListBloc>()
+            ..add(const DisplayFeedListEvent.started()),
+      child: _HomeEntryScreen(),
     );
   }
 }

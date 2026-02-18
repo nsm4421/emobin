@@ -16,6 +16,7 @@ class DriftFeedLocalDataSource
   @override
   Stream<FeedStreamPayload> watchEntries() {
     final query = _database.select(_database.feedEntries)
+      ..where((tbl) => tbl.deletedAt.isNull())
       ..orderBy([
         (tbl) =>
             OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc),
@@ -29,6 +30,7 @@ class DriftFeedLocalDataSource
     int offset = 0,
   }) async {
     final query = _database.select(_database.feedEntries)
+      ..where((tbl) => tbl.deletedAt.isNull())
       ..orderBy([
         (tbl) =>
             OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc),
@@ -44,6 +46,7 @@ class DriftFeedLocalDataSource
   Future<FeedEntryModel?> getById(String id) async {
     final query = _database.select(_database.feedEntries)
       ..where((tbl) => tbl.id.equals(id))
+      ..where((tbl) => tbl.deletedAt.isNull())
       ..limit(1);
     final row = await query.getSingleOrNull();
     return row == null ? null : mapRow(row);
@@ -67,7 +70,7 @@ class DriftFeedLocalDataSource
   }
 
   @override
-  Future<void> deleteEntry(String id) async {
+  Future<void> hardDeleteEntry(String id) async {
     final deleted = await (_database.delete(
       _database.feedEntries,
     )..where((tbl) => tbl.id.equals(id))).go();

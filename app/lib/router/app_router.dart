@@ -8,6 +8,7 @@ import 'package:emobin/features/entry/feed/pg_feed_entry.dart';
 import 'package:emobin/features/entry/home/pg_home_entry.dart';
 import 'package:emobin/features/entry/setting/pg_setting_entry.dart';
 import 'package:emobin/features/feed/create/pg_create_feed.dart';
+import 'package:emobin/features/feed/detail/pg_feed_detail.dart';
 import 'package:emobin/features/feed/edit/pg_edit_feed.dart';
 import 'package:emobin/features/feed/emotion/pg_edit_emotion.dart';
 import 'package:emobin/features/splash/pg_splash.dart';
@@ -67,6 +68,12 @@ class AppRouter extends RootStackRouter {
     ),
     CustomRoute(
       page: EditFeedRoute.page,
+      transitionsBuilder: TransitionsBuilders.slideRight,
+      duration: _transitionDuration,
+      reverseDuration: _transitionDuration,
+    ),
+    CustomRoute(
+      page: FeedDetailRoute.page,
       transitionsBuilder: TransitionsBuilders.slideRight,
       duration: _transitionDuration,
       reverseDuration: _transitionDuration,

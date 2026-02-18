@@ -32,8 +32,14 @@ class _HomeWriteEntry extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: () {
-                context.router.push(CreateFeedRoute());
+              onPressed: () async {
+                await context.router.push(CreateFeedRoute());
+                if (!context.mounted) return;
+                context.read<DisplayFeedListBloc>().add(
+                  const DisplayFeedListEvent.refreshRequested(
+                    showLoading: false,
+                  ),
+                );
               },
               icon: const Icon(Icons.edit_note_rounded),
               label: const Text('Write Today\'s Entry'),
@@ -101,6 +107,12 @@ class _HomeWriteEntry extends StatelessWidget {
                                 Navigator.of(dialogContext).pop();
                                 await context.router.push(
                                   EditFeedRoute(feedId: draft.id),
+                                );
+                                if (!context.mounted) return;
+                                context.read<DisplayFeedListBloc>().add(
+                                  const DisplayFeedListEvent.refreshRequested(
+                                    showLoading: false,
+                                  ),
                                 );
                               },
                             );

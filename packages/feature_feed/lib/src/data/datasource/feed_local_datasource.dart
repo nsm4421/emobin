@@ -13,7 +13,7 @@ abstract class FeedLocalDataSource {
 
   Future<FeedEntryModel> updateEntry(FeedEntryModel entry);
 
-  Future<void> deleteEntry(String id);
+  Future<void> hardDeleteEntry(String id);
 
   Future<List<FeedEntryModel>> fetchEntriesBySyncStatus(
     Set<FeedSyncStatus> statuses,

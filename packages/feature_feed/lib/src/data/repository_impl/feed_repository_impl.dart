@@ -91,7 +91,7 @@ class FeedRepositoryImpl
   }
 
   @override
-  Future<Either<FeedFailure, void>> deleteLocalEntry(String id) async {
+  Future<Either<FeedFailure, void>> softDeleteLocalEntry(String id) async {
     try {
       final existing = await _localDataSource.getById(id);
       if (existing == null) {
@@ -105,6 +105,16 @@ class FeedRepositoryImpl
         syncStatus: nextStatus,
       );
       await _localDataSource.updateEntry(deleted);
+      return const Right(null);
+    } catch (error, stackTrace) {
+      return Left(error.toFeedFailure(stackTrace));
+    }
+  }
+
+  @override
+  Future<Either<FeedFailure, void>> hardDeleteLocalEntry(String id) async {
+    try {
+      await _localDataSource.hardDeleteEntry(id);
       return const Right(null);
     } catch (error, stackTrace) {
       return Left(error.toFeedFailure(stackTrace));

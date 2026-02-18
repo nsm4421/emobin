@@ -61,7 +61,7 @@ class _FeedEntryListFragmentState extends State<_FeedEntryList> {
           child: ListView(
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
             children: [
               if (isLoading) ...[
                 const LinearProgressIndicator(minHeight: 2),

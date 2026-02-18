@@ -9,120 +9,183 @@ class _FeedEntryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final note = entry.note.trim();
     final emotion = entry.emotion?.trim();
-    final emotionLabel = emotion == null || emotion.isEmpty
-        ? 'Unknown'
-        : emotion;
+    final hasEmotion = emotion != null && emotion.isNotEmpty;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: context.colorScheme.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: context.colorScheme.primary.withAlpha(24),
-                child: Text(
-                  _emotionShortLabel(emotionLabel),
-                  style: context.textTheme.labelLarge?.copyWith(
-                    color: context.colorScheme.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => _openDetail(context),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: context.colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: context.colorScheme.outlineVariant),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (hasEmotion)
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.sentiment_satisfied_alt_outlined,
+                          size: 16,
+                          color: context.colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            emotion,
+                            style: context.textTheme.titleSmall?.copyWith(
+                              color: context.colorScheme.onSurface,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (note.isNotEmpty) ...[
+                    const SizedBox(height: 4),
                     Text(
-                      emotionLabel,
-                      style: context.textTheme.titleSmall?.copyWith(
+                      note,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.bodyMedium?.copyWith(
                         color: context.colorScheme.onSurface,
-                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  _FeedSyncStatusChip(status: entry.syncStatus),
-                  IconButton(
-                    onPressed: () async {
-                      await context.router.push(
-                        EditFeedRoute(feedId: entry.id),
-                      );
-                      if (!context.mounted) return;
-                      context.read<DisplayFeedListBloc>().add(
-                        const DisplayFeedListEvent.refreshRequested(
-                          showLoading: false,
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.schedule_outlined,
+                        size: 14,
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        entry.createdAt.ago,
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: context.colorScheme.onSurfaceVariant,
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.edit_outlined, size: 18),
-                    tooltip: 'Edit entry',
-                    visualDensity: VisualDensity.compact,
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-          if (note.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Text(
-              note,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: context.colorScheme.onSurface,
+            ),
+            const SizedBox(width: 8),
+            PopupMenuButton<_FeedEntryAction>(
+              icon: Icon(
+                Icons.more_vert,
+                size: 16,
+                color: context.colorScheme.onSurfaceVariant.withAlpha(145),
               ),
+              iconSize: 16,
+              splashRadius: 14,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
+              tooltip: 'Entry actions',
+              onSelected: (action) => _onSelectedAction(context, action),
+              itemBuilder: (context) => [
+                PopupMenuItem<_FeedEntryAction>(
+                  value: _FeedEntryAction.edit,
+                  child: Row(
+                    children: const [
+                      Icon(Icons.edit_outlined, size: 18),
+                      SizedBox(width: 8),
+                      Text('Edit'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<_FeedEntryAction>(
+                  value: _FeedEntryAction.delete,
+                  child: Row(
+                    children: const [
+                      Icon(Icons.delete_outline, size: 18),
+                      SizedBox(width: 8),
+                      Text('Delete'),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Icon(
-                Icons.schedule_outlined,
-                size: 16,
-                color: context.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                _formatDateTime(entry.createdAt),
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: context.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Future<void> _onSelectedAction(
+    BuildContext context,
+    _FeedEntryAction action,
+  ) async {
+    switch (action) {
+      case _FeedEntryAction.edit:
+        await _editEntry(context);
+      case _FeedEntryAction.delete:
+        await _deleteEntry(context);
+    }
+  }
+
+  Future<void> _editEntry(BuildContext context) async {
+    await context.router.push(EditFeedRoute(feedId: entry.id));
+    if (!context.mounted) return;
+    _refresh(context);
+  }
+
+  Future<void> _openDetail(BuildContext context) async {
+    await context.router.push(FeedDetailRoute(feedId: entry.id));
+    if (!context.mounted) return;
+    _refresh(context);
+  }
+
+  Future<void> _deleteEntry(BuildContext context) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Feed'),
+          content: const Text('Do you want to delete this feed?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+    if (shouldDelete != true || !context.mounted) return;
+
+    final result = await GetIt.instance<FeedUseCase>().softDeleteLocalEntry(
+      entry.id,
+    );
+    if (!context.mounted) return;
+
+    result.match((failure) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message)));
+    }, (_) => _refresh(context));
+  }
+
+  void _refresh(BuildContext context) {
+    context.read<DisplayFeedListBloc>().add(
+      const DisplayFeedListEvent.refreshRequested(showLoading: false),
     );
   }
 }
 
-String _emotionShortLabel(String emotion) {
-  final trimmed = emotion.trim();
-  if (trimmed.isEmpty) return '-';
-  final firstRune = trimmed.runes.first;
-  return String.fromCharCode(firstRune).toUpperCase();
-}
-
-String _formatDateTime(DateTime dateTime) {
-  final local = dateTime.toLocal();
-
-  String twoDigits(int value) => value.toString().padLeft(2, '0');
-
-  final date =
-      '${local.year}.${twoDigits(local.month)}.${twoDigits(local.day)}';
-  final time = '${twoDigits(local.hour)}:${twoDigits(local.minute)}';
-  return '$date $time';
-}
+enum _FeedEntryAction { edit, delete }

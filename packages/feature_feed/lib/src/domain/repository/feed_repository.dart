@@ -17,7 +17,9 @@ abstract class FeedRepository {
 
   Future<Either<FeedFailure, FeedEntry>> updateLocalEntry(FeedEntry entry);
 
-  Future<Either<FeedFailure, void>> deleteLocalEntry(String id);
+  Future<Either<FeedFailure, void>> softDeleteLocalEntry(String id);
+
+  Future<Either<FeedFailure, void>> hardDeleteLocalEntry(String id);
 
   Future<Either<FeedFailure, int>> syncPendingLocalEntriesToRemote();
 }

@@ -10,7 +10,6 @@ import 'package:get_it/get_it.dart';
 part 'sc_feed_entry.dart';
 part 'fg_feed_entry_list.dart';
 part 'wd_feed_entry_tile.dart';
-part 'wd_feed_sync_status_chip.dart';
 part 'fg_feed_entry_failure.dart';
 part 'wd_feed_entry_error_banner.dart';
 part 'fg_feed_entry_empty.dart';

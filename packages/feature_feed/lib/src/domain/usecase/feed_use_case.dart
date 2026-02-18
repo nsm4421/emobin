@@ -2,10 +2,11 @@ import 'package:injectable/injectable.dart';
 
 import 'package:feature_feed/src/domain/repository/feed_repository.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/create_feed_entry_use_case.dart';
-import 'package:feature_feed/src/domain/usecase/scenario/delete_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/get_feed_entry_by_id_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/hard_delete_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/observe_feed_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/soft_delete_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/update_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/upload_pending_feed_entries_use_case.dart';
 
@@ -30,8 +31,11 @@ class FeedUseCase {
   UpdateLocalFeedEntryUseCase get updateLocalEntry =>
       UpdateLocalFeedEntryUseCase(_repository);
 
-  DeleteLocalFeedEntryUseCase get deleteLocalEntry =>
-      DeleteLocalFeedEntryUseCase(_repository);
+  SoftDeleteLocalFeedEntryUseCase get softDeleteLocalEntry =>
+      SoftDeleteLocalFeedEntryUseCase(_repository);
+
+  HardDeleteLocalFeedEntryUseCase get hardDeleteLocalEntry =>
+      HardDeleteLocalFeedEntryUseCase(_repository);
 
   SyncPendingLocalFeedEntriesToRemoteUseCase
   get syncPendingLocalEntriesToRemote =>
