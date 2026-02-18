@@ -18,19 +18,25 @@ class _FeedDetailMetaRow extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: context.colorScheme.onSurfaceVariant,
+              Expanded(
+                child: Text(
+                  label,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
-              const Spacer(),
-              Text(
-                value,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: context.colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
+              const SizedBox(width: 12),
+              Flexible(
+                child: Text(
+                  value,
+                  textAlign: TextAlign.right,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],

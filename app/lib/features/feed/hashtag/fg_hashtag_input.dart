@@ -1,13 +1,13 @@
-part of 'pg_edit_emotion.dart';
+part of 'pg_edit_hashtag.dart';
 
-class _EmotionInput extends StatefulWidget {
-  const _EmotionInput();
+class _HashtagInput extends StatefulWidget {
+  const _HashtagInput();
 
   @override
-  State<_EmotionInput> createState() => _EmotionInputFragmentState();
+  State<_HashtagInput> createState() => _HashtagInputState();
 }
 
-class _EmotionInputFragmentState extends State<_EmotionInput> {
+class _HashtagInputState extends State<_HashtagInput> {
   late final TextEditingController _controller;
 
   @override
@@ -17,11 +17,11 @@ class _EmotionInputFragmentState extends State<_EmotionInput> {
   }
 
   void _handleAdd() {
-    final emotion = _controller.text.trim();
-    if (emotion.isEmpty) {
+    final hashtag = _normalizeHashtag(_controller.text.trim());
+    if (hashtag.isEmpty) {
       return;
     }
-    context.read<FeedEmotionPresetCubit>().addEmotion(emotion);
+    context.read<FeedHashtagPresetCubit>().addHashtag('#$hashtag');
     _controller.clear();
   }
 
@@ -33,7 +33,7 @@ class _EmotionInputFragmentState extends State<_EmotionInput> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FeedEmotionPresetCubit, FeedEmotionPresetState>(
+    return BlocBuilder<FeedHashtagPresetCubit, FeedHashtagPresetState>(
       builder: (context, state) {
         final tappable = !state.isLoading;
         return Row(
@@ -43,14 +43,14 @@ class _EmotionInputFragmentState extends State<_EmotionInput> {
                 controller: _controller,
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => tappable ? _handleAdd() : null,
-                decoration: const InputDecoration(hintText: 'Type an emotion'),
+                decoration: const InputDecoration(hintText: 'Type a hashtag'),
               ),
             ),
             const SizedBox(width: 8),
             IconButton(
               onPressed: tappable ? _handleAdd : null,
               iconSize: 30,
-              tooltip: 'Add emotion',
+              tooltip: 'Add hashtag',
               icon: tappable
                   ? const Icon(Icons.add_circle_rounded)
                   : const SizedBox(
@@ -63,5 +63,9 @@ class _EmotionInputFragmentState extends State<_EmotionInput> {
         );
       },
     );
+  }
+
+  String _normalizeHashtag(String raw) {
+    return raw.replaceFirst(RegExp(r'^#+'), '');
   }
 }

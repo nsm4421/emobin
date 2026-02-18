@@ -1,7 +1,7 @@
-part of 'pg_edit_emotion.dart';
+part of 'pg_edit_hashtag.dart';
 
-class _EmotionIntro extends StatelessWidget {
-  const _EmotionIntro();
+class _HashtagIntro extends StatelessWidget {
+  const _HashtagIntro();
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class _EmotionIntro extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            'Manage your default emotion presets for feed entries.',
+            'Manage hashtag presets used while creating or editing feeds.',
             style: context.textTheme.bodySmall?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
               height: 1.35,

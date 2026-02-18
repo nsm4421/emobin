@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:feature_feed/src/core/constants/feed_sync_status.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -10,17 +12,15 @@ class FeedEntryModel with _$FeedEntryModel {
   @override
   final String? serverId;
   @override
-  final String? emotion;
-  @override
   final String note;
+  @override
+  final List<String> hashtags;
   @override
   final String? imageLocalPath;
   @override
   final String? imageRemotePath;
   @override
   final String? imageRemoteUrl;
-  @override
-  final int intensity;
   @override
   final DateTime createdAt;
   @override
@@ -37,12 +37,11 @@ class FeedEntryModel with _$FeedEntryModel {
   FeedEntryModel({
     required this.id,
     this.serverId,
-    this.emotion,
     this.note = '',
+    this.hashtags = const <String>[],
     this.imageLocalPath,
     this.imageRemotePath,
     this.imageRemoteUrl,
-    this.intensity = 0,
     required this.createdAt,
     this.updatedAt,
     this.deletedAt,
@@ -55,12 +54,11 @@ class FeedEntryModel with _$FeedEntryModel {
     return <String, dynamic>{
       'id': id,
       'server_id': serverId,
-      'emotion': emotion,
       'note': note,
+      'hashtags': hashtags,
       'image_local_path': imageLocalPath,
       'image_remote_path': imageRemotePath,
       'image_remote_url': imageRemoteUrl,
-      'intensity': intensity,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
       'deleted_at': deletedAt?.toIso8601String(),
@@ -94,6 +92,42 @@ class FeedEntryModel with _$FeedEntryModel {
       return fallback;
     }
 
+    List<String> parseHashtags(dynamic value) {
+      if (value == null) return const <String>[];
+      if (value is List) {
+        return value
+            .map((item) => item.toString().trim())
+            .where((item) => item.isNotEmpty)
+            .toSet()
+            .toList(growable: false);
+      }
+
+      final raw = value.toString().trim();
+      if (raw.isEmpty) return const <String>[];
+
+      if (raw.startsWith('[') && raw.endsWith(']')) {
+        try {
+          final decoded = jsonDecode(raw);
+          if (decoded is List) {
+            return decoded
+                .map((item) => item.toString().trim())
+                .where((item) => item.isNotEmpty)
+                .toSet()
+                .toList(growable: false);
+          }
+        } catch (_) {
+          // Fallback to comma-separated parsing.
+        }
+      }
+
+      return raw
+          .split(',')
+          .map((item) => item.trim())
+          .where((item) => item.isNotEmpty)
+          .toSet()
+          .toList(growable: false);
+    }
+
     final createdAtValue = map['created_at'] ?? map['createdAt'];
     final updatedAtValue = map['updated_at'] ?? map['updatedAt'];
     final deletedAtValue = map['deleted_at'] ?? map['deletedAt'];
@@ -104,8 +138,8 @@ class FeedEntryModel with _$FeedEntryModel {
     return FeedEntryModel(
       id: map['id'] as String,
       serverId: map['server_id'] as String? ?? map['serverId'] as String?,
-      emotion: map['emotion'] as String?,
       note: map['note'] as String? ?? '',
+      hashtags: parseHashtags(map['hashtags']),
       imageLocalPath:
           map['image_local_path'] as String? ??
           map['imageLocalPath'] as String?,
@@ -115,7 +149,6 @@ class FeedEntryModel with _$FeedEntryModel {
       imageRemoteUrl:
           map['image_remote_url'] as String? ??
           map['imageRemoteUrl'] as String?,
-      intensity: map['intensity'] as int? ?? 0,
       createdAt: parseRequiredDate(createdAtValue),
       updatedAt: parseOptionalDate(updatedAtValue),
       deletedAt: parseOptionalDate(deletedAtValue),

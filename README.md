@@ -37,6 +37,26 @@ dart run melos codegen
 dart run scripts/seed_fake_feed.dart --db-path /path/to/emobin.sqlite --count 50 --clear
 ```
 
+- 주요 옵션
+  - `--days <n>`: 최근 `n`일 범위의 `created_at` 생성 (기본값: 14)
+  - `--seed <n>`: 재현 가능한 랜덤 시드 고정
+  - `--android-package <package>`: adb `run-as`로 기기 앱 DB에 직접 반영
+
+## feed_entries 스키마 (v9)
+- `id` (TEXT, PK)
+- `server_id` (TEXT, NULL)
+- `note` (TEXT, NULL)
+- `hashtags` (TEXT, NULL, JSON 배열 문자열)
+- `image_local_path` (TEXT, NULL)
+- `image_remote_path` (TEXT, NULL)
+- `image_remote_url` (TEXT, NULL)
+- `created_at` (INTEGER, NOT NULL)
+- `updated_at` (INTEGER, NULL)
+- `deleted_at` (INTEGER, NULL)
+- `is_draft` (INTEGER/BOOL, NOT NULL, default 0)
+- `sync_status` (TEXT, NOT NULL)
+- `last_synced_at` (INTEGER, NULL)
+
 ## 새 패키지 추가
 1. `packages/<name>` 또는 `app` 하위에 패키지를 생성합니다.
 2. 루트 `pubspec.yaml`의 `workspace:`에 경로를 추가합니다.

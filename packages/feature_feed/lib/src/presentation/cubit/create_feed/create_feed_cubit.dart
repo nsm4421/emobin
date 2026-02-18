@@ -14,7 +14,13 @@ part 'create_feed_state.dart';
 @injectable
 class CreateFeedCubit extends Cubit<CreateFeedState> {
   CreateFeedCubit(FeedUseCase feedUseCase)
-    : super(CreateFeedState.editing((emotion: null, intensity: 0, note: ''))) {
+    : super(
+        CreateFeedState.editing((
+          hashtags: const <String>[],
+          note: '',
+          imageLocalPath: null,
+        )),
+      ) {
     _useCase = feedUseCase.createLocalEntry;
   }
 
@@ -25,28 +31,49 @@ class CreateFeedCubit extends Cubit<CreateFeedState> {
     emit(
       (state as _EditingState).copyWith(
         data: (
-          emotion: state.data.emotion,
-          intensity: state.data.intensity,
+          hashtags: state.data.hashtags,
           note: text.trim(),
+          imageLocalPath: state.data.imageLocalPath,
         ),
       ),
     );
   }
 
-  void setEmotion({required String emotion, int intensity = 1}) {
+  void setHashtags(List<String> hashtags) {
     if (!state.isEditing) return;
     emit(
       (state as _EditingState).copyWith(
-        data: (emotion: emotion, intensity: intensity, note: state.data.note),
+        data: (
+          hashtags: _normalizeHashtags(hashtags),
+          note: state.data.note,
+          imageLocalPath: state.data.imageLocalPath,
+        ),
       ),
     );
   }
 
-  void clearEmotion() {
+  void clearHashtags() {
     if (!state.isEditing) return;
     emit(
       (state as _EditingState).copyWith(
-        data: (emotion: null, intensity: 0, note: state.data.note),
+        data: (
+          hashtags: const <String>[],
+          note: state.data.note,
+          imageLocalPath: state.data.imageLocalPath,
+        ),
+      ),
+    );
+  }
+
+  void setImageLocalPath(String? imageLocalPath) {
+    if (!state.isEditing) return;
+    emit(
+      (state as _EditingState).copyWith(
+        data: (
+          hashtags: state.data.hashtags,
+          note: state.data.note,
+          imageLocalPath: imageLocalPath,
+        ),
       ),
     );
   }
@@ -65,9 +92,9 @@ class CreateFeedCubit extends Cubit<CreateFeedState> {
     required CreateFeedData data,
     required bool isDraft,
   }) async {
-    final emotion = data.emotion?.trim();
+    final hashtags = _normalizeHashtags(data.hashtags);
     final note = data.note.trim();
-    final intensity = data.intensity;
+    final imageLocalPath = data.imageLocalPath?.trim();
 
     if (!isDraft && note.isEmpty) {
       emit(
@@ -82,9 +109,9 @@ class CreateFeedCubit extends Cubit<CreateFeedState> {
     emit(CreateFeedState.loading(data));
 
     final draft = FeedEntryDraft(
-      emotion: emotion?.isEmpty == true ? null : emotion,
+      hashtags: hashtags,
       note: note,
-      intensity: intensity,
+      imageLocalPath: imageLocalPath?.isEmpty == true ? null : imageLocalPath,
       isDraft: isDraft,
     );
 
@@ -101,5 +128,13 @@ class CreateFeedCubit extends Cubit<CreateFeedState> {
 
   void reset() {
     emit(CreateFeedState.editing(state.data));
+  }
+
+  List<String> _normalizeHashtags(List<String> hashtags) {
+    return hashtags
+        .map((tag) => tag.trim().replaceFirst(RegExp(r'^#+'), ''))
+        .where((tag) => tag.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
   }
 }

@@ -1,6 +1,10 @@
 part of 'create_feed_cubit.dart';
 
-typedef CreateFeedData = ({String? emotion, int intensity, String note});
+typedef CreateFeedData = ({
+  List<String> hashtags,
+  String note,
+  String? imageLocalPath,
+});
 
 @freezed
 class CreateFeedState with _$CreateFeedState {
@@ -32,9 +36,9 @@ extension CreateFeedStateX on CreateFeedState {
     loading: (data) => data,
     editing: (data, _) => data,
     created: (_, created) => (
-      emotion: created.emotion,
-      intensity: created.intensity,
+      hashtags: created.hashtags,
       note: created.note,
+      imageLocalPath: created.imageLocalPath,
     ),
   );
 }

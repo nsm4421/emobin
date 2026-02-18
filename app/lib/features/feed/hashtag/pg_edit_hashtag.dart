@@ -6,24 +6,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
-part 'sc_edit_emotion.dart';
+part 'sc_edit_hashtag.dart';
 
-part 'fg_emotion_intro.dart';
+part 'fg_hashtag_intro.dart';
 
-part 'fg_emotion_input.dart';
+part 'fg_hashtag_input.dart';
 
-part 'fg_emotion_list.dart';
+part 'fg_hashtag_list.dart';
 
-@RoutePage(name: 'EditEmotionRoute')
-class EditEmotion extends StatelessWidget {
-  const EditEmotion({super.key, this.cubit});
+@RoutePage(name: 'EditHashtagRoute')
+class EditHashtag extends StatelessWidget {
+  const EditHashtag({super.key, this.cubit});
 
-  final FeedEmotionPresetCubit? cubit;
+  final FeedHashtagPresetCubit? cubit;
 
   @override
   Widget build(BuildContext context) {
     final maybeCubit = cubit;
-    final child = BlocListener<FeedEmotionPresetCubit, FeedEmotionPresetState>(
+    final child = BlocListener<FeedHashtagPresetCubit, FeedHashtagPresetState>(
       listenWhen: (prev, curr) => curr.failure != null,
       listener: (context, state) {
         final failure = state.failure;
@@ -31,7 +31,7 @@ class EditEmotion extends StatelessWidget {
           ToastHelper.error(failure);
         }
       },
-      child: const _EditEmotion(),
+      child: const _EditHashtag(),
     );
 
     if (maybeCubit != null) {
@@ -39,7 +39,7 @@ class EditEmotion extends StatelessWidget {
     }
 
     return BlocProvider(
-      create: (_) => GetIt.instance<FeedEmotionPresetCubit>()..initialize(),
+      create: (_) => GetIt.instance<FeedHashtagPresetCubit>()..initialize(),
       child: child,
     );
   }

@@ -23,7 +23,6 @@ class _SeedOptions {
     required this.androidPackage,
     required this.adbPath,
     required this.count,
-    required this.createdBy,
     required this.days,
     required this.clearExisting,
     required this.randomSeed,
@@ -34,7 +33,6 @@ class _SeedOptions {
       androidPackage = null,
       adbPath = null,
       count = 30,
-      createdBy = 'seed_bot',
       days = 14,
       clearExisting = false,
       randomSeed = null,
@@ -44,7 +42,6 @@ class _SeedOptions {
   final String? androidPackage;
   final String? adbPath;
   final int count;
-  final String createdBy;
   final int days;
   final bool clearExisting;
   final int? randomSeed;
@@ -98,7 +95,6 @@ Future<void> main(List<String> args) async {
             random: random,
             now: now,
             index: i,
-            createdBy: options.createdBy,
             days: options.days,
           );
 
@@ -107,27 +103,29 @@ Future<void> main(List<String> args) async {
 INSERT INTO feed_entries (
   id,
   server_id,
-  emotion,
-  emotion_id,
   note,
-  intensity,
-  created_by,
+  hashtags,
+  image_local_path,
+  image_remote_path,
+  image_remote_url,
   created_at,
   updated_at,
   deleted_at,
   is_draft,
   sync_status,
   last_synced_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ''',
             variables: [
               Variable<String>(entry.id),
               Variable<String>(entry.serverId),
-              Variable<String>(entry.emotion),
-              Variable<String>(entry.emotionId),
               Variable<String>(entry.note),
-              Variable<int>(entry.intensity),
-              Variable<String>(entry.createdBy),
+              Variable<String>(
+                entry.hashtags.isEmpty ? null : jsonEncode(entry.hashtags),
+              ),
+              Variable<String>(entry.imageLocalPath),
+              Variable<String>(entry.imageRemotePath),
+              Variable<String>(entry.imageRemoteUrl),
               Variable<DateTime>(entry.createdAt),
               Variable<DateTime>(entry.updatedAt),
               Variable<DateTime>(entry.deletedAt),
@@ -411,11 +409,11 @@ Future<void> _ensureTable(_SeedDatabase db) {
 CREATE TABLE IF NOT EXISTS feed_entries (
   id TEXT NOT NULL PRIMARY KEY,
   server_id TEXT NULL,
-  emotion TEXT NOT NULL,
-  emotion_id TEXT NULL,
   note TEXT NULL,
-  intensity INTEGER NULL,
-  created_by TEXT NOT NULL,
+  hashtags TEXT NULL,
+  image_local_path TEXT NULL,
+  image_remote_path TEXT NULL,
+  image_remote_url TEXT NULL,
   created_at INTEGER NOT NULL,
   updated_at INTEGER NULL,
   deleted_at INTEGER NULL,
@@ -433,9 +431,39 @@ Future<void> _ensureColumns(_SeedDatabase db) async {
       .whereType<String>()
       .toSet();
 
-  if (!columns.contains('emotion_id')) {
+  if (!columns.contains('server_id')) {
     await db.customStatement(
-      'ALTER TABLE feed_entries ADD COLUMN emotion_id TEXT NULL;',
+      'ALTER TABLE feed_entries ADD COLUMN server_id TEXT NULL;',
+    );
+  }
+
+  if (!columns.contains('note')) {
+    await db.customStatement(
+      'ALTER TABLE feed_entries ADD COLUMN note TEXT NULL;',
+    );
+  }
+
+  if (!columns.contains('hashtags')) {
+    await db.customStatement(
+      'ALTER TABLE feed_entries ADD COLUMN hashtags TEXT NULL;',
+    );
+  }
+
+  if (!columns.contains('image_local_path')) {
+    await db.customStatement(
+      'ALTER TABLE feed_entries ADD COLUMN image_local_path TEXT NULL;',
+    );
+  }
+
+  if (!columns.contains('image_remote_path')) {
+    await db.customStatement(
+      'ALTER TABLE feed_entries ADD COLUMN image_remote_path TEXT NULL;',
+    );
+  }
+
+  if (!columns.contains('image_remote_url')) {
+    await db.customStatement(
+      'ALTER TABLE feed_entries ADD COLUMN image_remote_url TEXT NULL;',
     );
   }
 
@@ -445,28 +473,53 @@ Future<void> _ensureColumns(_SeedDatabase db) async {
       'ADD COLUMN is_draft INTEGER NOT NULL DEFAULT 0;',
     );
   }
+
+  if (!columns.contains('sync_status')) {
+    await db.customStatement(
+      "ALTER TABLE feed_entries "
+      "ADD COLUMN sync_status TEXT NOT NULL DEFAULT 'local_only';",
+    );
+  }
+
+  if (!columns.contains('last_synced_at')) {
+    await db.customStatement(
+      'ALTER TABLE feed_entries ADD COLUMN last_synced_at INTEGER NULL;',
+    );
+  }
 }
 
 _FakeEntryPayload _buildEntryPayload({
   required Random random,
   required DateTime now,
   required int index,
-  required String createdBy,
   required int days,
 }) {
-  const emotions = <String>['화남', '불안', '슬픔', '기쁨', '짜증', '두려움', '피곤', '무기력'];
+  const hashtagsPool = <String>[
+    'today',
+    'work',
+    'study',
+    'health',
+    'family',
+    'friends',
+    'focus',
+    'anxiety',
+    'happy',
+    'tired',
+    'routine',
+    'gratitude',
+  ];
 
   const notes = <String>[
-    '오늘은 감정이 요동쳤다.',
-    '짧게 산책하고 조금 나아졌다.',
-    '일정이 꼬여서 집중이 안 된다.',
+    '오늘은 루틴을 지키려고 노력했다.',
+    '짧게 산책하고 집중이 조금 돌아왔다.',
+    '일정이 많았지만 중요한 일은 끝냈다.',
     '생각보다 차분하게 하루를 마무리했다.',
-    '대화 하나로 기분이 크게 달라졌다.',
-    '쉬는 시간을 더 챙겨야겠다.',
-    '작은 성취가 있어서 기분이 괜찮다.',
-    '계획했던 일을 절반만 끝냈다.',
-    '머리가 복잡해서 정리가 필요하다.',
-    '잠을 제대로 못 자서 예민하다.',
+    '대화 하나로 컨디션이 꽤 달라졌다.',
+    '쉬는 시간을 의식적으로 챙겼다.',
+    '작은 성취가 있어서 만족도가 높았다.',
+    '계획했던 일을 절반 정도 진행했다.',
+    '머리가 복잡해서 메모로 정리했다.',
+    '수면이 부족해서 에너지 관리가 필요했다.',
   ];
 
   final spreadMinutes = max(1, days * 24 * 60);
@@ -481,31 +534,48 @@ _FakeEntryPayload _buildEntryPayload({
       ? createdAt.add(Duration(minutes: random.nextInt(240)))
       : null;
 
-  final isSynced = random.nextInt(100) < 18;
-  final syncStatus = switch (random.nextInt(100)) {
-    < 60 => 'local_only',
-    < 82 => 'pending_upload',
-    < 96 => 'synced',
-    _ => 'conflict',
-  };
-
-  final safeCreatedBy = createdBy.trim().isEmpty ? 'seed_bot' : createdBy;
+  final isDraft = random.nextInt(100) < 10;
+  final syncStatus = isDraft
+      ? 'local_only'
+      : switch (random.nextInt(100)) {
+          < 60 => 'local_only',
+          < 82 => 'pending_upload',
+          < 96 => 'synced',
+          _ => 'conflict',
+        };
   final idSuffix = random.nextInt(0x7fffffff).toRadixString(16);
   final id = 'fake_${now.millisecondsSinceEpoch}_$index$idSuffix';
-  final emotion = emotions[random.nextInt(emotions.length)];
+  final hashtagCount = random.nextInt(4);
+  final hashtags = <String>{};
+  while (hashtags.length < hashtagCount) {
+    hashtags.add(hashtagsPool[random.nextInt(hashtagsPool.length)]);
+  }
+  final note = random.nextInt(100) < 14
+      ? null
+      : notes[random.nextInt(notes.length)];
+  final hasImage = !isDraft && random.nextInt(100) < 40;
+  final remotePath = hasImage ? 'feeds/$id.jpg' : null;
+  final remoteUrl = (syncStatus == 'synced' && remotePath != null)
+      ? 'https://cdn.example.com/$remotePath'
+      : null;
+  final localPath = hasImage ? '/tmp/emobin_seed_images/$id.jpg' : null;
+  final deletedAt = (!isDraft && random.nextInt(100) < 5)
+      ? (updatedAt ?? createdAt).add(Duration(minutes: random.nextInt(240) + 1))
+      : null;
+  final isSynced = syncStatus == 'synced';
 
   return _FakeEntryPayload(
     id: id,
     serverId: isSynced ? 'server_$idSuffix' : null,
-    emotion: emotion,
-    emotionId: emotion.trim().toLowerCase(),
-    note: random.nextInt(100) < 18 ? null : notes[random.nextInt(notes.length)],
-    intensity: random.nextInt(100) < 15 ? null : 1 + random.nextInt(5),
-    createdBy: safeCreatedBy,
+    note: note,
+    hashtags: hashtags.toList(growable: false),
+    imageLocalPath: localPath,
+    imageRemotePath: remotePath,
+    imageRemoteUrl: remoteUrl,
     createdAt: createdAt,
     updatedAt: updatedAt,
-    deletedAt: null,
-    isDraft: false,
+    deletedAt: deletedAt,
+    isDraft: isDraft,
     syncStatus: syncStatus,
     lastSyncedAt: syncStatus == 'synced'
         ? (updatedAt ?? createdAt).add(Duration(minutes: random.nextInt(180)))
@@ -522,7 +592,6 @@ _SeedOptions _parseArgs(List<String> args) {
   String? androidPackage;
   String? adbPath;
   var count = 30;
-  var createdBy = 'seed_bot';
   var days = 14;
   var clearExisting = false;
   int? randomSeed;
@@ -556,10 +625,6 @@ _SeedOptions _parseArgs(List<String> args) {
       count = _parsePositiveInt(arg.substring('--count='.length), '--count');
       continue;
     }
-    if (arg.startsWith('--created-by=')) {
-      createdBy = arg.substring('--created-by='.length);
-      continue;
-    }
     if (arg.startsWith('--days=')) {
       days = _parsePositiveInt(arg.substring('--days='.length), '--days');
       continue;
@@ -573,7 +638,6 @@ _SeedOptions _parseArgs(List<String> args) {
         arg == '--android-package' ||
         arg == '--adb-path' ||
         arg == '--count' ||
-        arg == '--created-by' ||
         arg == '--days' ||
         arg == '--seed') {
       if (i + 1 >= args.length) {
@@ -590,8 +654,6 @@ _SeedOptions _parseArgs(List<String> args) {
         adbPath = _parseNonEmptyString(value, '--adb-path');
       } else if (arg == '--count') {
         count = _parsePositiveInt(value, '--count');
-      } else if (arg == '--created-by') {
-        createdBy = value;
       } else if (arg == '--days') {
         days = _parsePositiveInt(value, '--days');
       } else if (arg == '--seed') {
@@ -610,7 +672,6 @@ _SeedOptions _parseArgs(List<String> args) {
     androidPackage: androidPackage,
     adbPath: adbPath,
     count: count,
-    createdBy: createdBy,
     days: days,
     clearExisting: clearExisting,
     randomSeed: randomSeed,
@@ -639,11 +700,11 @@ class _FakeEntryPayload {
   const _FakeEntryPayload({
     required this.id,
     required this.serverId,
-    required this.emotion,
-    required this.emotionId,
     required this.note,
-    required this.intensity,
-    required this.createdBy,
+    required this.hashtags,
+    required this.imageLocalPath,
+    required this.imageRemotePath,
+    required this.imageRemoteUrl,
     required this.createdAt,
     required this.updatedAt,
     required this.deletedAt,
@@ -654,11 +715,11 @@ class _FakeEntryPayload {
 
   final String id;
   final String? serverId;
-  final String emotion;
-  final String emotionId;
   final String? note;
-  final int? intensity;
-  final String createdBy;
+  final List<String> hashtags;
+  final String? imageLocalPath;
+  final String? imageRemotePath;
+  final String? imageRemoteUrl;
   final DateTime createdAt;
   final DateTime? updatedAt;
   final DateTime? deletedAt;
@@ -676,7 +737,6 @@ Options:
   --android-package <p>  Seed app DB on Android via adb run-as
   --adb-path <path>      adb command path (default: auto-detect)
   --count <n>            Number of rows to insert (default: 30)
-  --created-by <value>   created_by value (default: seed_bot)
   --days <n>             Time range for created_at in days (default: 14)
   --seed <n>             Fixed random seed for reproducible data
   --clear                Delete existing rows before insert

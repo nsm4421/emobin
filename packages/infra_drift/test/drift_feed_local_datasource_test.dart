@@ -16,15 +16,21 @@ void main() {
     required String id,
     DateTime? createdAt,
     DateTime? deletedAt,
-    String emotion = 'happy',
+    List<String> hashtags = const <String>['happy'],
+    String? imageLocalPath,
+    String? imageRemotePath,
+    String? imageRemoteUrl,
     FeedSyncStatus syncStatus = FeedSyncStatus.localOnly,
     String note = '',
   }) {
     final resolvedCreatedAt = createdAt ?? DateTime.now();
     return FeedEntryModel(
       id: id,
-      emotion: emotion,
       note: note,
+      hashtags: hashtags,
+      imageLocalPath: imageLocalPath,
+      imageRemotePath: imageRemotePath,
+      imageRemoteUrl: imageRemoteUrl,
       createdAt: resolvedCreatedAt,
       updatedAt: resolvedCreatedAt,
       deletedAt: deletedAt,
@@ -132,6 +138,25 @@ void main() {
 
     expect(stored?.note, 'updated');
     expect(storedAnother?.id, 'another');
+  });
+
+  test('stores hashtags and image paths', () async {
+    final entry = buildEntry(
+      id: 'with_media',
+      hashtags: const <String>['calm', 'today'],
+      imageLocalPath: '/tmp/a.png',
+      imageRemotePath: 'feeds/a.png',
+      imageRemoteUrl: 'https://example.com/a.png',
+    );
+
+    await dataSource.addEntry(entry);
+    final stored = await dataSource.getById('with_media');
+
+    expect(stored, isNotNull);
+    expect(stored!.hashtags, ['calm', 'today']);
+    expect(stored.imageLocalPath, '/tmp/a.png');
+    expect(stored.imageRemotePath, 'feeds/a.png');
+    expect(stored.imageRemoteUrl, 'https://example.com/a.png');
   });
 
   test('watchEntries emits updates', () async {

@@ -7,74 +7,101 @@ class _FeedDetailContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emotion = entry.emotion?.trim();
-    final hasEmotion = emotion != null && emotion.isNotEmpty;
-    final emotionTag = hasEmotion ? '#${_normalizeHashtag(emotion)}' : null;
     final note = entry.note.trim();
+    final hashtags = _normalizeHashtags(entry.hashtags);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: context.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(color: context.colorScheme.outlineVariant),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: emotionTag == null
-                        ? const SizedBox.shrink()
-                        : Text(
-                            emotionTag,
-                            style: context.textTheme.titleMedium?.copyWith(
-                              color: context.colorScheme.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                  ),
-                  PopupMenuButton<_FeedDetailAction>(
-                    tooltip: 'Feed actions',
-                    onSelected: (action) async {
-                      switch (action) {
-                        case _FeedDetailAction.edit:
-                          await _editEntry(context);
-                        case _FeedDetailAction.delete:
-                          await _deleteEntry(context);
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem<_FeedDetailAction>(
-                        value: _FeedDetailAction.edit,
-                        child: Text('Edit Feed'),
-                      ),
-                      PopupMenuItem<_FeedDetailAction>(
-                        value: _FeedDetailAction.delete,
-                        child: Text(
-                          'Delete Feed',
-                          style: TextStyle(color: context.colorScheme.error),
-                        ),
-                      ),
-                    ],
-                    icon: Icon(
-                      Icons.more_vert,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 6, 8),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.schedule_outlined,
+                      size: 14,
                       color: context.colorScheme.onSurfaceVariant,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Text(
+                      _formatDateTime(entry.createdAt),
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: context.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    PopupMenuButton<_FeedDetailAction>(
+                      tooltip: 'Feed actions',
+                      onSelected: (action) async {
+                        switch (action) {
+                          case _FeedDetailAction.edit:
+                            await _editEntry(context);
+                          case _FeedDetailAction.delete:
+                            await _deleteEntry(context);
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem<_FeedDetailAction>(
+                          value: _FeedDetailAction.edit,
+                          child: Text('Edit Feed'),
+                        ),
+                        PopupMenuItem<_FeedDetailAction>(
+                          value: _FeedDetailAction.delete,
+                          child: Text(
+                            'Delete Feed',
+                            style: TextStyle(color: context.colorScheme.error),
+                          ),
+                        ),
+                      ],
+                      icon: Icon(
+                        Icons.more_vert,
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 14),
-              Text(
-                note.isEmpty ? 'No note yet.' : note,
-                style: context.textTheme.bodyLarge?.copyWith(
-                  color: context.colorScheme.onSurface,
-                  height: 1.7,
+              _FeedDetailMedia(entry: entry),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (hashtags.isNotEmpty)
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        children: hashtags
+                            .map(
+                              (tag) => Text(
+                                '#$tag',
+                                style: context.textTheme.titleSmall?.copyWith(
+                                  color: context.colorScheme.primary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            )
+                            .toList(growable: false),
+                      ),
+                    if (hashtags.isNotEmpty) const SizedBox(height: 10),
+                    Text(
+                      note.isEmpty ? 'No caption yet.' : note,
+                      style: context.textTheme.bodyLarge?.copyWith(
+                        color: context.colorScheme.onSurface,
+                        height: 1.65,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -102,8 +129,10 @@ class _FeedDetailContent extends StatelessWidget {
               ),
               children: [
                 _FeedDetailMetaRow(
-                  label: 'Intensity',
-                  value: entry.intensity.toString(),
+                  label: 'Hashtags',
+                  value: hashtags.isEmpty
+                      ? '-'
+                      : hashtags.map((tag) => '#$tag').join(' '),
                 ),
                 _FeedDetailMetaRow(
                   label: 'Created At',
@@ -118,10 +147,32 @@ class _FeedDetailContent extends StatelessWidget {
                   value: entry.syncStatus.name,
                 ),
                 _FeedDetailMetaRow(
+                  label: 'Server ID',
+                  value: _displayNullableText(entry.serverId),
+                ),
+                _FeedDetailMetaRow(
+                  label: 'Local Image',
+                  value: _displayNullableText(entry.imageLocalPath),
+                ),
+                _FeedDetailMetaRow(
+                  label: 'Remote Image Path',
+                  value: _displayNullableText(entry.imageRemotePath),
+                ),
+                _FeedDetailMetaRow(
+                  label: 'Remote Image URL',
+                  value: _displayNullableText(entry.imageRemoteUrl),
+                ),
+                _FeedDetailMetaRow(
                   label: 'Updated At',
-                  value: entry.updatedAt == null
-                      ? '-'
-                      : _formatDateTime(entry.updatedAt!),
+                  value: _formatDateTimeOrDash(entry.updatedAt),
+                ),
+                _FeedDetailMetaRow(
+                  label: 'Last Synced At',
+                  value: _formatDateTimeOrDash(entry.lastSyncedAt),
+                ),
+                _FeedDetailMetaRow(
+                  label: 'Deleted At',
+                  value: _formatDateTimeOrDash(entry.deletedAt),
                   showDivider: false,
                 ),
               ],
@@ -184,8 +235,119 @@ class _FeedDetailContent extends StatelessWidget {
 
 enum _FeedDetailAction { edit, delete }
 
-String _normalizeHashtag(String raw) {
-  return raw.trim().replaceAll(RegExp(r'\s+'), '_');
+class _FeedDetailMedia extends StatelessWidget {
+  const _FeedDetailMedia({required this.entry});
+
+  final FeedEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final localPath = _displayNullableText(entry.imageLocalPath);
+    final remoteUrl = _displayNullableText(entry.imageRemoteUrl);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: AspectRatio(
+        aspectRatio: 4 / 5,
+        child: ColoredBox(
+          color: context.colorScheme.surfaceContainerHighest.withAlpha(120),
+          child: _buildContent(
+            context: context,
+            localPath: localPath == '-' ? null : localPath,
+            remoteUrl: remoteUrl == '-' ? null : remoteUrl,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent({
+    required BuildContext context,
+    required String? localPath,
+    required String? remoteUrl,
+  }) {
+    if (localPath != null) {
+      return Image.file(
+        File(localPath),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _MediaPlaceholder(),
+      );
+    }
+
+    if (remoteUrl != null) {
+      return Image.network(
+        remoteUrl,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+        },
+        errorBuilder: (_, __, ___) => _MediaPlaceholder(),
+      );
+    }
+
+    return _MediaPlaceholder();
+  }
+}
+
+class _MediaPlaceholder extends StatelessWidget {
+  const _MediaPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            context.colorScheme.primaryContainer.withAlpha(180),
+            context.colorScheme.tertiaryContainer.withAlpha(160),
+          ],
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.image_outlined,
+              size: 34,
+              color: context.colorScheme.onPrimaryContainer,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Image slot',
+              style: context.textTheme.titleSmall?.copyWith(
+                color: context.colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'You can add photo later.',
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colorScheme.onPrimaryContainer.withAlpha(220),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+List<String> _normalizeHashtags(List<String> raw) {
+  return raw
+      .map((tag) => tag.trim().replaceFirst(RegExp(r'^#+'), ''))
+      .where((tag) => tag.isNotEmpty)
+      .toSet()
+      .toList(growable: false);
+}
+
+String _formatDateTimeOrDash(DateTime? dateTime) {
+  if (dateTime == null) return '-';
+  return _formatDateTime(dateTime);
 }
 
 String _formatDateTime(DateTime dateTime) {
@@ -197,4 +359,10 @@ String _formatDateTime(DateTime dateTime) {
       '${local.year}.${twoDigits(local.month)}.${twoDigits(local.day)}';
   final time = '${twoDigits(local.hour)}:${twoDigits(local.minute)}';
   return '$date $time';
+}
+
+String _displayNullableText(String? value) {
+  final normalized = value?.trim();
+  if (normalized == null || normalized.isEmpty) return '-';
+  return normalized;
 }

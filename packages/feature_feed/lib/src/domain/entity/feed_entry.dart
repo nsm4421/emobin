@@ -10,17 +10,15 @@ class FeedEntry with _$FeedEntry {
   @override
   final String? serverId;
   @override
-  final String? emotion;
-  @override
   final String note;
+  @override
+  final List<String> hashtags;
   @override
   final String? imageLocalPath;
   @override
   final String? imageRemotePath;
   @override
   final String? imageRemoteUrl;
-  @override
-  final int intensity;
   @override
   final DateTime createdAt;
   @override
@@ -37,12 +35,11 @@ class FeedEntry with _$FeedEntry {
   FeedEntry({
     required this.id,
     this.serverId,
-    this.emotion,
     this.note = '',
+    this.hashtags = const <String>[],
     this.imageLocalPath,
     this.imageRemotePath,
     this.imageRemoteUrl,
-    this.intensity = 0,
     required this.createdAt,
     this.updatedAt,
     this.deletedAt,

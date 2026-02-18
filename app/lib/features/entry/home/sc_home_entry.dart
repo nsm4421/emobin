@@ -1,7 +1,7 @@
 part of 'pg_home_entry.dart';
 
 class _HomeEntryScreen extends StatelessWidget {
-  const _HomeEntryScreen({super.key});
+  const _HomeEntryScreen();
 
   @override
   Widget build(BuildContext context) {

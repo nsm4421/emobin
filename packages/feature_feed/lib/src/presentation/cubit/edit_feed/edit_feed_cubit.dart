@@ -48,9 +48,9 @@ class EditFeedCubit extends Cubit<EditFeedState> {
               _initialEntry = fetched;
               emit(
                 EditFeedState.editing((
-                  emotion: fetched.emotion,
-                  intensity: fetched.intensity,
+                  hashtags: fetched.hashtags,
                   note: fetched.note,
+                  imageLocalPath: fetched.imageLocalPath,
                 )),
               );
             },
@@ -63,30 +63,52 @@ class EditFeedCubit extends Cubit<EditFeedState> {
     emit(
       (state as _EditingState).copyWith(
         data: (
-          emotion: state.data.emotion,
-          intensity: state.data.intensity,
+          hashtags: state.data.hashtags,
           note: text.trim(),
+          imageLocalPath: state.data.imageLocalPath,
         ),
         failure: null,
       ),
     );
   }
 
-  void setEmotion({required String emotion, int intensity = 1}) {
+  void setHashtags(List<String> hashtags) {
     if (!state.isEditing) return;
     emit(
       (state as _EditingState).copyWith(
-        data: (emotion: emotion, intensity: intensity, note: state.data.note),
+        data: (
+          hashtags: _normalizeHashtags(hashtags),
+          note: state.data.note,
+          imageLocalPath: state.data.imageLocalPath,
+        ),
         failure: null,
       ),
     );
   }
 
-  void clearEmotion() {
+  void clearHashtags() {
     if (!state.isEditing) return;
     emit(
       (state as _EditingState).copyWith(
-        data: (emotion: null, intensity: 0, note: state.data.note),
+        data: (
+          hashtags: const <String>[],
+          note: state.data.note,
+          imageLocalPath: state.data.imageLocalPath,
+        ),
+        failure: null,
+      ),
+    );
+  }
+
+  void setImageLocalPath(String? imageLocalPath) {
+    if (!state.isEditing) return;
+    emit(
+      (state as _EditingState).copyWith(
+        data: (
+          hashtags: state.data.hashtags,
+          note: state.data.note,
+          imageLocalPath: imageLocalPath,
+        ),
         failure: null,
       ),
     );
@@ -94,9 +116,9 @@ class EditFeedCubit extends Cubit<EditFeedState> {
 
   // 저장
   Future<void> saveEntry() async {
-    final emotion = state.data.emotion?.trim();
+    final hashtags = _normalizeHashtags(state.data.hashtags);
     final note = state.data.note.trim();
-    final intensity = state.data.intensity;
+    final imageLocalPath = state.data.imageLocalPath?.trim();
 
     if (note.isEmpty) {
       emit(
@@ -110,10 +132,17 @@ class EditFeedCubit extends Cubit<EditFeedState> {
 
     emit(EditFeedState.loading(state.data));
 
+    final normalizedImageLocalPath = imageLocalPath?.isEmpty == true
+        ? null
+        : imageLocalPath;
+    final imageChanged =
+        _initialEntry.imageLocalPath != normalizedImageLocalPath;
     final updatedEntry = _initialEntry.copyWith(
-      emotion: emotion?.isEmpty == true ? null : emotion,
+      hashtags: hashtags,
       note: note,
-      intensity: intensity,
+      imageLocalPath: normalizedImageLocalPath,
+      imageRemotePath: imageChanged ? null : _initialEntry.imageRemotePath,
+      imageRemoteUrl: imageChanged ? null : _initialEntry.imageRemoteUrl,
       isDraft: false,
     );
 
@@ -132,5 +161,13 @@ class EditFeedCubit extends Cubit<EditFeedState> {
 
   void reset() {
     emit(EditFeedState.editing(state.data));
+  }
+
+  List<String> _normalizeHashtags(List<String> hashtags) {
+    return hashtags
+        .map((tag) => tag.trim().replaceFirst(RegExp(r'^#+'), ''))
+        .where((tag) => tag.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
   }
 }

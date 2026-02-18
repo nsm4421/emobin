@@ -6,6 +6,7 @@ It owns setting-related state management and local preference persistence behind
 ## Responsibility Scope
 - Provide theme mode state (`AppThemeModeCubit`) and persistence.
 - Provide feed emotion preset state (`FeedEmotionPresetCubit`) and persistence.
+- Provide feed hashtag preset state (`FeedHashtagPresetCubit`) and persistence.
 - Register setting dependencies via `injectable` micro package DI.
 
 `feature_setting` is the only package that directly accesses `SharedPreferences` for these settings.
@@ -17,6 +18,7 @@ This package currently focuses on presentation + local setting infrastructure.
 - `presentation`
   - `AppThemeModeCubit`: handles light/dark mode toggle and initialization.
   - `FeedEmotionPresetCubit`: handles emotion preset initialize/update/validation.
+  - `FeedHashtagPresetCubit`: handles hashtag preset initialize/update/validation.
 - `data/infrastructure`
   - `SettingModule`: provides `SharedPreferences` instance for DI.
 - `domain`
@@ -26,9 +28,9 @@ This package currently focuses on presentation + local setting infrastructure.
 - `lib/feature_setting.dart`
   - Public exports for DI and Cubits.
 - `lib/src/core/constants/defaults.dart`
-  - Default values for settings (`feedEmotionPresets`).
+  - Default values for settings (`feedEmotionPresets`, `feedHashtagPresets`).
 - `lib/src/core/constants/keys.dart`
-  - Shared preference keys.
+  - Shared preference keys (`feedEmotionPreset`, `feedHashtagPreset`, etc.).
 - `lib/src/core/di/di.dart`
   - `@InjectableInit.microPackage()` entrypoint.
 - `lib/src/core/di/setting_module.dart`
@@ -39,6 +41,8 @@ This package currently focuses on presentation + local setting infrastructure.
   - Theme mode state management.
 - `lib/src/presentation/cubit/feed_emotion_preset/feed_emotion_preset_cubit.dart`
   - Emotion preset state management.
+- `lib/src/presentation/cubit/feed_hashtag_preset/feed_hashtag_preset_cubit.dart`
+  - Hashtag preset state management.
 
 ## Cubits and Features
 - `AppThemeModeCubit`
@@ -48,6 +52,10 @@ This package currently focuses on presentation + local setting infrastructure.
   - `initialize()`: seeds defaults when missing, then emits saved presets.
   - `addEmotion(String)`: validates and appends a new emotion preset.
   - `removeEmotion(String)`: removes an existing emotion preset.
+- `FeedHashtagPresetCubit`
+  - `initialize()`: seeds defaults when missing, then emits saved presets.
+  - `addHashtag(String)`: validates and appends a new hashtag preset.
+  - `removeHashtag(String)`: removes an existing hashtag preset.
 
 ## Usage Example
 ```dart
@@ -59,6 +67,7 @@ BlocProvider(
 
 ```dart
 context.read<FeedEmotionPresetCubit>().addEmotion('Calm');
+context.read<FeedHashtagPresetCubit>().addHashtag('#daily');
 ```
 
 ## Testing
@@ -66,6 +75,7 @@ There is currently no dedicated `test/` directory in this package.
 Recommended tests to add:
 - `AppThemeModeCubit` initialization and toggle persistence behavior.
 - `FeedEmotionPresetCubit` duplicate validation and save behavior.
+- `FeedHashtagPresetCubit` duplicate validation and save behavior.
 
 Run analysis and tests from workspace root:
 ```bash

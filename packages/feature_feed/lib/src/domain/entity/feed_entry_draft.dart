@@ -5,9 +5,9 @@ part 'feed_entry_draft.freezed.dart';
 @freezed
 class FeedEntryDraft with _$FeedEntryDraft {
   @override
-  final String? emotion;
-  @override
   final String note;
+  @override
+  final List<String> hashtags;
   @override
   final String? imageLocalPath;
   @override
@@ -15,19 +15,16 @@ class FeedEntryDraft with _$FeedEntryDraft {
   @override
   final String? imageRemoteUrl;
   @override
-  final int intensity;
-  @override
   final DateTime? createdAt;
   @override
   final bool isDraft;
 
   FeedEntryDraft({
-    this.emotion,
     this.note = '',
+    this.hashtags = const <String>[],
     this.imageLocalPath,
     this.imageRemotePath,
     this.imageRemoteUrl,
-    this.intensity = 0,
     this.createdAt,
     this.isDraft = false,
   });

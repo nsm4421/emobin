@@ -25,7 +25,7 @@ class HomeEntry extends StatelessWidget {
       create: (_) =>
           GetIt.instance<DisplayFeedListBloc>()
             ..add(const DisplayFeedListEvent.started()),
-      child: _HomeEntryScreen(),
+      child: const _HomeEntryScreen(),
     );
   }
 }

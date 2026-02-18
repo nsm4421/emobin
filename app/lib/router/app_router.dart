@@ -10,7 +10,7 @@ import 'package:emobin/features/entry/setting/pg_setting_entry.dart';
 import 'package:emobin/features/feed/create/pg_create_feed.dart';
 import 'package:emobin/features/feed/detail/pg_feed_detail.dart';
 import 'package:emobin/features/feed/edit/pg_edit_feed.dart';
-import 'package:emobin/features/feed/emotion/pg_edit_emotion.dart';
+import 'package:emobin/features/feed/hashtag/pg_edit_hashtag.dart';
 import 'package:emobin/features/splash/pg_splash.dart';
 import 'package:feature_setting/feature_setting.dart';
 import 'package:flutter/material.dart' show Key;
@@ -79,7 +79,7 @@ class AppRouter extends RootStackRouter {
       reverseDuration: _transitionDuration,
     ),
     CustomRoute(
-      page: EditEmotionRoute.page,
+      page: EditHashtagRoute.page,
       transitionsBuilder: TransitionsBuilders.slideRight,
       duration: _transitionDuration,
       reverseDuration: _transitionDuration,

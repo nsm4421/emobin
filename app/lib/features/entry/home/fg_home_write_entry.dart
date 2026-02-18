@@ -135,11 +135,13 @@ class _HomeWriteEntry extends StatelessWidget {
 }
 
 String _draftTitle(FeedEntry entry) {
-  final emotion = entry.emotion?.trim();
-  if (emotion == null || emotion.isEmpty) {
+  final firstHashtag = entry.hashtags
+      .map((tag) => tag.trim())
+      .firstWhere((tag) => tag.isNotEmpty, orElse: () => '');
+  if (firstHashtag.isEmpty) {
     return 'Untitled Draft';
   }
-  return emotion;
+  return firstHashtag;
 }
 
 String _draftPreview(String note) {

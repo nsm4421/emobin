@@ -6,11 +6,15 @@ class FeedEntries extends Table {
 
   TextColumn get serverId => text().nullable()();
 
-  TextColumn get emotion => text().nullable()();
-
   TextColumn get note => text().nullable()();
 
-  IntColumn get intensity => integer().nullable()();
+  TextColumn get hashtags => text().nullable()();
+
+  TextColumn get imageLocalPath => text().nullable()();
+
+  TextColumn get imageRemotePath => text().nullable()();
+
+  TextColumn get imageRemoteUrl => text().nullable()();
 
   DateTimeColumn get createdAt => dateTime()();
 

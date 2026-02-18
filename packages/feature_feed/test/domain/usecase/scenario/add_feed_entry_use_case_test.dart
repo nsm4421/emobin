@@ -35,7 +35,7 @@ void main() {
     });
 
     test('항목 생성 실패 결과를 그대로 반환한다', () async {
-      final draft = buildFeedEntryDraft(emotion: '');
+      final draft = buildFeedEntryDraft(hashtags: const <String>[]);
       final failure = FeedFailure.invalidEntry();
       final expected = Left<FeedFailure, FeedEntry>(failure);
 

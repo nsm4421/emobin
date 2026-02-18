@@ -9,4 +9,12 @@ abstract final class SettingDefaults {
     '😌 Pleasure',
     '🙂 Contentment',
   ];
+
+  static const List<String> feedHashtagPresets = <String>[
+    '#daily',
+    '#gratitude',
+    '#focus',
+    '#health',
+    '#work',
+  ];
 }

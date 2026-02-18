@@ -13,9 +13,9 @@ class _EditFeed extends StatelessWidget {
           children: const [
             _EditFeedIntro(),
             SizedBox(height: 16),
-            _EditFeedEmotion(),
-            SizedBox(height: 10),
             _EditFeedNote(),
+            SizedBox(height: 10),
+            _EditFeedHashtag(),
           ],
         ),
       ),

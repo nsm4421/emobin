@@ -13,9 +13,9 @@ class _CreateFeed extends StatelessWidget {
           children: [
             const _CreateFeedIntro(),
             const SizedBox(height: 16),
-            _CreateFeedEmotion(),
-            const SizedBox(height: 10),
             _CreateFeedNote(),
+            const SizedBox(height: 10),
+            _CreateFeedHashtag(),
           ],
         ),
       ),

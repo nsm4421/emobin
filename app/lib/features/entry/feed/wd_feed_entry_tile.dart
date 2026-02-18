@@ -8,8 +8,7 @@ class _FeedEntryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final note = entry.note.trim();
-    final emotion = entry.emotion?.trim();
-    final hasEmotion = emotion != null && emotion.isNotEmpty;
+    final hashtagSummary = _buildHashtagSummary(entry.hashtags);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -29,20 +28,20 @@ class _FeedEntryTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (hasEmotion)
+                  if (hashtagSummary != null)
                     Row(
                       children: [
                         Icon(
-                          Icons.sentiment_satisfied_alt_outlined,
+                          Icons.tag_rounded,
                           size: 16,
                           color: context.colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 6),
                         Flexible(
                           child: Text(
-                            emotion,
+                            hashtagSummary,
                             style: context.textTheme.titleSmall?.copyWith(
-                              color: context.colorScheme.onSurface,
+                              color: context.colorScheme.primary,
                               fontWeight: FontWeight.w700,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -189,3 +188,20 @@ class _FeedEntryTile extends StatelessWidget {
 }
 
 enum _FeedEntryAction { edit, delete }
+
+String? _buildHashtagSummary(List<String> hashtags) {
+  final normalized = hashtags
+      .map((tag) => tag.trim().replaceFirst(RegExp(r'^#+'), ''))
+      .where((tag) => tag.isNotEmpty)
+      .toList(growable: false);
+  if (normalized.isEmpty) return null;
+
+  const previewCount = 2;
+  final preview = normalized.take(previewCount).map((tag) => '#$tag').join(' ');
+  final remaining = normalized.length - previewCount;
+  if (remaining <= 0) {
+    return preview;
+  }
+
+  return '$preview +$remaining';
+}

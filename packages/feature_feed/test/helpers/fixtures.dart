@@ -7,9 +7,11 @@ final DateTime fixedNow = DateTime(2024, 1, 1, 12, 0, 0);
 FeedEntry buildFeedEntry({
   String id = 'entry_1',
   String? serverId,
-  String? emotion = 'joy',
   String note = '오늘은 기분이 좋아요',
-  int intensity = 4,
+  List<String> hashtags = const <String>['happy'],
+  String? imageLocalPath,
+  String? imageRemotePath,
+  String? imageRemoteUrl,
   DateTime? createdAt,
   DateTime? updatedAt,
   DateTime? deletedAt,
@@ -20,9 +22,11 @@ FeedEntry buildFeedEntry({
   return FeedEntry(
     id: id,
     serverId: serverId,
-    emotion: emotion,
     note: note,
-    intensity: intensity,
+    hashtags: hashtags,
+    imageLocalPath: imageLocalPath,
+    imageRemotePath: imageRemotePath,
+    imageRemoteUrl: imageRemoteUrl,
     createdAt: createdAt ?? fixedNow,
     updatedAt: updatedAt,
     deletedAt: deletedAt,
@@ -33,16 +37,20 @@ FeedEntry buildFeedEntry({
 }
 
 FeedEntryDraft buildFeedEntryDraft({
-  String emotion = 'joy',
   String note = '오늘은 기분이 좋아요',
-  int intensity = 4,
+  List<String> hashtags = const <String>['happy'],
+  String? imageLocalPath,
+  String? imageRemotePath,
+  String? imageRemoteUrl,
   DateTime? createdAt,
   bool isDraft = false,
 }) {
   return FeedEntryDraft(
-    emotion: emotion,
     note: note,
-    intensity: intensity,
+    hashtags: hashtags,
+    imageLocalPath: imageLocalPath,
+    imageRemotePath: imageRemotePath,
+    imageRemoteUrl: imageRemoteUrl,
     createdAt: createdAt,
     isDraft: isDraft,
   );

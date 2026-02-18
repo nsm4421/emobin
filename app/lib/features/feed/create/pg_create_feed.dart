@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:core/core.dart';
 import 'package:emobin/core/toast/toast_helper.dart';
 import 'package:emobin/router/app_router.dart';
-import 'package:emobin/features/feed/create/wd_feed_editor_emotion.dart';
+import 'package:emobin/features/feed/create/wd_feed_editor_hashtag.dart';
 import 'package:emobin/features/feed/create/wd_feed_editor_note.dart';
 import 'package:feature_feed/feature_feed.dart';
 import 'package:feature_setting/feature_setting.dart';
@@ -14,7 +14,7 @@ part 'sc_create_feed.dart';
 
 part 'fg_create_feed_intro.dart';
 
-part 'fg_create_feed_emotion.dart';
+part 'fg_create_feed_hashtag.dart';
 
 part 'fg_create_feed_note.dart';
 
@@ -30,7 +30,7 @@ class CreateFeed extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => GetIt.instance<CreateFeedCubit>()),
         BlocProvider(
-          create: (_) => GetIt.instance<FeedEmotionPresetCubit>()..initialize(),
+          create: (_) => GetIt.instance<FeedHashtagPresetCubit>()..initialize(),
         ),
       ],
       child: BlocListener<CreateFeedCubit, CreateFeedState>(

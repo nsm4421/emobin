@@ -1,15 +1,15 @@
-part of 'pg_edit_emotion.dart';
+part of 'pg_edit_hashtag.dart';
 
-class _EmotionList extends StatelessWidget {
-  const _EmotionList();
+class _HashtagList extends StatelessWidget {
+  const _HashtagList();
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FeedEmotionPresetCubit, FeedEmotionPresetState>(
+    return BlocBuilder<FeedHashtagPresetCubit, FeedHashtagPresetState>(
       builder: (context, state) {
-        final emotions = state.emotions;
+        final hashtags = state.hashtags;
 
-        if (emotions.isEmpty) {
+        if (hashtags.isEmpty) {
           return Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -19,7 +19,7 @@ class _EmotionList extends StatelessWidget {
               border: Border.all(color: context.colorScheme.outlineVariant),
             ),
             child: Text(
-              'No saved emotions yet.',
+              'No saved hashtags yet.',
               style: context.textTheme.bodyMedium,
             ),
           );
@@ -33,18 +33,18 @@ class _EmotionList extends StatelessWidget {
           ),
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(vertical: 4),
-            itemCount: emotions.length,
+            itemCount: hashtags.length,
             itemBuilder: (context, index) {
-              final emotion = emotions[index];
+              final hashtag = hashtags[index];
               return ListTile(
                 dense: true,
-                title: Text(emotion),
+                title: Text(hashtag),
                 trailing: IconButton(
                   onPressed: state.isLoading
                       ? null
                       : () => context
-                            .read<FeedEmotionPresetCubit>()
-                            .removeEmotion(emotion),
+                            .read<FeedHashtagPresetCubit>()
+                            .removeHashtag(hashtag),
                   icon: const Icon(Icons.remove_circle_outline_rounded),
                   tooltip: 'Remove',
                 ),

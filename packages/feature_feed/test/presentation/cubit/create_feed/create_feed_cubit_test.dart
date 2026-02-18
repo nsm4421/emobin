@@ -16,7 +16,7 @@ void main() {
     late CreateFeedCubit cubit;
 
     setUpAll(() {
-      registerFallbackValue(FeedEntryDraft(emotion: 'fallback'));
+      registerFallbackValue(FeedEntryDraft(hashtags: const <String>[]));
     });
 
     setUp(() {
@@ -37,7 +37,11 @@ void main() {
       ).thenAnswer((_) async => Right(createdEntry));
 
       cubit.emit(
-        CreateFeedState.editing((emotion: 'joy', intensity: 3, note: 'note')),
+        CreateFeedState.editing((
+          hashtags: const <String>['joy'],
+          note: 'note',
+          imageLocalPath: null,
+        )),
       );
 
       final emitted = <CreateFeedState>[];
@@ -61,15 +65,19 @@ void main() {
       await subscription.cancel();
     });
 
-    test('createEntry는 emotion이 없어도 성공한다', () async {
-      final createdEntry = buildFeedEntry(id: 'entry_without_emotion');
+    test('createEntry는 hashtags가 없어도 성공한다', () async {
+      final createdEntry = buildFeedEntry(id: 'entry_without_hashtags');
 
       when(
         () => repository.createLocalEntry(any()),
       ).thenAnswer((_) async => Right(createdEntry));
 
       cubit.emit(
-        CreateFeedState.editing((emotion: null, intensity: 0, note: 'note')),
+        CreateFeedState.editing((
+          hashtags: const <String>[],
+          note: 'note',
+          imageLocalPath: null,
+        )),
       );
 
       final emitted = <CreateFeedState>[];
@@ -95,7 +103,11 @@ void main() {
 
     test('createEntry는 note가 비어있으면 실패한다', () async {
       cubit.emit(
-        CreateFeedState.editing((emotion: null, intensity: 0, note: '')),
+        CreateFeedState.editing((
+          hashtags: const <String>[],
+          note: '',
+          imageLocalPath: null,
+        )),
       );
 
       final emitted = <CreateFeedState>[];
@@ -127,7 +139,11 @@ void main() {
       ).thenAnswer((_) async => Right(createdDraftEntry));
 
       cubit.emit(
-        CreateFeedState.editing((emotion: null, intensity: 0, note: 'temp')),
+        CreateFeedState.editing((
+          hashtags: const <String>[],
+          note: 'temp',
+          imageLocalPath: null,
+        )),
       );
 
       final emitted = <CreateFeedState>[];
