@@ -51,29 +51,29 @@ class _SignInViewState extends State<_SignIn> {
 
         return Scaffold(
           resizeToAvoidBottomInset: true,
-          appBar: AppBar(title: const Text('Sign In')),
+          appBar: AppBar(title: Text(context.l10n.signIn)),
           body: SafeArea(
             child: Form(
               key: _formKey,
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  const AppFormHeader(
-                    title: 'Welcome back',
-                    subtitle: 'Sign in to continue.',
+                  AppFormHeader(
+                    title: context.l10n.welcomeBack,
+                    subtitle: context.l10n.signInContinueSubtitle,
                   ),
                   const SizedBox(height: 32),
                   AppTextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
-                    label: 'Email',
+                    label: context.l10n.email,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Enter your email.';
+                        return context.l10n.enterYourEmail;
                       }
                       if (!value.contains('@')) {
-                        return 'Invalid email.';
+                        return context.l10n.invalidEmail;
                       }
                       return null;
                     },
@@ -83,10 +83,10 @@ class _SignInViewState extends State<_SignIn> {
                   AppPasswordField(
                     controller: _passwordController,
                     textInputAction: TextInputAction.done,
-                    label: 'Password',
+                    label: context.l10n.password,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Enter your password.';
+                        return context.l10n.enterYourPassword;
                       }
                       return null;
                     },
@@ -95,13 +95,13 @@ class _SignInViewState extends State<_SignIn> {
                   ),
                   const SizedBox(height: 24),
                   AppPrimaryButton(
-                    label: 'Sign In',
+                    label: context.l10n.signIn,
                     onPressed: isButtonDisabled ? null : _onSubmit,
                     isLoading: isLoading,
                   ),
                   const SizedBox(height: 12),
                   AppTextButton(
-                    label: 'Back',
+                    label: context.l10n.back,
                     onPressed: isLoading ? null : () => context.router.pop(),
                   ),
                 ],

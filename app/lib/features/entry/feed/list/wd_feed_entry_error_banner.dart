@@ -1,4 +1,4 @@
-part of 'pg_feed_entry.dart';
+part of '../pg_display_feed_entry.dart';
 
 class _FeedEntryErrorBanner extends StatelessWidget {
   const _FeedEntryErrorBanner({required this.message, required this.onRetry});
@@ -36,7 +36,7 @@ class _FeedEntryErrorBanner extends StatelessWidget {
             style: TextButton.styleFrom(
               foregroundColor: context.colorScheme.onErrorContainer,
             ),
-            child: const Text('Retry'),
+            child: Text(context.l10n.retry),
           ),
         ],
       ),

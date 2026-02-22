@@ -18,19 +18,19 @@ class _AuthEntryFeatures extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const _FeatureRow(
+          _FeatureRow(
             icon: Icons.auto_awesome,
-            text: 'Track your moments in a simple way.',
+            text: context.l10n.authFeatureTrackMoments,
           ),
           const SizedBox(height: 12),
-          const _FeatureRow(
+          _FeatureRow(
             icon: Icons.chat_bubble_outline,
-            text: 'Reflect with prompts when you need them.',
+            text: context.l10n.authFeatureReflectPrompts,
           ),
           const SizedBox(height: 12),
-          const _FeatureRow(
+          _FeatureRow(
             icon: Icons.lock_outline,
-            text: 'Your data stays private and secure.',
+            text: context.l10n.authFeaturePrivateSecure,
           ),
           const SizedBox(height: 16),
           Divider(color: context.colorScheme.outlineVariant),
@@ -42,14 +42,14 @@ class _AuthEntryFeatures extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Light / Dark mode',
+                      context.l10n.lightDarkMode,
                       style: context.textTheme.titleSmall,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       isDark
-                          ? 'Dark mode is on. Tap to switch.'
-                          : 'Light mode is on. Tap to switch.',
+                          ? context.l10n.darkModeOnTapSwitch
+                          : context.l10n.lightModeOnTapSwitch,
                       style: context.textTheme.bodySmall,
                     ),
                   ],
@@ -57,8 +57,8 @@ class _AuthEntryFeatures extends StatelessWidget {
               ),
               Tooltip(
                 message: isDark
-                    ? 'Switch to light mode'
-                    : 'Switch to dark mode',
+                    ? context.l10n.switchToLightMode
+                    : context.l10n.switchToDarkMode,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: context.colorScheme.surfaceContainerHighest,

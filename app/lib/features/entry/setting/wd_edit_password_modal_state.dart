@@ -26,17 +26,17 @@ class _EditPasswordModalState extends State<_EditPasswordModal> {
   String? _validatePassword(String? value) {
     final input = (value ?? '').trim();
     if (input.isEmpty) {
-      return 'Please enter a password.';
+      return context.l10n.pleaseEnterPassword;
     }
     if (input.length < _minPasswordLength) {
-      return 'Use at least $_minPasswordLength characters.';
+      return context.l10n.atLeastCharacters(_minPasswordLength);
     }
     return null;
   }
 
   String? _validatePasswordConfirm(String? value) {
     if ((value ?? '').trim() != _password) {
-      return 'Passwords do not match.';
+      return context.l10n.passwordsDoNotMatch;
     }
     return null;
   }
@@ -54,6 +54,7 @@ class _EditPasswordModalState extends State<_EditPasswordModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Padding(
@@ -65,12 +66,12 @@ class _EditPasswordModalState extends State<_EditPasswordModal> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(switch (widget._action) {
-              _PasswordEditAction.set => 'Set Password',
-              _PasswordEditAction.change => 'Change Password',
+              _PasswordEditAction.set => l10n.passwordModalSetTitle,
+              _PasswordEditAction.change => l10n.passwordModalChangeTitle,
             }, style: context.textTheme.titleMedium),
             const SizedBox(height: 6),
             Text(
-              'Enter a password with at least $_minPasswordLength characters.',
+              l10n.passwordModalDescription(_minPasswordLength),
               style: context.textTheme.bodySmall?.copyWith(
                 color: context.colorScheme.onSurfaceVariant,
               ),
@@ -78,16 +79,16 @@ class _EditPasswordModalState extends State<_EditPasswordModal> {
             const SizedBox(height: 16),
             AppPasswordField(
               controller: _passwordController,
-              label: 'New Password',
-              hintText: 'Enter password',
+              label: l10n.newPassword,
+              hintText: l10n.enterPassword,
               textInputAction: TextInputAction.next,
               validator: _validatePassword,
             ),
             const SizedBox(height: 12),
             AppPasswordField(
               controller: _confirmPasswordController,
-              label: 'Confirm Password',
-              hintText: 'Re-enter password',
+              label: l10n.confirmPassword,
+              hintText: l10n.reenterPassword,
               textInputAction: TextInputAction.done,
               onFieldSubmitted: (_) => _submit(),
               validator: _validatePasswordConfirm,
@@ -95,14 +96,14 @@ class _EditPasswordModalState extends State<_EditPasswordModal> {
             const SizedBox(height: 16),
             AppPrimaryButton(
               label: switch (widget._action) {
-                _PasswordEditAction.set => 'Set',
-                _PasswordEditAction.change => 'Change',
+                _PasswordEditAction.set => l10n.setAction,
+                _PasswordEditAction.change => l10n.changeAction,
               },
               onPressed: _submit,
             ),
             const SizedBox(height: 8),
             AppTextButton(
-              label: 'Cancel',
+              label: l10n.cancel,
               fullWidth: true,
               onPressed: () => Navigator.of(context).pop(),
             ),

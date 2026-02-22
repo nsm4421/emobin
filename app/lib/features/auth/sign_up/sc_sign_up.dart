@@ -58,28 +58,28 @@ class _SignUpViewState extends State<_SignUp> {
 
         return Scaffold(
           resizeToAvoidBottomInset: true,
-          appBar: AppBar(title: const Text('Sign Up')),
+          appBar: AppBar(title: Text(context.l10n.signUp)),
           body: SafeArea(
             child: Form(
               key: _formKey,
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  const AppFormHeader(
-                    title: 'Create account',
-                    subtitle: 'Start your journey with Emobin.',
+                  AppFormHeader(
+                    title: context.l10n.createAccount,
+                    subtitle: context.l10n.startJourneySubtitle,
                   ),
                   const SizedBox(height: 32),
                   AppTextField(
                     controller: _usernameController,
                     textInputAction: TextInputAction.next,
-                    label: 'Username',
+                    label: context.l10n.username,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Enter your username.';
+                        return context.l10n.enterYourUsername;
                       }
                       if (value.trim().length < 2) {
-                        return 'Use at least 2 characters.';
+                        return context.l10n.atLeastTwoCharacters;
                       }
                       return null;
                     },
@@ -90,13 +90,13 @@ class _SignUpViewState extends State<_SignUp> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
-                    label: 'Email',
+                    label: context.l10n.email,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Enter your email.';
+                        return context.l10n.enterYourEmail;
                       }
                       if (!value.contains('@')) {
-                        return 'Invalid email.';
+                        return context.l10n.invalidEmail;
                       }
                       return null;
                     },
@@ -106,13 +106,13 @@ class _SignUpViewState extends State<_SignUp> {
                   AppPasswordField(
                     controller: _passwordController,
                     textInputAction: TextInputAction.next,
-                    label: 'Password',
+                    label: context.l10n.password,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Enter a password.';
+                        return context.l10n.enterAPassword;
                       }
                       if (value.length < 6) {
-                        return 'Use at least 6 characters.';
+                        return context.l10n.atLeastCharacters(6);
                       }
                       return null;
                     },
@@ -123,13 +123,13 @@ class _SignUpViewState extends State<_SignUp> {
                   AppPasswordField(
                     controller: _confirmPasswordController,
                     textInputAction: TextInputAction.done,
-                    label: 'Confirm Password',
+                    label: context.l10n.confirmPassword,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Confirm your password.';
+                        return context.l10n.confirmYourPassword;
                       }
                       if (value != _passwordController.text) {
-                        return 'Passwords do not match.';
+                        return context.l10n.passwordsDoNotMatch;
                       }
                       return null;
                     },
@@ -138,13 +138,13 @@ class _SignUpViewState extends State<_SignUp> {
                   ),
                   const SizedBox(height: 24),
                   AppPrimaryButton(
-                    label: 'Sign Up',
+                    label: context.l10n.signUp,
                     onPressed: isButtonDisabled ? null : _onSubmit,
                     isLoading: isLoading,
                   ),
                   const SizedBox(height: 12),
                   AppTextButton(
-                    label: 'Back',
+                    label: context.l10n.back,
                     onPressed: isLoading ? null : () => context.router.pop(),
                   ),
                 ],

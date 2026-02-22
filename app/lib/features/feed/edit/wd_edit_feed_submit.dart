@@ -12,7 +12,7 @@ class _EditFeedSubmit extends StatelessWidget {
           children: [
             Expanded(
               child: AppOutlinedButton(
-                label: 'Cancel',
+                label: context.l10n.cancel,
                 fullWidth: true,
                 onPressed: tappable && context.router.canPop()
                     ? () => context.router.pop()
@@ -22,7 +22,7 @@ class _EditFeedSubmit extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: AppPrimaryButton(
-                label: 'Update Entry',
+                label: context.l10n.updateEntry,
                 fullWidth: true,
                 onPressed: tappable
                     ? () async {

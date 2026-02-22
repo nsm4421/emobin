@@ -1,10 +1,10 @@
 part of '../pg_entry.dart';
 
 extension HomeBottomNavigationMenuX on HomeBottomNavigationMenu {
-  String get label => switch (this) {
-    HomeBottomNavigationMenu.home => 'HOME',
-    HomeBottomNavigationMenu.feed => 'FEED',
-    HomeBottomNavigationMenu.setting => 'SETTING',
+  String label(BuildContext context) => switch (this) {
+    HomeBottomNavigationMenu.home => context.l10n.homeTitle,
+    HomeBottomNavigationMenu.feed => context.l10n.feedTitle,
+    HomeBottomNavigationMenu.setting => context.l10n.settingTitle,
   };
 
   IconData get iconData => switch (this) {

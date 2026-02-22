@@ -1,4 +1,4 @@
-part of 'pg_feed_entry.dart';
+part of '../pg_display_feed_entry.dart';
 
 class _FeedEntryFailure extends StatelessWidget {
   const _FeedEntryFailure({required this.message, required this.onRetry});
@@ -28,7 +28,7 @@ class _FeedEntryFailure extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+            ElevatedButton(onPressed: onRetry, child: Text(context.l10n.retry)),
           ],
         ),
       ),

@@ -43,7 +43,7 @@ class _EditFeedHashtag extends StatelessWidget {
             context.read<EditFeedCubit>().setHashtags(next);
           },
           onMaxSelectionReached: () {
-            ToastHelper.error('You can select up to 3 hashtags.');
+            ToastHelper.error(context.l10n.hashtagSelectionLimitToast(3));
           },
         );
       },

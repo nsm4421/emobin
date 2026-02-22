@@ -1,22 +1,25 @@
 import 'dart:io';
 
 import 'package:core/core.dart';
+import 'package:emobin/core/extensions/l10n_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 class FeedEditorImage extends StatefulWidget {
   const FeedEditorImage({
     super.key,
     required this.imageLocalPath,
-    required this.onChanged,
+    required this.onImageSelected,
+    required this.onImageRemoved,
+    this.isProcessing = false,
     this.onError,
   });
 
   final String? imageLocalPath;
-  final ValueChanged<String?> onChanged;
+  final Future<void> Function(String sourcePath) onImageSelected;
+  final Future<void> Function() onImageRemoved;
+  final bool isProcessing;
   final ValueChanged<String>? onError;
 
   @override
@@ -25,7 +28,9 @@ class FeedEditorImage extends StatefulWidget {
 
 class _FeedEditorImageState extends State<FeedEditorImage> {
   final ImagePicker _picker = ImagePicker();
-  bool _isProcessing = false;
+  bool _isPicking = false;
+
+  bool get _isProcessing => _isPicking || widget.isProcessing;
 
   @override
   Widget build(BuildContext context) {
@@ -35,24 +40,22 @@ class _FeedEditorImageState extends State<FeedEditorImage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Image', style: context.textTheme.titleMedium),
+        Text(context.l10n.image, style: context.textTheme.titleMedium),
         const SizedBox(height: 8),
         _ImagePreview(
           path: path,
           hasImage: hasImage,
           isProcessing: _isProcessing,
-          onTap: _isProcessing ? null : _pickAndStoreImage,
-          onRemove: hasImage && !_isProcessing
-              ? () => widget.onChanged(null)
-              : null,
+          onTap: _isProcessing ? null : _pickImage,
+          onRemove: hasImage && !_isProcessing ? _removeImage : null,
         ),
       ],
     );
   }
 
-  Future<void> _pickAndStoreImage() async {
+  Future<void> _pickImage() async {
     setState(() {
-      _isProcessing = true;
+      _isPicking = true;
     });
 
     try {
@@ -60,16 +63,7 @@ class _FeedEditorImageState extends State<FeedEditorImage> {
       if (picked == null) {
         return;
       }
-
-      final savedPath = await _compressAndStore(sourcePath: picked.path);
-      if (!mounted) return;
-
-      if (savedPath == null || savedPath.isEmpty) {
-        widget.onError?.call('Failed to process the image.');
-        return;
-      }
-
-      widget.onChanged(savedPath);
+      await widget.onImageSelected(picked.path);
     } catch (e, st) {
       debugPrint('FeedEditorImage error: $e');
       debugPrintStack(stackTrace: st);
@@ -78,52 +72,41 @@ class _FeedEditorImageState extends State<FeedEditorImage> {
     } finally {
       if (mounted) {
         setState(() {
-          _isProcessing = false;
+          _isPicking = false;
         });
       }
     }
   }
 
-  Future<String?> _compressAndStore({required String sourcePath}) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final imageDirectory = Directory('${directory.path}/feed_images');
-    if (!await imageDirectory.exists()) {
-      await imageDirectory.create(recursive: true);
+  Future<void> _removeImage() async {
+    try {
+      await widget.onImageRemoved();
+    } catch (e, st) {
+      debugPrint('FeedEditorImage remove error: $e');
+      debugPrintStack(stackTrace: st);
+      if (!mounted) return;
+      widget.onError?.call(context.l10n.failedProcessImage);
     }
-
-    final targetPath =
-        '${imageDirectory.path}/feed_${DateTime.now().millisecondsSinceEpoch}.jpg';
-
-    final compressed = await FlutterImageCompress.compressAndGetFile(
-      sourcePath,
-      targetPath,
-      format: CompressFormat.jpeg,
-      quality: 78,
-      minWidth: 1440,
-      minHeight: 1440,
-    );
-
-    return compressed?.path;
   }
 
   String _toReadableError(Object error) {
     if (error is MissingPluginException) {
-      return 'Image plugin is not initialized. Please fully restart the app.';
+      return context.l10n.imagePluginNotInitialized;
     }
 
     if (error is PlatformException) {
       final code = error.code.toLowerCase();
       final message = error.message;
       if (code.contains('denied') || code.contains('permission')) {
-        return 'Photo permission is required. Please allow access in settings.';
+        return context.l10n.photoPermissionRequired;
       }
       if (message != null && message.isNotEmpty) {
-        return 'Image picker error: $message';
+        return context.l10n.imagePickerErrorMessage(message);
       }
-      return 'Image picker error: ${error.code}';
+      return context.l10n.imagePickerErrorCode(error.code);
     }
 
-    return 'An error occurred while selecting an image.';
+    return context.l10n.imageSelectError;
   }
 }
 
@@ -192,7 +175,9 @@ class _ImagePreview extends StatelessWidget {
                         vertical: 4,
                       ),
                       child: Text(
-                        hasImage ? 'Tap to replace' : 'Tap to upload',
+                        hasImage
+                            ? context.l10n.tapToReplace
+                            : context.l10n.tapToUpload,
                         style: context.textTheme.labelSmall?.copyWith(
                           color: context.colorScheme.onSurfaceVariant,
                         ),
@@ -208,7 +193,7 @@ class _ImagePreview extends StatelessWidget {
                       onPressed: onRemove,
                       visualDensity: VisualDensity.compact,
                       splashRadius: 16,
-                      tooltip: 'Remove image',
+                      tooltip: context.l10n.removeImage,
                       icon: Icon(
                         Icons.close_rounded,
                         size: 16,
@@ -239,7 +224,7 @@ class _ImageContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final file = File(path);
     if (!file.existsSync()) {
-      return const _ImagePlaceholder(message: 'Saved image not found.');
+      return _ImagePlaceholder(message: context.l10n.savedImageNotFound);
     }
 
     return Image.file(
@@ -251,9 +236,9 @@ class _ImageContent extends StatelessWidget {
 }
 
 class _ImagePlaceholder extends StatelessWidget {
-  const _ImagePlaceholder({this.message = 'No image selected'});
+  const _ImagePlaceholder({this.message});
 
-  final String message;
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +253,7 @@ class _ImagePlaceholder extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            message,
+            message ?? context.l10n.noImageSelected,
             style: context.textTheme.bodySmall?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
             ),

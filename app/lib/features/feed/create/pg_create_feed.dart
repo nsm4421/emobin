@@ -1,10 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:core/core.dart';
 import 'package:emobin/core/toast/toast_helper.dart';
+import 'package:emobin/core/extensions/l10n_extension.dart';
 import 'package:emobin/router/app_router.dart';
 import 'package:emobin/features/feed/create/wd_feed_editor_hashtag.dart';
 import 'package:emobin/features/feed/create/wd_feed_editor_image.dart';
 import 'package:emobin/features/feed/create/wd_feed_editor_note.dart';
+import 'package:emobin/features/feed/create/wd_feed_editor_title.dart';
 import 'package:feature_feed/feature_feed.dart';
 import 'package:feature_setting/feature_setting.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,8 @@ part 'sc_create_feed.dart';
 part 'fg_create_feed_intro.dart';
 
 part 'fg_create_feed_hashtag.dart';
+
+part 'fg_create_feed_title.dart';
 
 part 'fg_create_feed_note.dart';
 
@@ -40,7 +44,7 @@ class CreateFeed extends StatelessWidget {
         listener: (context, state) {
           final created = state.created;
           if (created != null && state.isCreated && context.router.canPop()) {
-            ToastHelper.success('created!');
+            ToastHelper.success(context.l10n.createdToast);
             context.router.pop<FeedEntry>(created);
             return;
           }

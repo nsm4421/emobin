@@ -15,7 +15,7 @@ class _HomeWriteEntry extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Ready to Write?',
+            context.l10n.readyToWriteTitle,
             style: context.textTheme.titleLarge?.copyWith(
               color: context.colorScheme.onPrimaryContainer,
               fontWeight: FontWeight.w700,
@@ -23,7 +23,7 @@ class _HomeWriteEntry extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Start a new entry or continue your draft.',
+            context.l10n.readyToWriteSubtitle,
             style: context.textTheme.bodyMedium?.copyWith(
               color: context.colorScheme.onPrimaryContainer,
             ),
@@ -35,14 +35,10 @@ class _HomeWriteEntry extends StatelessWidget {
               onPressed: () async {
                 await context.router.push(CreateFeedRoute());
                 if (!context.mounted) return;
-                context.read<DisplayFeedListBloc>().add(
-                  const DisplayFeedListEvent.refreshRequested(
-                    showLoading: false,
-                  ),
-                );
+                context.read<HomeRecordStatusCubit>().refresh();
               },
               icon: const Icon(Icons.edit_note_rounded),
-              label: const Text('Write Today\'s Entry'),
+              label: Text(context.l10n.writeTodaysEntry),
             ),
           ),
           const SizedBox(height: 10),
@@ -51,7 +47,7 @@ class _HomeWriteEntry extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: () => _onContinueDraftPressed(context),
               icon: const Icon(Icons.restore_rounded),
-              label: const Text('Continue Draft'),
+              label: Text(context.l10n.continueDraft),
             ),
           ),
         ],
@@ -60,37 +56,51 @@ class _HomeWriteEntry extends StatelessWidget {
   }
 
   Future<void> _onContinueDraftPressed(BuildContext context) async {
-    final fetchDrafts = GetIt.instance<FeedUseCase>().fetchLocalEntries;
-    final result = await fetchDrafts();
+    final result = await context
+        .read<HomeRecordStatusCubit>()
+        .fetchDraftEntries();
     if (!context.mounted) return;
 
     result.match(
       (failure) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(failure.message)));
+        ToastHelper.error(failure.message);
       },
-      (entries) {
-        final drafts = entries
-            .where((entry) => entry.isDraft && entry.deletedAt == null)
-            .toList(growable: false);
-
-        showDialog<void>(
+      (drafts) {
+        showModalBottomSheet<void>(
           context: context,
-          builder: (dialogContext) {
-            return AlertDialog(
-              title: const Text('Saved Drafts'),
-              content: SizedBox(
-                width: double.maxFinite,
-                child: drafts.isEmpty
-                    ? const Text('No saved drafts.')
-                    : ConstrainedBox(
+          isScrollControlled: true,
+          showDragHandle: true,
+          builder: (sheetContext) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.l10n.savedDrafts,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (drafts.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(context.l10n.noSavedDrafts),
+                      )
+                    else
+                      ConstrainedBox(
                         constraints: const BoxConstraints(maxHeight: 360),
                         child: ListView.separated(
                           shrinkWrap: true,
                           itemCount: drafts.length,
                           separatorBuilder: (_, _) => const Divider(height: 1),
                           itemBuilder: (context, index) {
+                            final localeCode = Localizations.localeOf(
+                              context,
+                            ).languageCode;
                             final draft = drafts[index];
                             return ListTile(
                               contentPadding: EdgeInsets.zero,
@@ -98,34 +108,34 @@ class _HomeWriteEntry extends StatelessWidget {
                                 Icons.description_outlined,
                                 color: context.colorScheme.primary,
                               ),
-                              title: Text(_draftTitle(draft)),
+                              title: Text(_draftTitle(context, draft)),
                               subtitle: Text(
-                                '${_formatDraftDateTime(draft.createdAt)}\n${_draftPreview(draft.note)}',
+                                '${draft.createdAt.agoWithLocale(localeCode)} · ${_formatDraftDateTime(draft.createdAt)}\n${_draftPreview(context, draft.note)}',
                               ),
                               isThreeLine: true,
                               onTap: () async {
-                                Navigator.of(dialogContext).pop();
+                                Navigator.of(sheetContext).pop();
                                 await context.router.push(
                                   EditFeedRoute(feedId: draft.id),
                                 );
                                 if (!context.mounted) return;
-                                context.read<DisplayFeedListBloc>().add(
-                                  const DisplayFeedListEvent.refreshRequested(
-                                    showLoading: false,
-                                  ),
-                                );
+                                context.read<HomeRecordStatusCubit>().refresh();
                               },
                             );
                           },
                         ),
                       ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Close'),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => Navigator.of(sheetContext).pop(),
+                        child: Text(context.l10n.close),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             );
           },
         );
@@ -134,20 +144,25 @@ class _HomeWriteEntry extends StatelessWidget {
   }
 }
 
-String _draftTitle(FeedEntry entry) {
+String _draftTitle(BuildContext context, FeedEntry entry) {
+  final title = entry.title?.trim();
+  if (title != null && title.isNotEmpty) {
+    return title;
+  }
+
   final firstHashtag = entry.hashtags
       .map((tag) => tag.trim())
       .firstWhere((tag) => tag.isNotEmpty, orElse: () => '');
   if (firstHashtag.isEmpty) {
-    return 'Untitled Draft';
+    return context.l10n.untitledDraft;
   }
   return firstHashtag;
 }
 
-String _draftPreview(String note) {
+String _draftPreview(BuildContext context, String note) {
   final normalized = note.trim().replaceAll(RegExp(r'\s+'), ' ');
   if (normalized.isEmpty) {
-    return 'No content yet';
+    return context.l10n.noContentYet;
   }
   if (normalized.length <= 42) {
     return normalized;

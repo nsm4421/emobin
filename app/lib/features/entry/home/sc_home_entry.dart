@@ -1,12 +1,12 @@
 part of 'pg_home_entry.dart';
 
-class _HomeEntryScreen extends StatelessWidget {
-  const _HomeEntryScreen();
+class _HomeEntry extends StatelessWidget {
+  const _HomeEntry();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('HOME')),
+      appBar: AppBar(title: Text(context.l10n.homeTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
@@ -16,8 +16,6 @@ class _HomeEntryScreen extends StatelessWidget {
             _HomeWriteEntry(),
             SizedBox(height: 16),
             _HomeSyncBackup(),
-            SizedBox(height: 16),
-            _HomeQuickActions(),
           ],
         ),
       ),

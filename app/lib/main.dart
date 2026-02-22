@@ -38,22 +38,21 @@ class MainApp extends StatelessWidget {
           create: (_) => GetIt.instance<AppLocaleCubit>()..initialize(),
         ),
       ],
-      child: BlocBuilder<AppLocaleCubit, Locale>(
-        builder: (context, locale) {
-          return BlocBuilder<AppThemeModeCubit, ThemeMode>(
-            builder: (context, themeMode) {
-              final themeCubit = context.read<AppThemeModeCubit>();
-              return MaterialApp.router(
-                title: 'EmoBin',
-                theme: themeCubit.lightThemeData,
-                darkTheme: themeCubit.darkThemeData,
-                themeMode: themeMode,
-                locale: locale,
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
-                supportedLocales: AppLocalizations.supportedLocales,
-                routerConfig: appRouterConfig,
-              );
-            },
+      child: Builder(
+        builder: (context) {
+          final locale = context.select((AppLocaleCubit c) => c.state);
+          final themeMode = context.select((AppThemeModeCubit c) => c.state);
+          final themeCubit = context.read<AppThemeModeCubit>();
+
+          return MaterialApp.router(
+            title: 'EmoBin',
+            theme: themeCubit.lightThemeData,
+            darkTheme: themeCubit.darkThemeData,
+            themeMode: themeMode,
+            locale: locale,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: appRouterConfig,
           );
         },
       ),

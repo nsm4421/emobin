@@ -12,10 +12,10 @@ class _HasPassword extends StatelessWidget {
             context: context,
             builder: (_) => _EditPasswordModal(_PasswordEditAction.change),
           ),
-          child: const _SettingTile(
+          child: _SettingTile(
             icon: Icons.lock_reset_rounded,
-            title: 'Change Password',
-            subtitle: 'Set a new password.',
+            title: context.l10n.changePassword,
+            subtitle: context.l10n.changePasswordSubtitle,
           ),
         ),
         GestureDetector(
@@ -26,8 +26,8 @@ class _HasPassword extends StatelessWidget {
           },
           child: _SettingTile(
             icon: Icons.lock_open_rounded,
-            title: 'Disable Password',
-            subtitle: 'Remove the app lock password.',
+            title: context.l10n.disablePassword,
+            subtitle: context.l10n.disablePasswordSubtitle,
             titleColor: context.colorScheme.error,
             showBottomDivider: false,
           ),

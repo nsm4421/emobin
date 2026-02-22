@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:core/core.dart';
+import 'package:emobin/core/extensions/l10n_extension.dart';
+import 'package:emobin/core/toast/toast_helper.dart';
+import 'package:emobin/features/feed/widgets/wd_feed_sync_status_badge.dart';
 import 'package:emobin/router/app_router.dart';
 import 'package:feature_feed/feature_feed.dart';
 import 'package:flutter/material.dart';

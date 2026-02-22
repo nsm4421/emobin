@@ -56,7 +56,7 @@ class _SettingHero extends StatelessWidget {
                         Text(displayName, style: context.textTheme.titleMedium),
                         const SizedBox(height: 2),
                         Text(
-                          email ?? 'Signed in user',
+                          email ?? context.l10n.signedInUser,
                           style: context.textTheme.bodySmall,
                         ),
                       ],
@@ -88,10 +88,13 @@ class _SettingHero extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Welcome', style: context.textTheme.titleMedium),
+                      Text(
+                        context.l10n.welcome,
+                        style: context.textTheme.titleMedium,
+                      ),
                       const SizedBox(height: 2),
                       Text(
-                        'Sign in to use backup and sync across devices.',
+                        context.l10n.signInBackupSyncMessage,
                         style: context.textTheme.bodySmall,
                       ),
                       const SizedBox(height: 10),
@@ -102,12 +105,12 @@ class _SettingHero extends StatelessWidget {
                           FilledButton.tonal(
                             onPressed: () =>
                                 context.router.push(const SignInRoute()),
-                            child: const Text('Sign In'),
+                            child: Text(context.l10n.signIn),
                           ),
                           OutlinedButton(
                             onPressed: () =>
                                 context.router.push(const SignUpRoute()),
-                            child: const Text('Sign Up'),
+                            child: Text(context.l10n.signUp),
                           ),
                         ],
                       ),
@@ -136,7 +139,7 @@ class _SettingHero extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Checking account status...',
+                    context.l10n.checkingAccountStatus,
                     style: context.textTheme.bodyMedium,
                   ),
                 ),

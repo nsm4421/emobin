@@ -43,20 +43,53 @@ class _FeedDetailScreenState extends State<_FeedDetailScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<DetailFeedCubit, DetailFeedState>(
       builder: (context, state) {
+        final loadedEntry = state.maybeWhen(
+          loaded: (entry) => entry,
+          orElse: () => null,
+        );
         return Scaffold(
+          appBar: AppBar(
+            title: Text(
+              loadedEntry == null
+                  ? context.l10n.feedTitle
+                  : _resolveTitle(loadedEntry),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            actions: [
+              if (loadedEntry != null)
+                PopupMenuButton<_FeedDetailAction>(
+                  tooltip: context.l10n.feedActions,
+                  onSelected: (action) =>
+                      _onSelectedAction(loadedEntry, action),
+                  itemBuilder: (context) => [
+                    PopupMenuItem<_FeedDetailAction>(
+                      value: _FeedDetailAction.edit,
+                      child: Text(context.l10n.editFeedAction),
+                    ),
+                    PopupMenuItem<_FeedDetailAction>(
+                      value: _FeedDetailAction.delete,
+                      child: Text(
+                        context.l10n.deleteFeedAction,
+                        style: TextStyle(color: context.colorScheme.error),
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
           body: GestureDetector(
             behavior: HitTestBehavior.translucent,
             onHorizontalDragStart: _handleHorizontalDragStart,
             onHorizontalDragUpdate: _handleHorizontalDragUpdate,
             onHorizontalDragEnd: _handleHorizontalDragEnd,
             child: SafeArea(
-              top: false,
               child: state.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
                 notFound: () => _FeedDetailStatus(
-                  title: 'Feed not found',
-                  message: 'The requested feed does not exist.',
-                  actionLabel: 'Back',
+                  title: context.l10n.feedNotFoundTitle,
+                  message: context.l10n.feedNotFoundMessage,
+                  actionLabel: context.l10n.back,
                   onPressed: () {
                     if (context.router.canPop()) {
                       context.router.pop();
@@ -64,9 +97,9 @@ class _FeedDetailScreenState extends State<_FeedDetailScreen> {
                   },
                 ),
                 failure: (failure) => _FeedDetailStatus(
-                  title: 'Failed to load feed',
+                  title: context.l10n.failedLoadFeedTitle,
                   message: failure.message,
-                  actionLabel: 'Retry',
+                  actionLabel: context.l10n.retry,
                   onPressed: () {
                     context.read<DetailFeedCubit>().load();
                   },
@@ -79,4 +112,75 @@ class _FeedDetailScreenState extends State<_FeedDetailScreen> {
       },
     );
   }
+
+  String _resolveTitle(FeedEntry entry) {
+    final title = entry.title?.trim();
+    if (title == null || title.isEmpty) {
+      return context.l10n.feedTitle;
+    }
+    return title;
+  }
+
+  Future<void> _onSelectedAction(
+    FeedEntry entry,
+    _FeedDetailAction action,
+  ) async {
+    switch (action) {
+      case _FeedDetailAction.edit:
+        await _editEntry(entry.id);
+        break;
+      case _FeedDetailAction.delete:
+        await _deleteEntry();
+        break;
+    }
+  }
+
+  Future<void> _editEntry(String feedId) async {
+    await context.router.push(EditFeedRoute(feedId: feedId));
+    if (!mounted) return;
+    context.read<DetailFeedCubit>().load();
+  }
+
+  Future<void> _deleteEntry() async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(context.l10n.deleteFeedTitle),
+          content: Text(context.l10n.deleteFeedMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(context.l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(context.l10n.delete),
+            ),
+          ],
+        );
+      },
+    );
+    if (shouldDelete != true || !mounted) return;
+
+    final result = await context
+        .read<DetailFeedCubit>()
+        .softDeleteCurrentEntry();
+    if (!mounted) return;
+
+    result.match(
+      (failure) {
+        ToastHelper.error(failure.message);
+      },
+      (_) {
+        if (context.router.canPop()) {
+          context.router.pop(true);
+          return;
+        }
+        context.read<DetailFeedCubit>().load();
+      },
+    );
+  }
 }
+
+enum _FeedDetailAction { edit, delete }

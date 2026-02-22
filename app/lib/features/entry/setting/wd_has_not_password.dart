@@ -10,10 +10,10 @@ class _HasNotPassword extends StatelessWidget {
         context: context,
         builder: (_) => _EditPasswordModal(_PasswordEditAction.set),
       ),
-      child: const _SettingTile(
+      child: _SettingTile(
         icon: Icons.lock_outline_rounded,
-        title: 'Set Password',
-        subtitle: 'Set up a password for app lock.',
+        title: context.l10n.setPassword,
+        subtitle: context.l10n.setPasswordSubtitle,
         showBottomDivider: false,
       ),
     );

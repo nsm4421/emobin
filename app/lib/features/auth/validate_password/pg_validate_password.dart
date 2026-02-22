@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:core/core.dart';
 import 'package:emobin/core/toast/toast_helper.dart';
+import 'package:emobin/core/extensions/l10n_extension.dart';
 import 'package:emobin/router/app_router.dart';
 import 'package:feature_security/feature_security.dart';
 import 'package:flutter/material.dart';
@@ -38,10 +39,10 @@ class _ValidatePasswordState extends State<ValidatePassword> {
   String? _validatePassword(String? value) {
     final input = (value ?? '').trim();
     if (input.isEmpty) {
-      return 'Please enter a password.';
+      return context.l10n.pleaseEnterPassword;
     }
     if (input.length < _minPasswordLength) {
-      return 'Use at least $_minPasswordLength characters.';
+      return context.l10n.atLeastCharacters(_minPasswordLength);
     }
     return null;
   }
@@ -68,36 +69,36 @@ class _ValidatePasswordState extends State<ValidatePassword> {
         }
 
         if (state.unLocked) {
-          ToastHelper.success('Password Verified!');
+          ToastHelper.success(context.l10n.passwordVerifiedToast);
           context.router.replaceAll([EntryRoute()]);
           return;
         }
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(title: const Text('Validate Password')),
+          appBar: AppBar(title: Text(context.l10n.validatePasswordTitle)),
           body: SafeArea(
             child: Form(
               key: _formKey,
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  const AppFormHeader(
-                    title: 'Verify your password for security',
-                    subtitle: 'Enter your account password to continue.',
+                  AppFormHeader(
+                    title: context.l10n.validatePasswordHeader,
+                    subtitle: context.l10n.validatePasswordSubtitle,
                   ),
                   const SizedBox(height: 32),
                   AppPasswordField(
                     controller: _passwordController,
-                    label: 'Password',
-                    hintText: 'Enter your password',
+                    label: context.l10n.password,
+                    hintText: context.l10n.enterYourPasswordHint,
                     textInputAction: TextInputAction.done,
                     validator: _validatePassword,
                     onFieldSubmitted: (_) => _onValidatePressed(),
                   ),
                   const SizedBox(height: 8),
                   AppPrimaryButton(
-                    label: 'Confirm',
+                    label: context.l10n.confirm,
                     onPressed: state.isLoading ? null : _onValidatePressed,
                   ),
                   const SizedBox(height: 12),

@@ -1,12 +1,14 @@
-part of 'pg_feed_entry.dart';
+part of '../pg_display_feed_entry.dart';
 
 class _FeedEntryTile extends StatelessWidget {
   const _FeedEntryTile({required this.entry});
 
-  final ff.FeedEntry entry;
+  final FeedEntry entry;
 
   @override
   Widget build(BuildContext context) {
+    final localeCode = Localizations.localeOf(context).languageCode;
+    final title = entry.title?.trim();
     final note = entry.note.trim();
     final hashtagSummary = _buildHashtagSummary(entry.hashtags);
 
@@ -28,6 +30,18 @@ class _FeedEntryTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (title != null && title.isNotEmpty) ...[
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: context.colorScheme.onSurface,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
                   if (hashtagSummary != null)
                     Row(
                       children: [
@@ -69,10 +83,13 @@ class _FeedEntryTile extends StatelessWidget {
                         color: context.colorScheme.onSurfaceVariant,
                       ),
                       const SizedBox(width: 6),
-                      Text(
-                        entry.createdAt.ago,
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: context.colorScheme.onSurfaceVariant,
+                      Flexible(
+                        child: Text(
+                          entry.createdAt.agoWithLocale(localeCode),
+                          style: context.textTheme.bodySmall?.copyWith(
+                            color: context.colorScheme.onSurfaceVariant,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -91,26 +108,26 @@ class _FeedEntryTile extends StatelessWidget {
               splashRadius: 14,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
-              tooltip: 'Entry actions',
+              tooltip: context.l10n.entryActions,
               onSelected: (action) => _onSelectedAction(context, action),
               itemBuilder: (context) => [
                 PopupMenuItem<_FeedEntryAction>(
                   value: _FeedEntryAction.edit,
                   child: Row(
-                    children: const [
-                      Icon(Icons.edit_outlined, size: 18),
-                      SizedBox(width: 8),
-                      Text('Edit'),
+                    children: [
+                      const Icon(Icons.edit_outlined, size: 18),
+                      const SizedBox(width: 8),
+                      Text(context.l10n.edit),
                     ],
                   ),
                 ),
                 PopupMenuItem<_FeedEntryAction>(
                   value: _FeedEntryAction.delete,
                   child: Row(
-                    children: const [
-                      Icon(Icons.delete_outline, size: 18),
-                      SizedBox(width: 8),
-                      Text('Delete'),
+                    children: [
+                      const Icon(Icons.delete_outline, size: 18),
+                      const SizedBox(width: 8),
+                      Text(context.l10n.delete),
                     ],
                   ),
                 ),
@@ -151,16 +168,16 @@ class _FeedEntryTile extends StatelessWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Delete Feed'),
-          content: const Text('Do you want to delete this feed?'),
+          title: Text(context.l10n.deleteFeedTitle),
+          content: Text(context.l10n.deleteFeedMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Delete'),
+              child: Text(context.l10n.delete),
             ),
           ],
         );
@@ -168,21 +185,22 @@ class _FeedEntryTile extends StatelessWidget {
     );
     if (shouldDelete != true || !context.mounted) return;
 
-    final result = await GetIt.instance<FeedUseCase>().softDeleteLocalEntry(
+    final result = await context.read<DisplayFeedListBloc>().softDeleteEntry(
       entry.id,
     );
     if (!context.mounted) return;
 
     result.match((failure) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(failure.message)));
+      ToastHelper.error(failure.message);
     }, (_) => _refresh(context));
   }
 
   void _refresh(BuildContext context) {
     context.read<DisplayFeedListBloc>().add(
       const DisplayFeedListEvent.refreshRequested(showLoading: false),
+    );
+    context.read<DisplayFeedCalendarBloc>().add(
+      const DisplayFeedCalendarEvent.refreshRequested(showLoading: false),
     );
   }
 }

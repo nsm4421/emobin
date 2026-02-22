@@ -25,7 +25,7 @@ class _BottomNavigator extends StatelessWidget {
                       (menu) => BottomNavigationBarItem(
                         icon: Icon(menu.iconData),
                         activeIcon: Icon(menu.activeIconData),
-                        label: menu.label,
+                        label: menu.label(context),
                       ),
                     )
                     .toList(growable: false),

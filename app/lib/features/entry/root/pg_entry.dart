@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:core/core.dart';
+import 'package:emobin/core/extensions/l10n_extension.dart';
 import 'package:emobin/providers/cubit/home_bottom_navigation/home_bottom_navigation_cubit.dart';
 import 'package:emobin/router/app_router.dart';
 import 'package:flutter/material.dart';

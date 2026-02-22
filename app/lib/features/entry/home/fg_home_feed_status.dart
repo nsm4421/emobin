@@ -5,10 +5,12 @@ class _HomeFeedStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DisplayFeedListBloc, DisplayFeedListState>(
+    return BlocBuilder<HomeRecordStatusCubit, HomeRecordStatusState>(
       builder: (context, state) {
-        final metrics = _buildFeedStatusMetrics(state.entries);
-        final isFailed = state.status == DisplayFeedListStatus.failure;
+        final status = state.recordStatus;
+        final statusMessage = status.todayDone
+            ? context.l10n.todayRecordedMessage
+            : context.l10n.noEntryYetMessage;
 
         return Container(
           padding: const EdgeInsets.all(20),
@@ -23,38 +25,24 @@ class _HomeFeedStatus extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'Today\'s Journal Status',
+                      context.l10n.todayJournalStatus,
                       style: context.textTheme.titleMedium?.copyWith(
                         color: context.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  if (state.status == DisplayFeedListStatus.loading)
+                  if (state.isLoading)
                     const SizedBox(
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
-                  if (isFailed)
-                    IconButton(
-                      onPressed: () {
-                        context.read<DisplayFeedListBloc>().add(
-                          const DisplayFeedListEvent.refreshRequested(
-                            showLoading: false,
-                          ),
-                        );
-                      },
-                      tooltip: 'Retry',
-                      icon: const Icon(Icons.refresh_rounded),
-                    ),
                 ],
               ),
               const SizedBox(height: 6),
               Text(
-                isFailed
-                    ? (state.failure?.message ?? 'Failed to load feed status.')
-                    : metrics.message,
+                statusMessage,
                 style: context.textTheme.bodyMedium?.copyWith(
                   color: context.colorScheme.onSurfaceVariant,
                 ),
@@ -65,24 +53,26 @@ class _HomeFeedStatus extends StatelessWidget {
                   Expanded(
                     child: _HomeStatusMetric(
                       icon: Icons.local_fire_department_rounded,
-                      label: 'Streak',
-                      value: '${metrics.streakDays} days',
+                      label: context.l10n.streak,
+                      value: context.l10n.daysCount(status.streakDays),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _HomeStatusMetric(
                       icon: Icons.today_rounded,
-                      label: 'Today',
-                      value: metrics.todayDone ? 'Done' : 'Pending',
+                      label: context.l10n.todayLabel,
+                      value: status.todayDone
+                          ? context.l10n.done
+                          : context.l10n.pending,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _HomeStatusMetric(
                       icon: Icons.edit_calendar_rounded,
-                      label: 'This Week',
-                      value: '${metrics.thisWeekCount} / 7',
+                      label: context.l10n.thisWeek,
+                      value: '${status.thisWeekCount} / 7',
                     ),
                   ),
                 ],
@@ -93,57 +83,4 @@ class _HomeFeedStatus extends StatelessWidget {
       },
     );
   }
-}
-
-typedef _HomeFeedStatusMetrics = ({
-  bool todayDone,
-  int streakDays,
-  int thisWeekCount,
-  String message,
-});
-
-_HomeFeedStatusMetrics _buildFeedStatusMetrics(List<FeedEntry> entries) {
-  final validEntries = entries
-      .where((entry) => !entry.isDraft && entry.deletedAt == null)
-      .toList(growable: false);
-  final today = DateUtils.dateOnly(DateTime.now());
-  final recordedDays = validEntries
-      .map((entry) => DateUtils.dateOnly(entry.createdAt.toLocal()))
-      .toSet();
-
-  final todayDone = recordedDays.contains(today);
-  final streakDays = _calculateStreak(recordedDays, today);
-  final thisWeekCount = _countThisWeek(recordedDays, today);
-  final message = todayDone
-      ? 'Today is recorded. Keep your momentum going.'
-      : 'No entry yet. Capture today before it slips away.';
-
-  return (
-    todayDone: todayDone,
-    streakDays: streakDays,
-    thisWeekCount: thisWeekCount,
-    message: message,
-  );
-}
-
-int _calculateStreak(Set<DateTime> recordedDays, DateTime today) {
-  var streak = 0;
-  var cursor = today;
-  while (recordedDays.contains(cursor)) {
-    streak += 1;
-    cursor = cursor.subtract(const Duration(days: 1));
-  }
-  return streak;
-}
-
-int _countThisWeek(Set<DateTime> recordedDays, DateTime today) {
-  final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
-  var count = 0;
-  for (var i = 0; i < 7; i++) {
-    final day = startOfWeek.add(Duration(days: i));
-    if (recordedDays.contains(day)) {
-      count += 1;
-    }
-  }
-  return count;
 }

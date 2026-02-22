@@ -7,15 +7,15 @@ class _EditHashtag extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            const Text(
               '#',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
-            SizedBox(width: 8),
-            Text('Hashtag Preset'),
+            const SizedBox(width: 8),
+            Text(context.l10n.hashtagPresetTitle),
           ],
         ),
       ),

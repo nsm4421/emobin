@@ -9,8 +9,14 @@ class _EditFeedImage extends StatelessWidget {
       builder: (context, state) {
         return FeedEditorImage(
           imageLocalPath: state.data.imageLocalPath,
-          onChanged: (path) {
-            context.read<EditFeedCubit>().setImageLocalPath(path);
+          isProcessing: state.isLoading,
+          onImageSelected: (sourcePath) async {
+            await context.read<EditFeedCubit>().saveImageFromSourcePath(
+              sourcePath,
+            );
+          },
+          onImageRemoved: () async {
+            await context.read<EditFeedCubit>().removeImage();
           },
           onError: ToastHelper.error,
         );

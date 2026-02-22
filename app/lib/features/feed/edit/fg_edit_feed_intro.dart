@@ -8,7 +8,7 @@ class _EditFeedIntro extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Text(
-        'Edit your entry and save changes.',
+        context.l10n.editFeedIntro,
         style: context.textTheme.bodyMedium?.copyWith(
           color: context.colorScheme.onSurfaceVariant,
           height: 1.4,

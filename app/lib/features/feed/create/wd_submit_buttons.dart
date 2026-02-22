@@ -13,7 +13,7 @@ class _SubmitButtons extends StatelessWidget {
             // 임시저장
             Expanded(
               child: AppOutlinedButton(
-                label: 'Save Draft',
+                label: context.l10n.saveDraft,
                 fullWidth: true,
                 onPressed: tappable
                     ? () async {
@@ -27,7 +27,7 @@ class _SubmitButtons extends StatelessWidget {
             // 저장
             Expanded(
               child: AppPrimaryButton(
-                label: 'Post Entry',
+                label: context.l10n.postEntry,
                 fullWidth: true,
                 onPressed: tappable
                     ? () async {

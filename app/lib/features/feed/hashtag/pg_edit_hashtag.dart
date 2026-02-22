@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:core/core.dart';
 import 'package:emobin/core/toast/toast_helper.dart';
+import 'package:emobin/core/extensions/l10n_extension.dart';
 import 'package:feature_setting/feature_setting.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

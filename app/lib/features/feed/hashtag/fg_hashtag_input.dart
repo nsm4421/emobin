@@ -43,14 +43,14 @@ class _HashtagInputState extends State<_HashtagInput> {
                 controller: _controller,
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => tappable ? _handleAdd() : null,
-                decoration: const InputDecoration(hintText: 'Type a hashtag'),
+                decoration: InputDecoration(hintText: context.l10n.typeHashtag),
               ),
             ),
             const SizedBox(width: 8),
             IconButton(
               onPressed: tappable ? _handleAdd : null,
               iconSize: 30,
-              tooltip: 'Add hashtag',
+              tooltip: context.l10n.addHashtag,
               icon: tappable
                   ? const Icon(Icons.add_circle_rounded)
                   : const SizedBox(

@@ -8,7 +8,7 @@ class _CreateFeedIntro extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Text(
-        'Capture today with up to 3 hashtags.\nKeep it simple and meaningful.',
+        context.l10n.createFeedIntro,
         style: context.textTheme.bodyMedium?.copyWith(
           color: context.colorScheme.onSurfaceVariant,
           height: 1.4,

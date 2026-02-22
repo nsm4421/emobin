@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:emobin/core/extensions/l10n_extension.dart';
 import 'package:flutter/material.dart';
 
 class FeedEditorNote extends StatefulWidget {
@@ -47,7 +48,7 @@ class _FeedEditorNoteState extends State<FeedEditorNote> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Note', style: context.textTheme.titleMedium),
+        Text(context.l10n.note, style: context.textTheme.titleMedium),
         const SizedBox(height: 8),
         TextField(
           controller: _controller,
@@ -55,9 +56,8 @@ class _FeedEditorNoteState extends State<FeedEditorNote> {
           maxLines: 10,
           maxLength: _maxNoteLength,
           onChanged: widget.onChanged,
-          decoration: const InputDecoration(
-            hintText:
-                'e.g.) I could not express myself well in the meeting. I feel calmer now.',
+          decoration: InputDecoration(
+            hintText: context.l10n.noteHint,
             border: OutlineInputBorder(),
           ),
         ),

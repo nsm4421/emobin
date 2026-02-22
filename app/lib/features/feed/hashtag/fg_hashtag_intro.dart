@@ -16,7 +16,7 @@ class _HashtagIntro extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            'Manage hashtag presets used while creating or editing feeds.',
+            context.l10n.hashtagIntro,
             style: context.textTheme.bodySmall?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
               height: 1.35,

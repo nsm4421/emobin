@@ -10,102 +10,80 @@ class _FeedDetailContent extends StatelessWidget {
     final note = entry.note.trim();
     final hashtags = _normalizeHashtags(entry.hashtags);
     final hasMedia = _hasMedia(entry);
+    final createdAt = _formatDateTime(entry.createdAt);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
       children: [
         Container(
           decoration: BoxDecoration(
-            color: context.colorScheme.surface,
-            borderRadius: BorderRadius.circular(18),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                context.colorScheme.surface,
+                context.colorScheme.surfaceContainerHighest.withAlpha(110),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(color: context.colorScheme.outlineVariant),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 6, 8),
-                child: Row(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    Icon(
-                      Icons.schedule_outlined,
-                      size: 14,
-                      color: context.colorScheme.onSurfaceVariant,
+                    _FeedDetailPill(
+                      icon: Icons.calendar_today_rounded,
+                      label: createdAt,
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      _formatDateTime(entry.createdAt),
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: context.colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
+                    FeedSyncStatusBadge(status: entry.syncStatus),
+                    if (entry.isDraft)
+                      _FeedDetailPill(
+                        icon: Icons.edit_note_rounded,
+                        label: context.l10n.draft,
                       ),
-                    ),
-                    const Spacer(),
-                    PopupMenuButton<_FeedDetailAction>(
-                      tooltip: 'Feed actions',
-                      onSelected: (action) async {
-                        switch (action) {
-                          case _FeedDetailAction.edit:
-                            await _editEntry(context);
-                          case _FeedDetailAction.delete:
-                            await _deleteEntry(context);
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem<_FeedDetailAction>(
-                          value: _FeedDetailAction.edit,
-                          child: Text('Edit Feed'),
-                        ),
-                        PopupMenuItem<_FeedDetailAction>(
-                          value: _FeedDetailAction.delete,
-                          child: Text(
-                            'Delete Feed',
-                            style: TextStyle(color: context.colorScheme.error),
-                          ),
-                        ),
-                      ],
-                      icon: Icon(
-                        Icons.more_vert,
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
                   ],
                 ),
-              ),
-              if (hasMedia) _FeedDetailMedia(entry: entry),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (hashtags.isNotEmpty)
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 6,
-                        children: hashtags
-                            .map(
-                              (tag) => Text(
-                                '#$tag',
-                                style: context.textTheme.titleSmall?.copyWith(
-                                  color: context.colorScheme.primary,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            )
-                            .toList(growable: false),
-                      ),
-                    if (hashtags.isNotEmpty) const SizedBox(height: 10),
-                    Text(
-                      note.isEmpty ? 'No caption yet.' : note,
-                      style: context.textTheme.bodyLarge?.copyWith(
-                        color: context.colorScheme.onSurface,
-                        height: 1.65,
-                      ),
+                if (hasMedia) ...[
+                  const SizedBox(height: 12),
+                  _FeedDetailMedia(entry: entry),
+                ],
+                if (hashtags.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: hashtags
+                        .map((tag) => _FeedDetailTagChip(label: '#$tag'))
+                        .toList(growable: false),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: context.colorScheme.surface.withAlpha(170),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: context.colorScheme.outlineVariant.withAlpha(180),
                     ),
-                  ],
+                  ),
+                  child: Text(
+                    note.isEmpty ? context.l10n.noCaptionYet : note,
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      color: context.colorScheme.onSurface,
+                      height: 1.68,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -113,7 +91,7 @@ class _FeedDetailContent extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
           decoration: BoxDecoration(
             color: context.colorScheme.surface,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: context.colorScheme.outlineVariant),
           ),
           child: Theme(
@@ -121,59 +99,43 @@ class _FeedDetailContent extends StatelessWidget {
             child: ExpansionTile(
               tilePadding: EdgeInsets.zero,
               childrenPadding: const EdgeInsets.only(bottom: 8),
-              title: Text(
-                'Details',
-                style: context.textTheme.titleSmall?.copyWith(
-                  color: context.colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w700,
-                ),
+              title: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 16,
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    context.l10n.details,
+                    style: context.textTheme.titleSmall?.copyWith(
+                      color: context.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
               children: [
                 _FeedDetailMetaRow(
-                  label: 'Hashtags',
-                  value: hashtags.isEmpty
-                      ? '-'
-                      : hashtags.map((tag) => '#$tag').join(' '),
+                  label: context.l10n.createdAt,
+                  value: createdAt,
                 ),
                 _FeedDetailMetaRow(
-                  label: 'Created At',
-                  value: _formatDateTime(entry.createdAt),
+                  label: context.l10n.draft,
+                  value: entry.isDraft ? context.l10n.yes : context.l10n.no,
                 ),
                 _FeedDetailMetaRow(
-                  label: 'Draft',
-                  value: entry.isDraft ? 'Yes' : 'No',
+                  label: context.l10n.syncStatus,
+                  value: entry.syncStatus.label(context),
                 ),
                 _FeedDetailMetaRow(
-                  label: 'Sync Status',
-                  value: entry.syncStatus.name,
-                ),
-                _FeedDetailMetaRow(
-                  label: 'Server ID',
-                  value: _displayNullableText(entry.serverId),
-                ),
-                _FeedDetailMetaRow(
-                  label: 'Local Image',
-                  value: _displayNullableText(entry.imageLocalPath),
-                ),
-                _FeedDetailMetaRow(
-                  label: 'Remote Image Path',
-                  value: _displayNullableText(entry.imageRemotePath),
-                ),
-                _FeedDetailMetaRow(
-                  label: 'Remote Image URL',
-                  value: _displayNullableText(entry.imageRemoteUrl),
-                ),
-                _FeedDetailMetaRow(
-                  label: 'Updated At',
+                  label: context.l10n.updatedAt,
                   value: _formatDateTimeOrDash(entry.updatedAt),
                 ),
                 _FeedDetailMetaRow(
-                  label: 'Last Synced At',
+                  label: context.l10n.lastSyncedAt,
                   value: _formatDateTimeOrDash(entry.lastSyncedAt),
-                ),
-                _FeedDetailMetaRow(
-                  label: 'Deleted At',
-                  value: _formatDateTimeOrDash(entry.deletedAt),
                   showDivider: false,
                 ),
               ],
@@ -183,58 +145,64 @@ class _FeedDetailContent extends StatelessWidget {
       ],
     );
   }
+}
 
-  Future<void> _editEntry(BuildContext context) async {
-    await context.router.push(EditFeedRoute(feedId: entry.id));
-    if (!context.mounted) return;
-    context.read<DetailFeedCubit>().load();
-  }
+class _FeedDetailPill extends StatelessWidget {
+  const _FeedDetailPill({required this.icon, required this.label});
 
-  Future<void> _deleteEntry(BuildContext context) async {
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Delete Feed'),
-          content: const Text('Do you want to delete this feed?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: context.colorScheme.surface.withAlpha(180),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: context.colorScheme.outlineVariant),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: context.colorScheme.onSurfaceVariant),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: context.textTheme.labelMedium?.copyWith(
+              color: context.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
             ),
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-    if (shouldDelete != true || !context.mounted) return;
-
-    final result = await GetIt.instance<FeedUseCase>().softDeleteLocalEntry(
-      entry.id,
-    );
-    if (!context.mounted) return;
-
-    result.match(
-      (failure) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(failure.message)));
-      },
-      (_) {
-        if (context.router.canPop()) {
-          context.router.pop(true);
-          return;
-        }
-        context.read<DetailFeedCubit>().load();
-      },
+          ),
+        ],
+      ),
     );
   }
 }
 
-enum _FeedDetailAction { edit, delete }
+class _FeedDetailTagChip extends StatelessWidget {
+  const _FeedDetailTagChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: context.colorScheme.primaryContainer.withAlpha(185),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: context.textTheme.labelLarge?.copyWith(
+          color: context.colorScheme.onPrimaryContainer,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
 
 class _FeedDetailMedia extends StatelessWidget {
   const _FeedDetailMedia({required this.entry});
@@ -321,7 +289,7 @@ class _MediaPlaceholder extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Image slot',
+              context.l10n.imageSlot,
               style: context.textTheme.titleSmall?.copyWith(
                 color: context.colorScheme.onPrimaryContainer,
                 fontWeight: FontWeight.w700,
@@ -329,7 +297,7 @@ class _MediaPlaceholder extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'You can add photo later.',
+              context.l10n.addPhotoLater,
               style: context.textTheme.bodySmall?.copyWith(
                 color: context.colorScheme.onPrimaryContainer.withAlpha(220),
               ),
@@ -363,12 +331,6 @@ String _formatDateTime(DateTime dateTime) {
       '${local.year}.${twoDigits(local.month)}.${twoDigits(local.day)}';
   final time = '${twoDigits(local.hour)}:${twoDigits(local.minute)}';
   return '$date $time';
-}
-
-String _displayNullableText(String? value) {
-  final normalized = value?.trim();
-  if (normalized == null || normalized.isEmpty) return '-';
-  return normalized;
 }
 
 String? _normalizeNullableText(String? value) {

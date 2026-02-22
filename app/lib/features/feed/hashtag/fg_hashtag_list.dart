@@ -19,7 +19,7 @@ class _HashtagList extends StatelessWidget {
               border: Border.all(color: context.colorScheme.outlineVariant),
             ),
             child: Text(
-              'No saved hashtags yet.',
+              context.l10n.noSavedHashtagsYet,
               style: context.textTheme.bodyMedium,
             ),
           );
@@ -46,7 +46,7 @@ class _HashtagList extends StatelessWidget {
                             .read<FeedHashtagPresetCubit>()
                             .removeHashtag(hashtag),
                   icon: const Icon(Icons.remove_circle_outline_rounded),
-                  tooltip: 'Remove',
+                  tooltip: context.l10n.remove,
                 ),
               );
             },

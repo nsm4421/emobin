@@ -1,4 +1,4 @@
-part of 'pg_feed_entry.dart';
+part of '../pg_display_feed_entry.dart';
 
 class _FeedEntryEmpty extends StatelessWidget {
   const _FeedEntryEmpty();
@@ -21,14 +21,14 @@ class _FeedEntryEmpty extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'No feeds yet.',
+            context.l10n.noFeedsYet,
             style: context.textTheme.titleSmall?.copyWith(
               color: context.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'Pull down to refresh.',
+            context.l10n.pullDownToRefresh,
             style: context.textTheme.bodySmall?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
             ),

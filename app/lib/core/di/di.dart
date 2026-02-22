@@ -6,6 +6,7 @@ import 'package:feature_feed/feature_feed.dart';
 import 'package:feature_setting/feature_setting.dart';
 import 'package:feature_security/feature_security.dart';
 import 'package:infra_drift/infra_drift.dart';
+import 'package:infra_media_local/infra_media_local.dart';
 import 'package:infra_supabase/infra_supabase.dart';
 
 import '../bloc/app_bloc_observer.dart';
@@ -16,6 +17,7 @@ import 'di.config.dart';
   includeMicroPackages: true,
   externalPackageModulesBefore: [
     ExternalModule(InfraDriftPackageModule),
+    ExternalModule(InfraMediaLocalPackageModule),
     ExternalModule(InfraSupabasePackageModule),
     ExternalModule(FeatureAuthPackageModule),
     ExternalModule(FeatureFeedPackageModule),
@@ -26,6 +28,7 @@ import 'di.config.dart';
 Future<void> configureDependencies() async {
   await initInfraSupabasePackage();
   await initInfraDriftPackage();
+  await initInfraMediaLocalPackage();
   await initFeatureSettingPackage();
   await GetIt.instance.init();
   Bloc.observer = GetIt.instance<AppBlocObserver>();

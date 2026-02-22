@@ -20,7 +20,7 @@ class _SettingSecurity extends StatelessWidget {
             state.whenOrNull(unlocked: (_, hasPassword) => hasPassword) ??
             false;
         return _SettingSectionCard(
-          title: 'Security',
+          title: context.l10n.securityTitle,
           children: [hasPassword ? _HasPassword() : _HasNotPassword()],
         );
       },

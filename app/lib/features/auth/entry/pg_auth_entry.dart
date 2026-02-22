@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:core/core.dart';
+import 'package:emobin/core/extensions/l10n_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:feature_setting/feature_setting.dart';
@@ -50,13 +51,13 @@ class AuthEntry extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Welcome to Emobin',
+                  context.l10n.welcomeToEmobin,
                   style: context.textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Sign in or create an account to continue.',
+                  context.l10n.signInOrCreateToContinue,
                   style: context.textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -64,18 +65,18 @@ class AuthEntry extends StatelessWidget {
                 const _AuthEntryFeatures(),
                 const Spacer(),
                 AppPrimaryButton(
-                  label: 'Sign In',
+                  label: context.l10n.signIn,
                   onPressed: () => context.router.push(const SignInRoute()),
                 ),
                 const SizedBox(height: 12),
                 AppOutlinedButton(
-                  label: 'Sign Up',
+                  label: context.l10n.signUp,
                   onPressed: () => context.router.push(const SignUpRoute()),
                   fullWidth: true,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Create an account in under a minute.',
+                  context.l10n.createAccountInMinute,
                   style: context.textTheme.bodySmall,
                   textAlign: TextAlign.center,
                 ),

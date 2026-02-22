@@ -8,7 +8,7 @@ class _CreateFeed extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Create Feed'),
+        title: Text(context.l10n.createFeedTitle),
       ),
       body: SafeArea(
         child: ListView(
@@ -16,6 +16,8 @@ class _CreateFeed extends StatelessWidget {
           children: [
             const _CreateFeedIntro(),
             const SizedBox(height: 16),
+            const _CreateFeedTitle(),
+            const SizedBox(height: 10),
             _CreateFeedNote(),
             const SizedBox(height: 10),
             _CreateFeedImage(),

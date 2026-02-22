@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:emobin/core/extensions/l10n_extension.dart';
 import 'package:flutter/material.dart';
 
 class FeedEditorHashtag extends StatelessWidget {
@@ -31,7 +32,10 @@ class FeedEditorHashtag extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Text('Hashtags', style: context.textTheme.titleMedium),
+              child: Text(
+                context.l10n.hashtags,
+                style: context.textTheme.titleMedium,
+              ),
             ),
             IconButton(
               onPressed: onOpenHashtagEditor,
@@ -40,7 +44,7 @@ class FeedEditorHashtag extends StatelessWidget {
                 size: 18,
                 color: context.colorScheme.onSurfaceVariant,
               ),
-              tooltip: 'Edit hashtags',
+              tooltip: context.l10n.editHashtags,
               visualDensity: VisualDensity.compact,
               splashRadius: 18,
             ),
@@ -57,7 +61,7 @@ class FeedEditorHashtag extends StatelessWidget {
               border: Border.all(color: context.colorScheme.outlineVariant),
             ),
             child: Text(
-              'No hashtag presets yet.',
+              context.l10n.noHashtagPresetsYet,
               style: context.textTheme.bodyMedium,
             ),
           )
@@ -91,7 +95,7 @@ class FeedEditorHashtag extends StatelessWidget {
           ),
         const SizedBox(height: 8),
         Text(
-          'Select up to $maxSelectable hashtags.',
+          context.l10n.selectUpToHashtags(maxSelectable),
           style: context.textTheme.bodySmall?.copyWith(
             color: context.colorScheme.onSurfaceVariant,
           ),

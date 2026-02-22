@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:core/core.dart';
+import 'package:emobin/core/extensions/l10n_extension.dart';
 import 'package:emobin/core/toast/toast_helper.dart';
 import 'package:emobin/router/app_router.dart';
 import 'package:feature_auth/feature_auth.dart';
@@ -26,7 +27,7 @@ class SettingEntry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('SETTING')),
+      appBar: AppBar(title: Text(context.l10n.settingTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
