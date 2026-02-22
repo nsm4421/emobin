@@ -1,0 +1,25 @@
+name: infra_media_local
+description: "Local media infrastructure implementations."
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: ^3.9.2
+  flutter: ">=1.17.0"
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  feature_feed: ^0.0.1
+  injectable: ^2.5.2
+  flutter_image_compress: ^2.4.0
+  path_provider: ^2.1.2
+  uuid: ^4.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:

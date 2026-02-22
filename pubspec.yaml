@@ -13,6 +13,7 @@ workspace:
   - packages/feature_security
   - packages/feature_setting
   - packages/infra_drift
+  - packages/infra_media_local
   - packages/infra_supabase
   - packages/ui_theme
 
@@ -34,7 +35,10 @@ melos:
         injectable_generator: ^2.10.0
   scripts:
     get: melos exec -- flutter pub get
+    get:offline: melos exec -- flutter pub get --offline
     bootstrap:features: melos bootstrap --scope="feature_*"
+    run:app: melos exec --scope=emobin -- flutter run
+    run:app:offline: melos exec --scope=emobin -- flutter run --no-pub
     clean: melos exec -- flutter clean
     analyze: melos exec -- flutter analyze
     test: melos exec -- flutter test
