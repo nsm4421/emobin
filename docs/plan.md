@@ -222,6 +222,10 @@ Entry
 **코드 구조 메모**
 - 긴 매핑 로직은 mixin으로 분리하고 with로 합성한다
 - 예: Drift 로컬 datasource의 row<->model 매핑, FeedRepository의 동기화 관련 유틸
+- 아키텍처 규칙(강제):
+- View(UI) 레이어에서 UseCase를 직접 참조/호출하지 않는다.
+- `feature_feed.dart` 같은 배럴 파일에서 UseCase를 export하지 않는다.
+- UI 액션(조회/복원/삭제/동기화 등)은 반드시 Bloc/Cubit을 통해서만 실행한다.
 
 ---
 

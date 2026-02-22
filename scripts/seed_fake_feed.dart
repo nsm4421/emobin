@@ -103,7 +103,11 @@ Future<void> main(List<String> args) async {
 INSERT INTO feed_entries (
   id,
   server_id,
+  emotion,
+  emotion_id,
   note,
+  intensity,
+  created_by,
   hashtags,
   image_local_path,
   image_remote_path,
@@ -114,12 +118,16 @@ INSERT INTO feed_entries (
   is_draft,
   sync_status,
   last_synced_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ''',
             variables: [
               Variable<String>(entry.id),
               Variable<String>(entry.serverId),
+              Variable<String>(entry.emotion),
+              Variable<String>(entry.emotionId),
               Variable<String>(entry.note),
+              Variable<int>(entry.intensity),
+              Variable<String>(entry.createdBy),
               Variable<String>(
                 entry.hashtags.isEmpty ? null : jsonEncode(entry.hashtags),
               ),
@@ -409,7 +417,11 @@ Future<void> _ensureTable(_SeedDatabase db) {
 CREATE TABLE IF NOT EXISTS feed_entries (
   id TEXT NOT NULL PRIMARY KEY,
   server_id TEXT NULL,
+  emotion TEXT NOT NULL DEFAULT 'neutral',
+  emotion_id TEXT NULL,
   note TEXT NULL,
+  intensity INTEGER NULL,
+  created_by TEXT NOT NULL DEFAULT 'seed_script',
   hashtags TEXT NULL,
   image_local_path TEXT NULL,
   image_remote_path TEXT NULL,
@@ -437,9 +449,35 @@ Future<void> _ensureColumns(_SeedDatabase db) async {
     );
   }
 
+  if (!columns.contains('emotion')) {
+    await db.customStatement(
+      "ALTER TABLE feed_entries "
+      "ADD COLUMN emotion TEXT NOT NULL DEFAULT 'neutral';",
+    );
+  }
+
+  if (!columns.contains('emotion_id')) {
+    await db.customStatement(
+      'ALTER TABLE feed_entries ADD COLUMN emotion_id TEXT NULL;',
+    );
+  }
+
   if (!columns.contains('note')) {
     await db.customStatement(
       'ALTER TABLE feed_entries ADD COLUMN note TEXT NULL;',
+    );
+  }
+
+  if (!columns.contains('intensity')) {
+    await db.customStatement(
+      'ALTER TABLE feed_entries ADD COLUMN intensity INTEGER NULL;',
+    );
+  }
+
+  if (!columns.contains('created_by')) {
+    await db.customStatement(
+      "ALTER TABLE feed_entries "
+      "ADD COLUMN created_by TEXT NOT NULL DEFAULT 'seed_script';",
     );
   }
 
@@ -509,6 +547,15 @@ _FakeEntryPayload _buildEntryPayload({
     'gratitude',
   ];
 
+  const emotions = <String>[
+    'happy',
+    'calm',
+    'sad',
+    'angry',
+    'anxious',
+    'tired',
+  ];
+
   const notes = <String>[
     '오늘은 루틴을 지키려고 노력했다.',
     '짧게 산책하고 집중이 조금 돌아왔다.',
@@ -559,6 +606,11 @@ _FakeEntryPayload _buildEntryPayload({
       ? 'https://cdn.example.com/$remotePath'
       : null;
   final localPath = hasImage ? '/tmp/emobin_seed_images/$id.jpg' : null;
+  final emotion = emotions[random.nextInt(emotions.length)];
+  final emotionId = random.nextInt(100) < 45
+      ? 'emo_${emotion}_${random.nextInt(999).toString().padLeft(3, '0')}'
+      : null;
+  final intensity = random.nextInt(100) < 70 ? random.nextInt(5) + 1 : null;
   final deletedAt = (!isDraft && random.nextInt(100) < 5)
       ? (updatedAt ?? createdAt).add(Duration(minutes: random.nextInt(240) + 1))
       : null;
@@ -567,7 +619,11 @@ _FakeEntryPayload _buildEntryPayload({
   return _FakeEntryPayload(
     id: id,
     serverId: isSynced ? 'server_$idSuffix' : null,
+    emotion: emotion,
+    emotionId: emotionId,
     note: note,
+    intensity: intensity,
+    createdBy: 'seed_script',
     hashtags: hashtags.toList(growable: false),
     imageLocalPath: localPath,
     imageRemotePath: remotePath,
@@ -700,7 +756,11 @@ class _FakeEntryPayload {
   const _FakeEntryPayload({
     required this.id,
     required this.serverId,
+    required this.emotion,
+    required this.emotionId,
     required this.note,
+    required this.intensity,
+    required this.createdBy,
     required this.hashtags,
     required this.imageLocalPath,
     required this.imageRemotePath,
@@ -715,7 +775,11 @@ class _FakeEntryPayload {
 
   final String id;
   final String? serverId;
+  final String emotion;
+  final String? emotionId;
   final String? note;
+  final int? intensity;
+  final String createdBy;
   final List<String> hashtags;
   final String? imageLocalPath;
   final String? imageRemotePath;
