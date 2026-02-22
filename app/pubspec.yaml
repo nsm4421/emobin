@@ -10,6 +10,9 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.0
   core: ^0.0.1
   feature_auth: ^0.0.1
   feature_feed: ^0.0.1
@@ -38,6 +41,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 flutter:
+  generate: true
   uses-material-design: true
   assets:
     - assets/svg/

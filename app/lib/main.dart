@@ -1,5 +1,6 @@
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_security/feature_security.dart';
+import 'package:emobin/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:emobin/router/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,16 +34,26 @@ class MainApp extends StatelessWidget {
         BlocProvider(
           create: (_) => GetIt.instance<AppThemeModeCubit>()..initialize(),
         ),
+        BlocProvider(
+          create: (_) => GetIt.instance<AppLocaleCubit>()..initialize(),
+        ),
       ],
-      child: BlocBuilder<AppThemeModeCubit, ThemeMode>(
-        builder: (context, state) {
-          final cubit = context.read<AppThemeModeCubit>();
-          return MaterialApp.router(
-            title: 'EmoBin',
-            theme: cubit.lightThemeData,
-            darkTheme: cubit.darkThemeData,
-            themeMode: state,
-            routerConfig: appRouterConfig,
+      child: BlocBuilder<AppLocaleCubit, Locale>(
+        builder: (context, locale) {
+          return BlocBuilder<AppThemeModeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              final themeCubit = context.read<AppThemeModeCubit>();
+              return MaterialApp.router(
+                title: 'EmoBin',
+                theme: themeCubit.lightThemeData,
+                darkTheme: themeCubit.darkThemeData,
+                themeMode: themeMode,
+                locale: locale,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                routerConfig: appRouterConfig,
+              );
+            },
           );
         },
       ),

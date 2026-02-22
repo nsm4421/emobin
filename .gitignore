@@ -42,6 +42,7 @@ emobin.sqlite
 .pub-cache/
 .pub/
 /app/build/
+/app/lib/l10n/
 /coverage/
 pubspec.lock
 .metadata

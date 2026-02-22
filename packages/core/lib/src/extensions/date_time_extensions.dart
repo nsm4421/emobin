@@ -1,29 +1,32 @@
 import 'package:timeago/timeago.dart' as timeago;
 
+bool _timeagoLocaleInitialized = false;
+
 extension DateTimeX on DateTime {
   String get ago {
-    final local = toLocal();
-    final now = DateTime.now();
+    return agoWithLocale('en');
+  }
 
-    final isSameDay =
-        local.year == now.year &&
-        local.month == now.month &&
-        local.day == now.day;
-    if (isSameDay) {
-      final difference = now.difference(local);
-      if (difference.isNegative || difference.inMinutes < 1) {
-        return 'today';
-      }
-      return timeago.format(local, locale: 'en');
-    }
+  String agoWithLocale(String localeCode) {
+    _ensureTimeagoLocales();
+    return timeago.format(toLocal(), locale: _supportedLocaleCode(localeCode));
+  }
+}
 
-    if (local.year == now.year) {
-      return '${local.month}월 ${local.day}일';
-    }
+void _ensureTimeagoLocales() {
+  if (_timeagoLocaleInitialized) return;
+  timeago.setLocaleMessages('ko', timeago.KoMessages());
+  timeago.setLocaleMessages('ja', timeago.JaMessages());
+  _timeagoLocaleInitialized = true;
+}
 
-    final year = local.year.toString().padLeft(4, '0');
-    final month = local.month.toString().padLeft(2, '0');
-    final day = local.day.toString().padLeft(2, '0');
-    return '$year-$month-$day';
+String _supportedLocaleCode(String localeCode) {
+  switch (localeCode) {
+    case 'ko':
+      return 'ko';
+    case 'ja':
+      return 'ja';
+    default:
+      return 'en';
   }
 }
