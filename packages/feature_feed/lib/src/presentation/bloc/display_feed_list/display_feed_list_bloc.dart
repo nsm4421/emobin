@@ -5,7 +5,9 @@ import 'package:feature_feed/src/core/errors/feed_failure_mapper.dart';
 import 'package:feature_feed/src/domain/entity/feed_entry.dart';
 import 'package:feature_feed/src/domain/usecase/feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/soft_delete_feed_entry_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 
@@ -21,12 +23,25 @@ class DisplayFeedListBloc
   DisplayFeedListBloc(FeedUseCase feedUseCase)
     : super(const DisplayFeedListState()) {
     _useCase = feedUseCase.fetchLocalEntries;
+    _softDeleteUseCase = feedUseCase.softDeleteLocalEntry;
     on<DisplayFeedListEvent>(_onEvent);
   }
 
   static const int _pageSize = 20;
 
   late final FetchLocalFeedEntriesUseCase _useCase;
+  late final SoftDeleteLocalFeedEntryUseCase _softDeleteUseCase;
+
+  Future<Either<FeedFailure, void>> softDeleteEntry(String id) async {
+    final result = await _softDeleteUseCase(id);
+    if (isClosed) return result;
+
+    result.fold((_) {}, (_) {
+      add(const DisplayFeedListEvent.refreshRequested(showLoading: false));
+    });
+
+    return result;
+  }
 
   Future<void> _onEvent(
     DisplayFeedListEvent event,

@@ -10,6 +10,8 @@ class FeedEntry with _$FeedEntry {
   @override
   final String? serverId;
   @override
+  final String? title;
+  @override
   final String note;
   @override
   final List<String> hashtags;
@@ -35,6 +37,7 @@ class FeedEntry with _$FeedEntry {
   FeedEntry({
     required this.id,
     this.serverId,
+    this.title,
     this.note = '',
     this.hashtags = const <String>[],
     this.imageLocalPath,

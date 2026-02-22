@@ -1,6 +1,7 @@
 part of 'create_feed_cubit.dart';
 
 typedef CreateFeedData = ({
+  String? title,
   List<String> hashtags,
   String note,
   String? imageLocalPath,
@@ -36,6 +37,7 @@ extension CreateFeedStateX on CreateFeedState {
     loading: (data) => data,
     editing: (data, _) => data,
     created: (_, created) => (
+      title: created.title,
       hashtags: created.hashtags,
       note: created.note,
       imageLocalPath: created.imageLocalPath,

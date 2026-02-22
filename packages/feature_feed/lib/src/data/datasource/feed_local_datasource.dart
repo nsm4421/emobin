@@ -5,7 +5,11 @@ import 'package:feature_feed/src/data/model/feed_entry_model.dart';
 abstract class FeedLocalDataSource {
   Stream<FeedStreamPayload> watchEntries();
 
+  Stream<List<DateTime>> watchRecordedDates();
+
   Future<List<FeedEntryModel>> fetchEntries({int? limit, int offset = 0});
+
+  Future<List<DateTime>> fetchRecordedDates();
 
   Future<List<FeedEntryModel>> fetchEntriesByYearMonth({
     required int year,

@@ -25,6 +25,26 @@ class DriftFeedLocalDataSource
   }
 
   @override
+  Stream<List<DateTime>> watchRecordedDates() {
+    final query = _database.selectOnly(_database.feedEntries)
+      ..addColumns([_database.feedEntries.createdAt])
+      ..where(_database.feedEntries.deletedAt.isNull())
+      ..where(_database.feedEntries.isDraft.equals(false))
+      ..orderBy([
+        OrderingTerm(
+          expression: _database.feedEntries.createdAt,
+          mode: OrderingMode.desc,
+        ),
+      ]);
+    return query.watch().map(
+      (rows) => rows
+          .map((row) => row.read(_database.feedEntries.createdAt))
+          .whereType<DateTime>()
+          .toList(growable: false),
+    );
+  }
+
+  @override
   Future<List<FeedEntryModel>> fetchEntries({
     int? limit,
     int offset = 0,
@@ -40,6 +60,25 @@ class DriftFeedLocalDataSource
     }
     final rows = await query.get();
     return mapRows(rows);
+  }
+
+  @override
+  Future<List<DateTime>> fetchRecordedDates() async {
+    final query = _database.selectOnly(_database.feedEntries)
+      ..addColumns([_database.feedEntries.createdAt])
+      ..where(_database.feedEntries.deletedAt.isNull())
+      ..where(_database.feedEntries.isDraft.equals(false))
+      ..orderBy([
+        OrderingTerm(
+          expression: _database.feedEntries.createdAt,
+          mode: OrderingMode.desc,
+        ),
+      ]);
+    final rows = await query.get();
+    return rows
+        .map((row) => row.read(_database.feedEntries.createdAt))
+        .whereType<DateTime>()
+        .toList(growable: false);
   }
 
   @override

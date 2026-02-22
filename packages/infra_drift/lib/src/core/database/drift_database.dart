@@ -22,7 +22,7 @@ class EmobinDatabase extends _$EmobinDatabase {
   }
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -353,6 +353,67 @@ class EmobinDatabase extends _$EmobinDatabase {
             NULL AS image_local_path,
             NULL AS image_remote_path,
             NULL AS image_remote_url,
+            created_at,
+            updated_at,
+            deleted_at,
+            is_draft,
+            sync_status,
+            last_synced_at
+          FROM feed_entries;
+        ''');
+
+        await customStatement('DROP TABLE feed_entries;');
+        await customStatement(
+          'ALTER TABLE feed_entries_new RENAME TO feed_entries;',
+        );
+      }
+
+      if (from < 10) {
+        await customStatement('''
+          CREATE TABLE feed_entries_new (
+            id TEXT NOT NULL PRIMARY KEY,
+            server_id TEXT NULL,
+            title TEXT NULL,
+            note TEXT NULL,
+            hashtags TEXT NULL,
+            image_local_path TEXT NULL,
+            image_remote_path TEXT NULL,
+            image_remote_url TEXT NULL,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NULL,
+            deleted_at INTEGER NULL,
+            is_draft INTEGER NOT NULL DEFAULT 0,
+            sync_status TEXT NOT NULL,
+            last_synced_at INTEGER NULL
+          );
+        ''');
+
+        await customStatement('''
+          INSERT INTO feed_entries_new (
+            id,
+            server_id,
+            title,
+            note,
+            hashtags,
+            image_local_path,
+            image_remote_path,
+            image_remote_url,
+            created_at,
+            updated_at,
+            deleted_at,
+            is_draft,
+            sync_status,
+            last_synced_at
+          )
+          SELECT
+            id,
+            server_id,
+            NULL AS title,
+            note,
+            hashtags,
+            image_local_path,
+            image_remote_path,
+            image_remote_url,
             created_at,
             updated_at,
             deleted_at,

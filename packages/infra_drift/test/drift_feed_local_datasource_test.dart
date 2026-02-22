@@ -16,6 +16,8 @@ void main() {
     required String id,
     DateTime? createdAt,
     DateTime? deletedAt,
+    bool isDraft = false,
+    String? title,
     List<String> hashtags = const <String>['happy'],
     String? imageLocalPath,
     String? imageRemotePath,
@@ -26,6 +28,7 @@ void main() {
     final resolvedCreatedAt = createdAt ?? DateTime.now();
     return FeedEntryModel(
       id: id,
+      title: title,
       note: note,
       hashtags: hashtags,
       imageLocalPath: imageLocalPath,
@@ -34,6 +37,7 @@ void main() {
       createdAt: resolvedCreatedAt,
       updatedAt: resolvedCreatedAt,
       deletedAt: deletedAt,
+      isDraft: isDraft,
       syncStatus: syncStatus,
     );
   }
@@ -140,6 +144,32 @@ void main() {
     );
   });
 
+  test('fetchRecordedDates는 삭제/드래프트 제외하고 createdAt 목록을 반환한다', () async {
+    final recorded = buildEntry(
+      id: 'recorded',
+      createdAt: DateTime(2024, 1, 5),
+    );
+    final draft = buildEntry(
+      id: 'draft',
+      createdAt: DateTime(2024, 1, 6),
+      isDraft: true,
+    );
+    final deleted = buildEntry(
+      id: 'deleted',
+      createdAt: DateTime(2024, 1, 7),
+      deletedAt: DateTime(2024, 1, 8),
+    );
+
+    await dataSource.addEntry(recorded);
+    await dataSource.addEntry(draft);
+    await dataSource.addEntry(deleted);
+
+    final recordedDates = await dataSource.fetchRecordedDates();
+
+    expect(recordedDates.length, 1);
+    expect(recordedDates.first, DateTime(2024, 1, 5));
+  });
+
   test('fetchEntriesBySyncStatus filters by status', () async {
     final pending = buildEntry(
       id: 'pending',
@@ -175,6 +205,7 @@ void main() {
   test('stores hashtags and image paths', () async {
     final entry = buildEntry(
       id: 'with_media',
+      title: 'today',
       hashtags: const <String>['calm', 'today'],
       imageLocalPath: '/tmp/a.png',
       imageRemotePath: 'feeds/a.png',
@@ -185,10 +216,12 @@ void main() {
     final stored = await dataSource.getById('with_media');
 
     expect(stored, isNotNull);
-    expect(stored!.hashtags, ['calm', 'today']);
-    expect(stored.imageLocalPath, '/tmp/a.png');
-    expect(stored.imageRemotePath, 'feeds/a.png');
-    expect(stored.imageRemoteUrl, 'https://example.com/a.png');
+    final storedEntry = stored!;
+    expect(storedEntry.title, 'today');
+    expect(storedEntry.hashtags, ['calm', 'today']);
+    expect(storedEntry.imageLocalPath, '/tmp/a.png');
+    expect(storedEntry.imageRemotePath, 'feeds/a.png');
+    expect(storedEntry.imageRemoteUrl, 'https://example.com/a.png');
   });
 
   test('watchEntries emits updates', () async {
@@ -205,4 +238,26 @@ void main() {
     await dataSource.addEntry(entry);
     await expectation;
   });
+
+  test(
+    'watchRecordedDates emits updates for non-draft, non-deleted entries',
+    () async {
+      final entry = buildEntry(id: 'recorded');
+      final expectation = expectLater(
+        dataSource.watchRecordedDates(),
+        emits(
+          predicate<List<DateTime>>(
+            (dates) =>
+                dates.length == 1 &&
+                dates.first.year == entry.createdAt.year &&
+                dates.first.month == entry.createdAt.month &&
+                dates.first.day == entry.createdAt.day,
+          ),
+        ),
+      );
+
+      await dataSource.addEntry(entry);
+      await expectation;
+    },
+  );
 }

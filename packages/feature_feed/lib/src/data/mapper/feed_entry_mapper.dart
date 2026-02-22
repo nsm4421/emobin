@@ -8,6 +8,7 @@ extension FeedEntryModelX on FeedEntryModel {
     return FeedEntry(
       id: id,
       serverId: serverId,
+      title: title,
       note: note,
       hashtags: hashtags,
       imageLocalPath: imageLocalPath,
@@ -28,6 +29,7 @@ extension FeedEntryX on FeedEntry {
     return FeedEntryModel(
       id: id,
       serverId: serverId,
+      title: title,
       note: note,
       hashtags: hashtags,
       imageLocalPath: imageLocalPath,
@@ -53,6 +55,7 @@ extension FeedEntryDraftX on FeedEntryDraft {
         .toUtc();
     return FeedEntryModel(
       id: id,
+      title: title,
       note: note,
       hashtags: hashtags,
       imageLocalPath: imageLocalPath,

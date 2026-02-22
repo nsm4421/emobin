@@ -12,6 +12,8 @@ class FeedEntryModel with _$FeedEntryModel {
   @override
   final String? serverId;
   @override
+  final String? title;
+  @override
   final String note;
   @override
   final List<String> hashtags;
@@ -37,6 +39,7 @@ class FeedEntryModel with _$FeedEntryModel {
   FeedEntryModel({
     required this.id,
     this.serverId,
+    this.title,
     this.note = '',
     this.hashtags = const <String>[],
     this.imageLocalPath,
@@ -54,6 +57,7 @@ class FeedEntryModel with _$FeedEntryModel {
     return <String, dynamic>{
       'id': id,
       'server_id': serverId,
+      'title': title,
       'note': note,
       'hashtags': hashtags,
       'image_local_path': imageLocalPath,
@@ -138,6 +142,7 @@ class FeedEntryModel with _$FeedEntryModel {
     return FeedEntryModel(
       id: map['id'] as String,
       serverId: map['server_id'] as String? ?? map['serverId'] as String?,
+      title: map['title'] as String?,
       note: map['note'] as String? ?? '',
       hashtags: parseHashtags(map['hashtags']),
       imageLocalPath:

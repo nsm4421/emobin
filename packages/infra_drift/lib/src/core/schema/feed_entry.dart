@@ -6,6 +6,8 @@ class FeedEntries extends Table {
 
   TextColumn get serverId => text().nullable()();
 
+  TextColumn get title => text().nullable()();
+
   TextColumn get note => text().nullable()();
 
   TextColumn get hashtags => text().nullable()();

@@ -1,2 +1,3 @@
 const int feedIntensityMin = 1;
 const int feedIntensityMax = 5;
+const int feedTitleMaxLength = 20;

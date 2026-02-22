@@ -4,7 +4,9 @@ import 'package:feature_feed/src/core/errors/feed_failure.dart';
 import 'package:feature_feed/src/domain/entity/feed_entry.dart';
 import 'package:feature_feed/src/domain/usecase/feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/get_feed_entry_by_id_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/soft_delete_feed_entry_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 
@@ -17,11 +19,13 @@ class DetailFeedCubit extends Cubit<DetailFeedState> {
     : _feedId = feedId,
       super(const DetailFeedState.loading()) {
     _getByIdUseCase = feedUseCase.getById;
+    _softDeleteUseCase = feedUseCase.softDeleteLocalEntry;
     unawaited(load());
   }
 
   final String _feedId;
   late final GetLocalFeedEntryByIdUseCase _getByIdUseCase;
+  late final SoftDeleteLocalFeedEntryUseCase _softDeleteUseCase;
 
   Future<void> load() async {
     emit(const DetailFeedState.loading());
@@ -37,5 +41,9 @@ class DetailFeedCubit extends Cubit<DetailFeedState> {
 
       emit(DetailFeedState.loaded(entry));
     });
+  }
+
+  Future<Either<FeedFailure, void>> softDeleteCurrentEntry() {
+    return _softDeleteUseCase(_feedId);
   }
 }

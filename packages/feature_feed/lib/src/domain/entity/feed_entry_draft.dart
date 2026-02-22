@@ -5,6 +5,8 @@ part 'feed_entry_draft.freezed.dart';
 @freezed
 class FeedEntryDraft with _$FeedEntryDraft {
   @override
+  final String? title;
+  @override
   final String note;
   @override
   final List<String> hashtags;
@@ -20,6 +22,7 @@ class FeedEntryDraft with _$FeedEntryDraft {
   final bool isDraft;
 
   FeedEntryDraft({
+    this.title,
     this.note = '',
     this.hashtags = const <String>[],
     this.imageLocalPath,

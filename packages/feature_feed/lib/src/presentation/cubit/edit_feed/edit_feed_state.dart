@@ -1,6 +1,7 @@
 part of 'edit_feed_cubit.dart';
 
 typedef EditFeedData = ({
+  String? title,
   List<String> hashtags,
   String note,
   String? imageLocalPath,
@@ -32,10 +33,16 @@ extension EditFeedStateX on EditFeedState {
   FeedEntry? get updated => mapOrNull(updated: (e) => e.updated);
 
   EditFeedData get data => when(
-    idle: (_) => (hashtags: const <String>[], note: '', imageLocalPath: null),
+    idle: (_) => (
+      title: null,
+      hashtags: const <String>[],
+      note: '',
+      imageLocalPath: null,
+    ),
     loading: (data) => data,
     editing: (data, _) => data,
     updated: (updated) => (
+      title: updated.title,
       hashtags: updated.hashtags,
       note: updated.note,
       imageLocalPath: updated.imageLocalPath,

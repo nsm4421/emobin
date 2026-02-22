@@ -15,6 +15,7 @@ mixin DriftFeedEntryMapper {
     return FeedEntryModel(
       id: row.id,
       serverId: row.serverId,
+      title: row.title,
       note: row.note ?? '',
       hashtags: _decodeHashtags(row.hashtags),
       imageLocalPath: row.imageLocalPath,
@@ -33,6 +34,7 @@ mixin DriftFeedEntryMapper {
     return FeedEntriesCompanion(
       id: Value(entry.id),
       serverId: Value(entry.serverId),
+      title: Value(entry.title),
       note: Value(entry.note),
       hashtags: Value(_encodeHashtags(entry.hashtags)),
       imageLocalPath: Value(entry.imageLocalPath),
