@@ -53,6 +53,28 @@ void main() {
       await subscription.cancel();
     });
 
+    test('started 시 pageSize 초과 응답이어도 hasMore를 유지한다', () async {
+      final oversizedFirstPage = List<FeedEntry>.generate(
+        21,
+        (index) => buildFeedEntry(id: 'entry_$index'),
+      );
+
+      when(
+        () => repository.fetchLocalEntries(limit: 20, offset: 0),
+      ).thenAnswer((_) async => Right(oversizedFirstPage));
+
+      bloc.add(const DisplayFeedListEvent.started());
+      await Future<void>.delayed(Duration.zero);
+
+      expect(bloc.state.status, DisplayFeedListStatus.success);
+      expect(bloc.state.entries.length, 21);
+      expect(bloc.state.hasMore, isTrue);
+      verify(
+        () => repository.fetchLocalEntries(limit: 20, offset: 0),
+      ).called(1);
+      verifyNoMoreInteractions(repository);
+    });
+
     test('loadMoreRequested 시 다음 페이지를 이어붙인다', () async {
       final firstPage = List<FeedEntry>.generate(
         20,

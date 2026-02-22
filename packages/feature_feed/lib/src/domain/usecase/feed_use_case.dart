@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 
 import 'package:feature_feed/src/domain/repository/feed_repository.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/create_feed_entry_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_by_year_month_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/get_feed_entry_by_id_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/hard_delete_feed_entry_use_case.dart';
@@ -21,6 +22,9 @@ class FeedUseCase {
 
   FetchLocalFeedEntriesUseCase get fetchLocalEntries =>
       FetchLocalFeedEntriesUseCase(_repository);
+
+  FetchLocalFeedEntriesByYearMonthUseCase get fetchLocalEntriesByYearMonth =>
+      FetchLocalFeedEntriesByYearMonthUseCase(_repository);
 
   GetLocalFeedEntryByIdUseCase get getById =>
       GetLocalFeedEntryByIdUseCase(_repository);

@@ -108,6 +108,38 @@ void main() {
     expect(entries.map((entry) => entry.id).toList(), ['active']);
   });
 
+  test('fetchEntriesByYearMonth filters entries by year and month', () async {
+    final january = buildEntry(
+      id: 'jan',
+      createdAt: DateTime(2024, 1, 15, 10).toUtc(),
+    );
+    final february = buildEntry(
+      id: 'feb',
+      createdAt: DateTime(2024, 2, 1, 9).toUtc(),
+    );
+
+    await dataSource.addEntry(january);
+    await dataSource.addEntry(february);
+
+    final januaryEntries = await dataSource.fetchEntriesByYearMonth(
+      year: 2024,
+      month: 1,
+    );
+
+    expect(januaryEntries.map((entry) => entry.id).toList(), ['jan']);
+  });
+
+  test('fetchEntriesByYearMonth throws when month is out of range', () async {
+    expect(
+      () => dataSource.fetchEntriesByYearMonth(year: 2024, month: 0),
+      throwsA(isA<ArgumentError>()),
+    );
+    expect(
+      () => dataSource.fetchEntriesByYearMonth(year: 2024, month: 13),
+      throwsA(isA<ArgumentError>()),
+    );
+  });
+
   test('fetchEntriesBySyncStatus filters by status', () async {
     final pending = buildEntry(
       id: 'pending',

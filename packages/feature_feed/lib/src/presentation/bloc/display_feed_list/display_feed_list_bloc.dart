@@ -27,7 +27,6 @@ class DisplayFeedListBloc
   static const int _pageSize = 20;
 
   late final FetchLocalFeedEntriesUseCase _useCase;
-  bool _initialized = false;
 
   Future<void> _onEvent(
     DisplayFeedListEvent event,
@@ -35,10 +34,7 @@ class DisplayFeedListBloc
   ) async {
     await event.when(
       started: () async {
-        if (_initialized) return;
-        _initialized = true;
-
-        await _refresh(emit, showLoading: true);
+        await _refresh(emit, showLoading: state.entries.isEmpty);
       },
       refreshRequested: (showLoading) async {
         await _refresh(emit, showLoading: showLoading);
@@ -77,7 +73,7 @@ class DisplayFeedListBloc
             state.copyWith(
               status: DisplayFeedListStatus.success,
               entries: [...state.entries, ...nextEntries],
-              hasMore: nextEntries.length == _pageSize,
+              hasMore: nextEntries.length >= _pageSize,
               isLoadingMore: false,
               failure: null,
             ),
@@ -117,7 +113,7 @@ class DisplayFeedListBloc
           status: DisplayFeedListStatus.success,
           entries: entries,
           failure: null,
-          hasMore: entries.length == _pageSize,
+          hasMore: entries.length >= _pageSize,
           isLoadingMore: false,
         ),
       ),

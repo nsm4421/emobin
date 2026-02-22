@@ -43,6 +43,37 @@ class DriftFeedLocalDataSource
   }
 
   @override
+  Future<List<FeedEntryModel>> fetchEntriesByYearMonth({
+    required int year,
+    required int month,
+  }) async {
+    final monthRange = _resolveMonthRange(year: year, month: month);
+    final query = _database.select(_database.feedEntries)
+      ..where((tbl) => tbl.deletedAt.isNull())
+      ..where((tbl) => tbl.createdAt.isBiggerOrEqualValue(monthRange.$1))
+      ..where((tbl) => tbl.createdAt.isSmallerThanValue(monthRange.$2))
+      ..orderBy([
+        (tbl) =>
+            OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc),
+      ]);
+    final rows = await query.get();
+    return mapRows(rows);
+  }
+
+  (DateTime, DateTime) _resolveMonthRange({
+    required int year,
+    required int month,
+  }) {
+    if (month < 1 || month > 12) {
+      throw ArgumentError.value(month, 'month', 'must be between 1 and 12');
+    }
+
+    final localMonthStart = DateTime(year, month, 1);
+    final localNextMonthStart = DateTime(year, month + 1, 1);
+    return (localMonthStart.toUtc(), localNextMonthStart.toUtc());
+  }
+
+  @override
   Future<FeedEntryModel?> getById(String id) async {
     final query = _database.select(_database.feedEntries)
       ..where((tbl) => tbl.id.equals(id))

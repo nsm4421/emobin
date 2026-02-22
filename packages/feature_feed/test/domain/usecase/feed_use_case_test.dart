@@ -2,6 +2,7 @@ import 'package:feature_feed/src/core/errors/feed_failure.dart';
 import 'package:feature_feed/src/domain/entity/feed_entry.dart';
 import 'package:feature_feed/src/domain/usecase/feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/create_feed_entry_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_by_year_month_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/get_feed_entry_by_id_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/hard_delete_feed_entry_use_case.dart';
@@ -35,6 +36,10 @@ void main() {
         feedUseCase.fetchLocalEntries,
         isA<FetchLocalFeedEntriesUseCase>(),
       );
+      expect(
+        feedUseCase.fetchLocalEntriesByYearMonth,
+        isA<FetchLocalFeedEntriesByYearMonthUseCase>(),
+      );
       expect(feedUseCase.getById, isA<GetLocalFeedEntryByIdUseCase>());
       expect(feedUseCase.createLocalEntry, isA<CreateLocalFeedEntryUseCase>());
       expect(feedUseCase.updateLocalEntry, isA<UpdateLocalFeedEntryUseCase>());
@@ -56,8 +61,13 @@ void main() {
       final entry = buildFeedEntry();
       final draft = buildFeedEntryDraft();
       final entries = <FeedEntry>[entry];
+      const year = 2024;
+      const month = 1;
 
       final fetchResult = Right<FeedFailure, List<FeedEntry>>(entries);
+      final fetchByYearMonthResult = Right<FeedFailure, List<FeedEntry>>(
+        entries,
+      );
       final getByIdResult = Right<FeedFailure, FeedEntry?>(entry);
       final createResult = Right<FeedFailure, FeedEntry>(entry);
       final updateResult = Right<FeedFailure, FeedEntry>(entry);
@@ -71,6 +81,9 @@ void main() {
       when(
         () => repository.fetchLocalEntries(),
       ).thenAnswer((_) async => fetchResult);
+      when(
+        () => repository.fetchLocalEntriesByYearMonth(year: year, month: month),
+      ).thenAnswer((_) async => fetchByYearMonthResult);
       when(
         () => repository.getById(entry.id),
       ).thenAnswer((_) async => getByIdResult);
@@ -92,6 +105,7 @@ void main() {
 
       await expectLater(feedUseCase.observeLocalEntries(), emits(entries));
       await feedUseCase.fetchLocalEntries();
+      await feedUseCase.fetchLocalEntriesByYearMonth(year: year, month: month);
       await feedUseCase.getById(entry.id);
       await feedUseCase.createLocalEntry(draft);
       await feedUseCase.updateLocalEntry(entry);
@@ -101,6 +115,9 @@ void main() {
 
       verify(() => repository.watchLocalEntries()).called(1);
       verify(() => repository.fetchLocalEntries()).called(1);
+      verify(
+        () => repository.fetchLocalEntriesByYearMonth(year: year, month: month),
+      ).called(1);
       verify(() => repository.getById(entry.id)).called(1);
       verify(() => repository.createLocalEntry(draft)).called(1);
       verify(() => repository.updateLocalEntry(entry)).called(1);

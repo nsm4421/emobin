@@ -47,6 +47,23 @@ class FeedRepositoryImpl
   }
 
   @override
+  Future<Either<FeedFailure, List<FeedEntry>>> fetchLocalEntriesByYearMonth({
+    required int year,
+    required int month,
+  }) async {
+    try {
+      final entries = await _localDataSource.fetchEntriesByYearMonth(
+        year: year,
+        month: month,
+      );
+      final entities = entries.map((entry) => entry.toEntity()).toList();
+      return Right(entities);
+    } catch (error, stackTrace) {
+      return Left(error.toFeedFailure(stackTrace));
+    }
+  }
+
+  @override
   Future<Either<FeedFailure, FeedEntry?>> getById(String id) async {
     try {
       final entry = await _localDataSource.getById(id);

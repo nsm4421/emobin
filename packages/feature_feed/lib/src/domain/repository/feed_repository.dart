@@ -11,6 +11,11 @@ abstract class FeedRepository {
     int offset = 0,
   });
 
+  Future<Either<FeedFailure, List<FeedEntry>>> fetchLocalEntriesByYearMonth({
+    required int year,
+    required int month,
+  });
+
   Future<Either<FeedFailure, FeedEntry?>> getById(String id);
 
   Future<Either<FeedFailure, FeedEntry>> createLocalEntry(FeedEntryDraft draft);
