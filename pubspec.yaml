@@ -8,13 +8,11 @@ environment:
 workspace:
   - app
   - packages/core
-  - packages/feature_auth
   - packages/feature_feed
   - packages/feature_security
   - packages/feature_setting
   - packages/infra_drift
   - packages/infra_media_local
-  - packages/infra_supabase
   - packages/ui_theme
 
 dev_dependencies:
@@ -44,10 +42,8 @@ melos:
     test: melos exec -- flutter test
     format: melos exec -- dart format .
     format:check: melos exec -- dart format --set-exit-if-changed .
-    codegen: melos run codegen:core && melos run codegen:feature_auth && melos run codegen:feature_feed && melos run codegen:feature_security && melos run codegen:infra_supabase && melos run codegen:app
+    codegen: melos run codegen:core && melos run codegen:feature_feed && melos run codegen:feature_security && melos run codegen:app
     codegen:core: melos exec --scope=core -- dart run build_runner build --delete-conflicting-outputs
-    codegen:feature_auth: melos exec --scope=feature_auth -- dart run build_runner build --delete-conflicting-outputs
     codegen:feature_feed: melos exec --scope=feature_feed -- dart run build_runner build --delete-conflicting-outputs
     codegen:feature_security: melos exec --scope=feature_security -- dart run build_runner build --delete-conflicting-outputs
-    codegen:infra_supabase: melos exec --scope=infra_supabase -- dart run build_runner build --delete-conflicting-outputs
     codegen:app: melos exec --scope=emobin -- dart run build_runner build --delete-conflicting-outputs

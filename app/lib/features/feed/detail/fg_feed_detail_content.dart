@@ -41,7 +41,6 @@ class _FeedDetailContent extends StatelessWidget {
                       icon: Icons.calendar_today_rounded,
                       label: createdAt,
                     ),
-                    FeedSyncStatusBadge(status: entry.syncStatus),
                     if (entry.isDraft)
                       _FeedDetailPill(
                         icon: Icons.edit_note_rounded,
@@ -126,16 +125,8 @@ class _FeedDetailContent extends StatelessWidget {
                   value: entry.isDraft ? context.l10n.yes : context.l10n.no,
                 ),
                 _FeedDetailMetaRow(
-                  label: context.l10n.syncStatus,
-                  value: entry.syncStatus.label(context),
-                ),
-                _FeedDetailMetaRow(
                   label: context.l10n.updatedAt,
                   value: _formatDateTimeOrDash(entry.updatedAt),
-                ),
-                _FeedDetailMetaRow(
-                  label: context.l10n.lastSyncedAt,
-                  value: _formatDateTimeOrDash(entry.lastSyncedAt),
                   showDivider: false,
                 ),
               ],

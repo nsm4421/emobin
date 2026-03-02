@@ -15,7 +15,7 @@ class _FeedEntryFailure extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.wifi_off_rounded,
+              Icons.error_outline,
               size: 32,
               color: context.colorScheme.onSurfaceVariant,
             ),

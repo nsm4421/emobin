@@ -5,76 +5,92 @@ class _FeedTrashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.trashMenu)),
-      body: SafeArea(
-        child: BlocBuilder<FeedTrashCubit, FeedTrashState>(
-          builder: (context, state) {
-            switch (state.status) {
-              case FeedTrashStatus.initial:
-              case FeedTrashStatus.loading:
-                return const Center(child: CircularProgressIndicator());
-              case FeedTrashStatus.failure:
-                final message =
-                    state.failure?.message ?? context.l10n.failedLoadTrashList;
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          message,
-                          textAlign: TextAlign.center,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        FilledButton(
-                          onPressed: () =>
-                              context.read<FeedTrashCubit>().load(),
-                          child: Text(context.l10n.retry),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              case FeedTrashStatus.success:
-                if (state.entries.isEmpty) {
-                  return Center(
-                    child: Text(
-                      context.l10n.noDeletedFeeds,
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  );
-                }
-                return RefreshIndicator(
-                  onRefresh: () => context.read<FeedTrashCubit>().load(),
-                  child: ListView.separated(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-                    itemCount: state.entries.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      final entry = state.entries[index];
-                      return _TrashItem(
-                        entry: entry,
-                        isBusy: state.busyEntryIds.contains(entry.id),
-                        onRestore: () => _onRestorePressed(context, entry),
-                        onHardDelete: () =>
-                            _onHardDeletePressed(context, entry),
-                      );
-                    },
-                  ),
-                );
-            }
-          },
-        ),
-      ),
+    return BlocBuilder<FeedTrashCubit, FeedTrashState>(
+      builder: (context, state) {
+        final canClearAll =
+            state.status == FeedTrashStatus.success &&
+            state.entries.isNotEmpty &&
+            state.busyEntryIds.isEmpty;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(context.l10n.trashMenu),
+            actions: [
+              IconButton(
+                onPressed: canClearAll
+                    ? () => _onClearAllPressed(context)
+                    : null,
+                tooltip: context.l10n.emptyTrashAction,
+                icon: const Icon(Icons.delete_sweep_outlined),
+              ),
+            ],
+          ),
+          body: SafeArea(child: _buildBody(context, state)),
+        );
+      },
     );
+  }
+
+  Widget _buildBody(BuildContext context, FeedTrashState state) {
+    switch (state.status) {
+      case FeedTrashStatus.initial:
+      case FeedTrashStatus.loading:
+        return const Center(child: CircularProgressIndicator());
+      case FeedTrashStatus.failure:
+        final message =
+            state.failure?.message ?? context.l10n.failedLoadTrashList;
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: () => context.read<FeedTrashCubit>().load(),
+                  child: Text(context.l10n.retry),
+                ),
+              ],
+            ),
+          ),
+        );
+      case FeedTrashStatus.success:
+        if (state.entries.isEmpty) {
+          return Center(
+            child: Text(
+              context.l10n.noDeletedFeeds,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          );
+        }
+        return RefreshIndicator(
+          onRefresh: () => context.read<FeedTrashCubit>().load(),
+          child: ListView.separated(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            itemCount: state.entries.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              final entry = state.entries[index];
+              return _TrashItem(
+                entry: entry,
+                isBusy: state.busyEntryIds.contains(entry.id),
+                onRestore: () => _onRestorePressed(context, entry),
+                onHardDelete: () => _onHardDeletePressed(context, entry),
+              );
+            },
+          ),
+        );
+    }
   }
 
   Future<void> _onRestorePressed(BuildContext context, FeedEntry entry) async {
@@ -122,5 +138,45 @@ class _FeedTrashScreen extends StatelessWidget {
       (failure) => ToastHelper.error(failure.message),
       (_) => ToastHelper.success(context.l10n.feedPermanentlyDeleted),
     );
+  }
+
+  Future<void> _onClearAllPressed(BuildContext context) async {
+    final cubit = context.read<FeedTrashCubit>();
+    final entries = List<FeedEntry>.from(cubit.state.entries);
+    if (entries.isEmpty) return;
+
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(context.l10n.emptyTrashTitle),
+          content: Text(context.l10n.emptyTrashMessage(entries.length)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(context.l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(context.l10n.emptyTrashAction),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete != true || !context.mounted) return;
+
+    for (final entry in entries) {
+      final result = await cubit.hardDeleteEntry(entry.id);
+      if (!context.mounted) return;
+      if (result.isLeft()) {
+        result.match((failure) => ToastHelper.error(failure.message), (_) {});
+        return;
+      }
+    }
+
+    if (!context.mounted) return;
+    ToastHelper.success(context.l10n.trashEmptied(entries.length));
   }
 }

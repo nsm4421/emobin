@@ -1,7 +1,7 @@
 part of 'pg_home_entry.dart';
 
-class _HomeSyncBackup extends StatelessWidget {
-  const _HomeSyncBackup();
+class _HomeSyncMenu extends StatelessWidget {
+  const _HomeSyncMenu();
 
   @override
   Widget build(BuildContext context) {
@@ -9,18 +9,11 @@ class _HomeSyncBackup extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          context.l10n.syncAndBackup,
+          context.l10n.trashMenu,
           style: context.textTheme.titleSmall?.copyWith(
             color: context.colorScheme.onSurface,
             fontWeight: FontWeight.w700,
           ),
-        ),
-        const SizedBox(height: 10),
-        _HomeQuickAction(
-          icon: Icons.sync_rounded,
-          title: context.l10n.syncMenu,
-          subtitle: context.l10n.syncMenuSubtitle,
-          onTap: () => context.router.push(const FeedSyncRoute()),
         ),
         const SizedBox(height: 10),
         _HomeQuickAction(

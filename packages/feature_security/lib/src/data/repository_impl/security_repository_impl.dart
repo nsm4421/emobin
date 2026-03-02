@@ -23,10 +23,40 @@ class SecurityRepositoryImpl implements SecurityRepository {
   }
 
   @override
+  Future<Either<SecurityFailure, void>> savePasswordHint(String hint) async {
+    try {
+      await _dataSource.savePasswordHint(hint);
+      return const Right(null);
+    } catch (error, stackTrace) {
+      return Left(error.toSecurityFailure(stackTrace));
+    }
+  }
+
+  @override
   Future<Either<SecurityFailure, bool>> verifyPassword(String password) async {
     try {
       final matched = await _dataSource.verifyPassword(password);
       return Right(matched);
+    } catch (error, stackTrace) {
+      return Left(error.toSecurityFailure(stackTrace));
+    }
+  }
+
+  @override
+  Future<Either<SecurityFailure, String?>> getPasswordHint() async {
+    try {
+      final hint = await _dataSource.getPasswordHint();
+      return Right(hint);
+    } catch (error, stackTrace) {
+      return Left(error.toSecurityFailure(stackTrace));
+    }
+  }
+
+  @override
+  Future<Either<SecurityFailure, void>> deletePasswordHint() async {
+    try {
+      await _dataSource.deletePasswordHint();
+      return const Right(null);
     } catch (error, stackTrace) {
       return Left(error.toSecurityFailure(stackTrace));
     }

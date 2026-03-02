@@ -1,84 +1,24 @@
 # feature_setting
 
-`feature_setting` is the settings feature package for Emobin.
-It owns setting-related state management and local preference persistence behind feature-level APIs.
+`feature_setting`은 앱 설정 관련 상태와 로컬 저장을 담당하는 기능 패키지입니다.
+테마, 로케일, 해시태그/감정 프리셋을 관리합니다.
 
-## Responsibility Scope
-- Provide theme mode state (`AppThemeModeCubit`) and persistence.
-- Provide feed emotion preset state (`FeedEmotionPresetCubit`) and persistence.
-- Provide feed hashtag preset state (`FeedHashtagPresetCubit`) and persistence.
-- Register setting dependencies via `injectable` micro package DI.
+## 역할
+- `AppThemeModeCubit`: 테마 모드 관리
+- `AppLocaleCubit`: 언어 설정 관리
+- `FeedEmotionPresetCubit`: 감정 프리셋 관리
+- `FeedHashtagPresetCubit`: 해시태그 프리셋 관리
+- 설정 관련 DI 등록
 
-`feature_setting` is the only package that directly accesses `SharedPreferences` for these settings.
-The `app` package should consume Cubits exported by this feature package instead of reading preferences directly.
-
-## Clean Architecture Mapping
-This package currently focuses on presentation + local setting infrastructure.
-
-- `presentation`
-  - `AppThemeModeCubit`: handles light/dark mode toggle and initialization.
-  - `FeedEmotionPresetCubit`: handles emotion preset initialize/update/validation.
-  - `FeedHashtagPresetCubit`: handles hashtag preset initialize/update/validation.
-- `data/infrastructure`
-  - `SettingModule`: provides `SharedPreferences` instance for DI.
-- `domain`
-  - Not separated yet because setting logic is currently simple and Cubit-centric.
-
-## Directory Layout
+## 공개 엔트리
 - `lib/feature_setting.dart`
-  - Public exports for DI and Cubits.
-- `lib/src/core/constants/defaults.dart`
-  - Default values for settings (`feedEmotionPresets`, `feedHashtagPresets`).
-- `lib/src/core/constants/keys.dart`
-  - Shared preference keys (`feedEmotionPreset`, `feedHashtagPreset`, etc.).
-- `lib/src/core/di/di.dart`
-  - `@InjectableInit.microPackage()` entrypoint.
-- `lib/src/core/di/setting_module.dart`
-  - `SharedPreferences` provider module.
-- `lib/src/core/di/di.module.dart`
-  - Generated DI registrations.
-- `lib/src/presentation/cubit/app_theme/app_theme_mode_cubit.dart`
-  - Theme mode state management.
-- `lib/src/presentation/cubit/feed_emotion_preset/feed_emotion_preset_cubit.dart`
-  - Emotion preset state management.
-- `lib/src/presentation/cubit/feed_hashtag_preset/feed_hashtag_preset_cubit.dart`
-  - Hashtag preset state management.
 
-## Cubits and Features
-- `AppThemeModeCubit`
-  - `initialize()`: loads saved theme mode.
-  - `toggleBrightness()`: toggles light/dark and persists the new mode.
-- `FeedEmotionPresetCubit`
-  - `initialize()`: seeds defaults when missing, then emits saved presets.
-  - `addEmotion(String)`: validates and appends a new emotion preset.
-  - `removeEmotion(String)`: removes an existing emotion preset.
-- `FeedHashtagPresetCubit`
-  - `initialize()`: seeds defaults when missing, then emits saved presets.
-  - `addHashtag(String)`: validates and appends a new hashtag preset.
-  - `removeHashtag(String)`: removes an existing hashtag preset.
-
-## Usage Example
-```dart
-BlocProvider(
-  create: (_) => getIt<AppThemeModeCubit>()..initialize(),
-  child: const MyScreen(),
-)
-```
-
-```dart
-context.read<FeedEmotionPresetCubit>().addEmotion('Calm');
-context.read<FeedHashtagPresetCubit>().addHashtag('#daily');
-```
-
-## Testing
-There is currently no dedicated `test/` directory in this package.
-Recommended tests to add:
-- `AppThemeModeCubit` initialization and toggle persistence behavior.
-- `FeedEmotionPresetCubit` duplicate validation and save behavior.
-- `FeedHashtagPresetCubit` duplicate validation and save behavior.
-
-Run analysis and tests from workspace root:
+## 개발 명령어
 ```bash
-flutter analyze packages/feature_setting
-flutter test packages/feature_setting
+cd packages/feature_setting
+flutter analyze
 ```
+
+## 의존 관계
+- 의존: `ui_theme`, `shared_preferences`
+- 사용처: `app`

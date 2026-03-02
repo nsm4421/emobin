@@ -14,7 +14,7 @@ part 'fg_home_feed_status.dart';
 
 part 'fg_home_write_entry.dart';
 
-part 'fg_home_sync_backup.dart';
+part 'fg_home_sync_menu.dart';
 
 part 'wd_home_status_metric.dart';
 

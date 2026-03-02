@@ -2,8 +2,11 @@ import 'package:injectable/injectable.dart';
 
 import 'package:feature_security/src/domain/repository/security_repository.dart';
 import 'package:feature_security/src/domain/usecase/scenario/delete_local_password_use_case.dart';
+import 'package:feature_security/src/domain/usecase/scenario/delete_local_password_hint_use_case.dart';
+import 'package:feature_security/src/domain/usecase/scenario/get_local_password_hint_use_case.dart';
 import 'package:feature_security/src/domain/usecase/scenario/has_local_password_use_case.dart';
 import 'package:feature_security/src/domain/usecase/scenario/save_local_password_use_case.dart';
+import 'package:feature_security/src/domain/usecase/scenario/save_local_password_hint_use_case.dart';
 import 'package:feature_security/src/domain/usecase/scenario/verify_local_password_use_case.dart';
 
 @lazySingleton
@@ -20,6 +23,15 @@ class SecurityUseCase {
 
   DeleteLocalPasswordUseCase get deleteLocalPassword =>
       DeleteLocalPasswordUseCase(_repository);
+
+  SaveLocalPasswordHintUseCase get saveLocalPasswordHint =>
+      SaveLocalPasswordHintUseCase(_repository);
+
+  GetLocalPasswordHintUseCase get getLocalPasswordHint =>
+      GetLocalPasswordHintUseCase(_repository);
+
+  DeleteLocalPasswordHintUseCase get deleteLocalPasswordHint =>
+      DeleteLocalPasswordHintUseCase(_repository);
 
   HasLocalPasswordUseCase get hasLocalPassword =>
       HasLocalPasswordUseCase(_repository);

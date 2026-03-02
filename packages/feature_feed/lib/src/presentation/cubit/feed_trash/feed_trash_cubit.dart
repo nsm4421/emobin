@@ -1,7 +1,7 @@
 import 'package:feature_feed/src/core/errors/feed_failure.dart';
 import 'package:feature_feed/src/domain/entity/feed_entry.dart';
 import 'package:feature_feed/src/domain/usecase/feed_use_case.dart';
-import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/fetch_soft_deleted_feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/hard_delete_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/update_feed_entry_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,40 +16,33 @@ part 'feed_trash_state.dart';
 @injectable
 class FeedTrashCubit extends Cubit<FeedTrashState> {
   FeedTrashCubit(FeedUseCase feedUseCase) : super(const FeedTrashState()) {
-    _fetchEntriesUseCase = feedUseCase.fetchLocalEntries;
+    _fetchSoftDeletedEntriesUseCase = feedUseCase.fetchSoftDeletedLocalEntries;
     _updateEntryUseCase = feedUseCase.updateLocalEntry;
     _hardDeleteEntryUseCase = feedUseCase.hardDeleteLocalEntry;
   }
 
-  late final FetchLocalFeedEntriesUseCase _fetchEntriesUseCase;
+  late final FetchSoftDeletedLocalFeedEntriesUseCase
+  _fetchSoftDeletedEntriesUseCase;
   late final UpdateLocalFeedEntryUseCase _updateEntryUseCase;
   late final HardDeleteLocalFeedEntryUseCase _hardDeleteEntryUseCase;
 
   Future<void> load() async {
     emit(state.copyWith(status: FeedTrashStatus.loading, failure: null));
 
-    final result = await _fetchEntriesUseCase();
+    final result = await _fetchSoftDeletedEntriesUseCase();
     if (isClosed) return;
 
     result.fold(
       (failure) => emit(
         state.copyWith(status: FeedTrashStatus.failure, failure: failure),
       ),
-      (entries) {
-        final deletedEntries =
-            entries
-                .where((entry) => entry.deletedAt != null)
-                .toList(growable: false)
-              ..sort((a, b) => b.deletedAt!.compareTo(a.deletedAt!));
-
-        emit(
-          state.copyWith(
-            status: FeedTrashStatus.success,
-            entries: deletedEntries,
-            failure: null,
-          ),
-        );
-      },
+      (entries) => emit(
+        state.copyWith(
+          status: FeedTrashStatus.success,
+          entries: entries,
+          failure: null,
+        ),
+      ),
     );
   }
 

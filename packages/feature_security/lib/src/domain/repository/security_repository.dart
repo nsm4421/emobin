@@ -4,7 +4,13 @@ import 'package:fpdart/fpdart.dart';
 abstract interface class SecurityRepository {
   Future<Either<SecurityFailure, void>> savePassword(String password);
 
+  Future<Either<SecurityFailure, void>> savePasswordHint(String hint);
+
   Future<Either<SecurityFailure, bool>> verifyPassword(String password);
+
+  Future<Either<SecurityFailure, String?>> getPasswordHint();
+
+  Future<Either<SecurityFailure, void>> deletePasswordHint();
 
   Future<Either<SecurityFailure, void>> deletePassword();
 

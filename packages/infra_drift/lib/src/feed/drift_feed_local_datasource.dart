@@ -63,6 +63,18 @@ class DriftFeedLocalDataSource
   }
 
   @override
+  Future<List<FeedEntryModel>> fetchSoftDeletedEntries() async {
+    final query = _database.select(_database.feedEntries)
+      ..where((tbl) => tbl.deletedAt.isNotNull())
+      ..orderBy([
+        (tbl) =>
+            OrderingTerm(expression: tbl.deletedAt, mode: OrderingMode.desc),
+      ]);
+    final rows = await query.get();
+    return mapRows(rows);
+  }
+
+  @override
   Future<List<DateTime>> fetchRecordedDates() async {
     final query = _database.selectOnly(_database.feedEntries)
       ..addColumns([_database.feedEntries.createdAt])

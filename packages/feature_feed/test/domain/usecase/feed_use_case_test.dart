@@ -4,6 +4,7 @@ import 'package:feature_feed/src/domain/entity/feed_record_status.dart';
 import 'package:feature_feed/src/domain/usecase/feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/create_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/delete_feed_image_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/fetch_soft_deleted_feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_by_year_month_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_record_status_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_use_case.dart';
@@ -14,7 +15,6 @@ import 'package:feature_feed/src/domain/usecase/scenario/observe_feed_record_sta
 import 'package:feature_feed/src/domain/usecase/scenario/save_feed_image_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/soft_delete_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/update_feed_entry_use_case.dart';
-import 'package:feature_feed/src/domain/usecase/scenario/backup_pending_feed_entries_use_case.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
@@ -46,6 +46,10 @@ void main() {
         isA<FetchLocalFeedEntriesUseCase>(),
       );
       expect(
+        feedUseCase.fetchSoftDeletedLocalEntries,
+        isA<FetchSoftDeletedLocalFeedEntriesUseCase>(),
+      );
+      expect(
         feedUseCase.fetchLocalRecordStatus,
         isA<FetchLocalFeedRecordStatusUseCase>(),
       );
@@ -66,10 +70,6 @@ void main() {
       );
       expect(feedUseCase.saveFeedImage, isA<SaveFeedImageUseCase>());
       expect(feedUseCase.deleteFeedImage, isA<DeleteFeedImageUseCase>());
-      expect(
-        feedUseCase.backupPendingLocalEntriesToRemote,
-        isA<BackupPendingLocalFeedEntriesToRemoteUseCase>(),
-      );
     });
 
     test('각 getter에서 생성된 유스케이스가 동일 repository를 사용한다', () async {
@@ -85,6 +85,9 @@ void main() {
       const month = 1;
 
       final fetchResult = Right<FeedFailure, List<FeedEntry>>(entries);
+      final fetchSoftDeletedResult = Right<FeedFailure, List<FeedEntry>>(
+        entries,
+      );
       const fetchRecordStatusResult = Right<FeedFailure, FeedRecordStatus>(
         recordStatus,
       );
@@ -98,7 +101,6 @@ void main() {
       final hardDeleteResult = Right<FeedFailure, void>(null);
       final saveImageResult = Right<FeedFailure, String>('/tmp/saved.jpg');
       final deleteImageResult = Right<FeedFailure, void>(null);
-      final backupResult = Right<FeedFailure, int>(1);
 
       when(
         () => repository.watchLocalEntries(),
@@ -109,6 +111,9 @@ void main() {
       when(
         () => repository.fetchLocalEntries(),
       ).thenAnswer((_) async => fetchResult);
+      when(
+        () => repository.fetchSoftDeletedLocalEntries(),
+      ).thenAnswer((_) async => fetchSoftDeletedResult);
       when(
         () => repository.fetchLocalRecordStatus(),
       ).thenAnswer((_) async => fetchRecordStatusResult);
@@ -136,9 +141,6 @@ void main() {
       when(
         () => repository.deleteImageByPath('/tmp/saved.jpg'),
       ).thenAnswer((_) async => deleteImageResult);
-      when(
-        () => repository.backupPendingLocalEntriesToRemote(),
-      ).thenAnswer((_) async => backupResult);
 
       await expectLater(feedUseCase.observeLocalEntries(), emits(entries));
       await expectLater(
@@ -146,6 +148,7 @@ void main() {
         emits(recordStatus),
       );
       await feedUseCase.fetchLocalEntries();
+      await feedUseCase.fetchSoftDeletedLocalEntries();
       await feedUseCase.fetchLocalRecordStatus();
       await feedUseCase.fetchLocalEntriesByYearMonth(year: year, month: month);
       await feedUseCase.getById(entry.id);
@@ -155,11 +158,11 @@ void main() {
       await feedUseCase.hardDeleteLocalEntry(entry.id);
       await feedUseCase.saveFeedImage('/tmp/source.jpg');
       await feedUseCase.deleteFeedImage('/tmp/saved.jpg');
-      await feedUseCase.backupPendingLocalEntriesToRemote();
 
       verify(() => repository.watchLocalEntries()).called(1);
       verify(() => repository.watchLocalRecordStatus()).called(1);
       verify(() => repository.fetchLocalEntries()).called(1);
+      verify(() => repository.fetchSoftDeletedLocalEntries()).called(1);
       verify(() => repository.fetchLocalRecordStatus()).called(1);
       verify(
         () => repository.fetchLocalEntriesByYearMonth(year: year, month: month),
@@ -173,7 +176,6 @@ void main() {
         () => repository.saveImageFromSourcePath('/tmp/source.jpg'),
       ).called(1);
       verify(() => repository.deleteImageByPath('/tmp/saved.jpg')).called(1);
-      verify(() => repository.backupPendingLocalEntriesToRemote()).called(1);
       verifyNoMoreInteractions(repository);
     });
   });

@@ -11,9 +11,11 @@ class SecureStorageSecurityDataSource implements SecurityDataSource {
     : _secureStorage = secureStorage;
 
   static const String defaultPasswordKey = 'local_password';
+  static const String defaultPasswordHintKey = 'local_password_hint';
 
   final FlutterSecureStorage _secureStorage;
   final String key = defaultPasswordKey;
+  final String hintKey = defaultPasswordHintKey;
 
   @override
   Future<void> savePassword(String password) async {
@@ -23,6 +25,23 @@ class SecureStorageSecurityDataSource implements SecurityDataSource {
 
     try {
       await _secureStorage.write(key: key, value: password);
+    } catch (error, stackTrace) {
+      throw SecurityException.storageFailure(
+        cause: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  @override
+  Future<void> savePasswordHint(String hint) async {
+    final normalized = hint.trim();
+    try {
+      if (normalized.isEmpty) {
+        await _secureStorage.delete(key: hintKey);
+        return;
+      }
+      await _secureStorage.write(key: hintKey, value: normalized);
     } catch (error, stackTrace) {
       throw SecurityException.storageFailure(
         cause: error,
@@ -48,9 +67,39 @@ class SecureStorageSecurityDataSource implements SecurityDataSource {
   }
 
   @override
+  Future<String?> getPasswordHint() async {
+    try {
+      final hint = await _secureStorage.read(key: hintKey);
+      final normalized = hint?.trim();
+      if (normalized == null || normalized.isEmpty) {
+        return null;
+      }
+      return normalized;
+    } catch (error, stackTrace) {
+      throw SecurityException.storageFailure(
+        cause: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  @override
+  Future<void> deletePasswordHint() async {
+    try {
+      await _secureStorage.delete(key: hintKey);
+    } catch (error, stackTrace) {
+      throw SecurityException.storageFailure(
+        cause: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  @override
   Future<void> deletePassword() async {
     try {
       await _secureStorage.delete(key: key);
+      await _secureStorage.delete(key: hintKey);
     } catch (error, stackTrace) {
       throw SecurityException.storageFailure(
         cause: error,

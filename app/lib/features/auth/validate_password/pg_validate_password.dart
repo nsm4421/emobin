@@ -92,6 +92,7 @@ class _ValidatePasswordState extends State<ValidatePassword> {
                     controller: _passwordController,
                     label: context.l10n.password,
                     hintText: context.l10n.enterYourPasswordHint,
+                    helperText: context.l10n.enterYourPassword,
                     textInputAction: TextInputAction.done,
                     validator: _validatePassword,
                     onFieldSubmitted: (_) => _onValidatePressed(),

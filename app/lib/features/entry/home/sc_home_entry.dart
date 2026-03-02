@@ -15,7 +15,7 @@ class _HomeEntry extends StatelessWidget {
             SizedBox(height: 16),
             _HomeWriteEntry(),
             SizedBox(height: 16),
-            _HomeSyncBackup(),
+            _HomeSyncMenu(),
           ],
         ),
       ),

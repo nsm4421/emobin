@@ -62,6 +62,7 @@ class _TrashItem extends StatelessWidget {
                 color: context.colorScheme.onSurface,
                 fontWeight: FontWeight.w700,
               ),
+              softWrap: false,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -71,7 +72,7 @@ class _TrashItem extends StatelessWidget {
               style: context.textTheme.bodySmall?.copyWith(
                 color: context.colorScheme.onSurfaceVariant,
               ),
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
@@ -87,23 +88,41 @@ class _TrashItem extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                OutlinedButton.icon(
+                TextButton.icon(
                   onPressed: isBusy ? null : onRestore,
                   icon: isBusy
                       ? const SizedBox(
-                          width: 14,
-                          height: 14,
+                          width: 12,
+                          height: 12,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Icon(Icons.restore_rounded, size: 18),
+                      : const Icon(Icons.restore_rounded, size: 16),
                   label: Text(context.l10n.restore),
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    minimumSize: const Size(0, 30),
+                    textStyle: context.textTheme.labelSmall,
+                  ),
                 ),
                 const SizedBox(width: 8),
-                FilledButton.tonalIcon(
+                TextButton.icon(
                   onPressed: isBusy ? null : onHardDelete,
-                  icon: const Icon(Icons.delete_forever_outlined, size: 18),
+                  icon: const Icon(Icons.delete_forever_outlined, size: 16),
                   label: Text(context.l10n.deleteForever),
-                  style: FilledButton.styleFrom(
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    minimumSize: const Size(0, 30),
+                    textStyle: context.textTheme.labelSmall,
                     foregroundColor: context.colorScheme.error,
                   ),
                 ),

@@ -21,16 +21,19 @@ class _FeedEntryListViewFragmentState extends State<_FeedEntryListView> {
     return BlocBuilder<DisplayFeedListBloc, DisplayFeedListState>(
       builder: (context, state) {
         final entries = state.entries;
+        final visibleEntries = entries
+            .where((entry) => !entry.isDraft)
+            .toList(growable: false);
         final isLoading = state.status == DisplayFeedListStatus.loading;
         final hasFailure = state.status == DisplayFeedListStatus.failure;
         final failureMessage =
             state.failure?.message ?? context.l10n.failedLoadFeedList;
 
-        if (isLoading && entries.isEmpty) {
+        if (isLoading && visibleEntries.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (hasFailure && entries.isEmpty) {
+        if (hasFailure && visibleEntries.isEmpty) {
           return _FeedEntryFailure(
             message: failureMessage,
             onRetry: () {
@@ -68,8 +71,8 @@ class _FeedEntryListViewFragmentState extends State<_FeedEntryListView> {
                   ),
                   const SizedBox(height: 12),
                 ],
-                if (entries.isEmpty) const _FeedEntryEmpty(),
-                ..._buildDateSectionedEntries(context, entries),
+                if (visibleEntries.isEmpty) const _FeedEntryEmpty(),
+                ..._buildDateSectionedEntries(context, visibleEntries),
                 if (state.isLoadingMore) ...[
                   const SizedBox(height: 12),
                   const Center(child: CircularProgressIndicator()),

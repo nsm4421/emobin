@@ -23,17 +23,20 @@ class _FeedEntryCalendarViewState extends State<_FeedEntryCalendarView> {
     return BlocBuilder<DisplayFeedCalendarBloc, DisplayFeedCalendarState>(
       builder: (context, state) {
         final entries = state.entries;
+        final visibleEntriesByDraft = entries
+            .where((entry) => !entry.isDraft)
+            .toList(growable: false);
         final focusedMonth = state.focusedMonth;
         final isLoading = state.status == DisplayFeedCalendarStatus.loading;
         final hasFailure = state.status == DisplayFeedCalendarStatus.failure;
         final failureMessage =
             state.failure?.message ?? context.l10n.failedLoadFeedCalendar;
 
-        if (isLoading && entries.isEmpty) {
+        if (isLoading && visibleEntriesByDraft.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (hasFailure && entries.isEmpty) {
+        if (hasFailure && visibleEntriesByDraft.isEmpty) {
           return _FeedEntryFailure(
             message: failureMessage,
             onRetry: () {
@@ -42,9 +45,9 @@ class _FeedEntryCalendarViewState extends State<_FeedEntryCalendarView> {
           );
         }
 
-        final dayCounts = _toDayCounts(entries);
+        final dayCounts = _toDayCounts(visibleEntriesByDraft);
         final visibleEntries = _filterEntriesBySelectedDate(
-          entries: entries,
+          entries: visibleEntriesByDraft,
           selectedDate: _selectedDate,
         );
 
@@ -81,7 +84,7 @@ class _FeedEntryCalendarViewState extends State<_FeedEntryCalendarView> {
               const SizedBox(height: 12),
               _FeedCalendarSummary(
                 focusedMonth: focusedMonth,
-                entryCount: entries.length,
+                entryCount: visibleEntriesByDraft.length,
               ),
               const SizedBox(height: 12),
               if (_selectedDate != null)

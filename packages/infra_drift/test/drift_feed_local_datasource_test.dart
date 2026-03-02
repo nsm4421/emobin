@@ -112,6 +112,27 @@ void main() {
     expect(entries.map((entry) => entry.id).toList(), ['active']);
   });
 
+  test('fetchSoftDeletedEntries returns only soft-deleted rows', () async {
+    final active = buildEntry(id: 'active', createdAt: DateTime(2024, 1, 1));
+    final deleted1 = buildEntry(
+      id: 'deleted1',
+      createdAt: DateTime(2024, 1, 2),
+      deletedAt: DateTime(2024, 1, 3),
+    );
+    final deleted2 = buildEntry(
+      id: 'deleted2',
+      createdAt: DateTime(2024, 1, 4),
+      deletedAt: DateTime(2024, 1, 5),
+    );
+
+    await dataSource.addEntry(active);
+    await dataSource.addEntry(deleted1);
+    await dataSource.addEntry(deleted2);
+
+    final entries = await dataSource.fetchSoftDeletedEntries();
+    expect(entries.map((entry) => entry.id).toList(), ['deleted2', 'deleted1']);
+  });
+
   test('fetchEntriesByYearMonth filters entries by year and month', () async {
     final january = buildEntry(
       id: 'jan',

@@ -1,13 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
-import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_feed/feature_feed.dart';
 import 'package:feature_setting/feature_setting.dart';
 import 'package:feature_security/feature_security.dart';
 import 'package:infra_drift/infra_drift.dart';
 import 'package:infra_media_local/infra_media_local.dart';
-import 'package:infra_supabase/infra_supabase.dart';
 
 import '../bloc/app_bloc_observer.dart';
 import 'di.config.dart';
@@ -18,15 +16,12 @@ import 'di.config.dart';
   externalPackageModulesBefore: [
     ExternalModule(InfraDriftPackageModule),
     ExternalModule(InfraMediaLocalPackageModule),
-    ExternalModule(InfraSupabasePackageModule),
-    ExternalModule(FeatureAuthPackageModule),
     ExternalModule(FeatureFeedPackageModule),
     ExternalModule(FeatureSecurityPackageModule),
     ExternalModule(FeatureSettingPackageModule),
   ],
 )
 Future<void> configureDependencies() async {
-  await initInfraSupabasePackage();
   await initInfraDriftPackage();
   await initInfraMediaLocalPackage();
   await initFeatureSettingPackage();

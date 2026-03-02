@@ -9,6 +9,8 @@ abstract class FeedLocalDataSource {
 
   Future<List<FeedEntryModel>> fetchEntries({int? limit, int offset = 0});
 
+  Future<List<FeedEntryModel>> fetchSoftDeletedEntries();
+
   Future<List<DateTime>> fetchRecordedDates();
 
   Future<List<FeedEntryModel>> fetchEntriesByYearMonth({

@@ -66,6 +66,121 @@ void main() {
       expect(matched, isTrue);
     });
 
+    test('saves password hint into secure storage', () async {
+      when(
+        () => secureStorage.write(
+          key: any(named: 'key'),
+          value: any(named: 'value'),
+          iOptions: any(named: 'iOptions'),
+          aOptions: any(named: 'aOptions'),
+          lOptions: any(named: 'lOptions'),
+          wOptions: any(named: 'wOptions'),
+          mOptions: any(named: 'mOptions'),
+          webOptions: any(named: 'webOptions'),
+        ),
+      ).thenAnswer((_) async {});
+
+      await dataSource.savePasswordHint('my first pet');
+
+      verify(
+        () => secureStorage.write(
+          key: SecureStorageSecurityDataSource.defaultPasswordHintKey,
+          value: 'my first pet',
+          iOptions: null,
+          aOptions: null,
+          lOptions: null,
+          wOptions: null,
+          mOptions: null,
+          webOptions: null,
+        ),
+      ).called(1);
+    });
+
+    test('returns normalized password hint', () async {
+      when(
+        () => secureStorage.read(
+          key: any(named: 'key'),
+          iOptions: any(named: 'iOptions'),
+          aOptions: any(named: 'aOptions'),
+          lOptions: any(named: 'lOptions'),
+          wOptions: any(named: 'wOptions'),
+          mOptions: any(named: 'mOptions'),
+          webOptions: any(named: 'webOptions'),
+        ),
+      ).thenAnswer((_) async => '  hint text  ');
+
+      final hint = await dataSource.getPasswordHint();
+
+      expect(hint, 'hint text');
+    });
+
+    test('deletes password hint when hint is empty', () async {
+      when(
+        () => secureStorage.delete(
+          key: any(named: 'key'),
+          iOptions: any(named: 'iOptions'),
+          aOptions: any(named: 'aOptions'),
+          lOptions: any(named: 'lOptions'),
+          wOptions: any(named: 'wOptions'),
+          mOptions: any(named: 'mOptions'),
+          webOptions: any(named: 'webOptions'),
+        ),
+      ).thenAnswer((_) async {});
+
+      await dataSource.savePasswordHint('   ');
+
+      verify(
+        () => secureStorage.delete(
+          key: SecureStorageSecurityDataSource.defaultPasswordHintKey,
+          iOptions: null,
+          aOptions: null,
+          lOptions: null,
+          wOptions: null,
+          mOptions: null,
+          webOptions: null,
+        ),
+      ).called(1);
+    });
+
+    test('deletes password and password hint together', () async {
+      when(
+        () => secureStorage.delete(
+          key: any(named: 'key'),
+          iOptions: any(named: 'iOptions'),
+          aOptions: any(named: 'aOptions'),
+          lOptions: any(named: 'lOptions'),
+          wOptions: any(named: 'wOptions'),
+          mOptions: any(named: 'mOptions'),
+          webOptions: any(named: 'webOptions'),
+        ),
+      ).thenAnswer((_) async {});
+
+      await dataSource.deletePassword();
+
+      verify(
+        () => secureStorage.delete(
+          key: SecureStorageSecurityDataSource.defaultPasswordKey,
+          iOptions: null,
+          aOptions: null,
+          lOptions: null,
+          wOptions: null,
+          mOptions: null,
+          webOptions: null,
+        ),
+      ).called(1);
+      verify(
+        () => secureStorage.delete(
+          key: SecureStorageSecurityDataSource.defaultPasswordHintKey,
+          iOptions: null,
+          aOptions: null,
+          lOptions: null,
+          wOptions: null,
+          mOptions: null,
+          webOptions: null,
+        ),
+      ).called(1);
+    });
+
     test('throws when password is empty', () async {
       expect(
         () => dataSource.savePassword('  '),

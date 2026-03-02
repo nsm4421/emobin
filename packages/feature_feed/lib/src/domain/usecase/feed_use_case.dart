@@ -5,6 +5,7 @@ import 'package:feature_feed/src/domain/usecase/scenario/create_feed_entry_use_c
 import 'package:feature_feed/src/domain/usecase/scenario/delete_feed_image_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_by_year_month_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_record_status_use_case.dart';
+import 'package:feature_feed/src/domain/usecase/scenario/fetch_soft_deleted_feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/fetch_feed_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/get_feed_entry_by_id_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/hard_delete_feed_entry_use_case.dart';
@@ -13,7 +14,6 @@ import 'package:feature_feed/src/domain/usecase/scenario/observe_feed_record_sta
 import 'package:feature_feed/src/domain/usecase/scenario/save_feed_image_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/soft_delete_feed_entry_use_case.dart';
 import 'package:feature_feed/src/domain/usecase/scenario/update_feed_entry_use_case.dart';
-import 'package:feature_feed/src/domain/usecase/scenario/backup_pending_feed_entries_use_case.dart';
 
 @lazySingleton
 class FeedUseCase {
@@ -29,6 +29,9 @@ class FeedUseCase {
 
   FetchLocalFeedEntriesUseCase get fetchLocalEntries =>
       FetchLocalFeedEntriesUseCase(_repository);
+
+  FetchSoftDeletedLocalFeedEntriesUseCase get fetchSoftDeletedLocalEntries =>
+      FetchSoftDeletedLocalFeedEntriesUseCase(_repository);
 
   FetchLocalFeedRecordStatusUseCase get fetchLocalRecordStatus =>
       FetchLocalFeedRecordStatusUseCase(_repository);
@@ -55,8 +58,4 @@ class FeedUseCase {
 
   DeleteFeedImageUseCase get deleteFeedImage =>
       DeleteFeedImageUseCase(_repository);
-
-  BackupPendingLocalFeedEntriesToRemoteUseCase
-  get backupPendingLocalEntriesToRemote =>
-      BackupPendingLocalFeedEntriesToRemoteUseCase(_repository);
 }

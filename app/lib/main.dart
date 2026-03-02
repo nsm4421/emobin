@@ -1,4 +1,3 @@
-import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_security/feature_security.dart';
 import 'package:emobin/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -24,9 +23,6 @@ class MainApp extends StatelessWidget {
     final appRouterConfig = AppRouter(navigatorKey: toastNavigatorKey).config();
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => GetIt.instance<AuthBloc>()..add(AuthEvent.started()),
-        ),
         BlocProvider(
           create: (_) =>
               GetIt.instance<SecurityBloc>()..add(SecurityEvent.started()),

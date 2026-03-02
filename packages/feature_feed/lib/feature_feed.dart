@@ -5,7 +5,6 @@ export 'src/core/types/feed_stream_payload.dart';
 export 'src/core/errors/feed_error.dart';
 export 'src/core/errors/feed_exception.dart';
 export 'src/core/errors/feed_failure.dart';
-export 'src/data/datasource/feed_remote_datasource.dart';
 export 'src/data/datasource/feed_image_storage.dart';
 export 'src/data/model/feed_entry_model.dart';
 export 'src/domain/entity/feed_entry.dart';

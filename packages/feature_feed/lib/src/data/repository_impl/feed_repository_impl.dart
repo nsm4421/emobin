@@ -7,7 +7,6 @@ import 'package:feature_feed/src/core/errors/feed_failure.dart';
 import 'package:feature_feed/src/core/errors/feed_failure_mapper.dart';
 import 'package:feature_feed/src/data/datasource/feed_image_storage.dart';
 import 'package:feature_feed/src/data/datasource/feed_local_datasource.dart';
-import 'package:feature_feed/src/data/datasource/feed_remote_datasource.dart';
 import 'package:feature_feed/src/data/mapper/feed_entry_mapper.dart';
 import 'package:feature_feed/src/data/repository_impl/feed_repository_sync_mixin.dart';
 import 'package:feature_feed/src/domain/entity/feed_entry.dart';
@@ -21,14 +20,9 @@ class FeedRepositoryImpl
     with FeedRepositorySyncMixin
     implements FeedRepository {
   final FeedLocalDataSource _localDataSource;
-  final FeedRemoteDataSource _remoteDataSource;
   final FeedImageStorage _imageStorage;
 
-  FeedRepositoryImpl(
-    this._localDataSource,
-    this._remoteDataSource,
-    this._imageStorage,
-  );
+  FeedRepositoryImpl(this._localDataSource, this._imageStorage);
 
   @override
   Stream<List<FeedEntry>> watchLocalEntries() {
@@ -52,6 +46,18 @@ class FeedRepositoryImpl
         limit: limit,
         offset: offset,
       );
+      final entities = entries.map((entry) => entry.toEntity()).toList();
+      return Right(entities);
+    } catch (error, stackTrace) {
+      return Left(error.toFeedFailure(stackTrace));
+    }
+  }
+
+  @override
+  Future<Either<FeedFailure, List<FeedEntry>>>
+  fetchSoftDeletedLocalEntries() async {
+    try {
+      final entries = await _localDataSource.fetchSoftDeletedEntries();
       final entities = entries.map((entry) => entry.toEntity()).toList();
       return Right(entities);
     } catch (error, stackTrace) {
@@ -187,26 +193,6 @@ class FeedRepositoryImpl
     try {
       await _imageStorage.deleteByPath(localPath);
       return const Right(null);
-    } catch (error, stackTrace) {
-      return Left(error.toFeedFailure(stackTrace));
-    }
-  }
-
-  @override
-  Future<Either<FeedFailure, int>> backupPendingLocalEntriesToRemote() async {
-    try {
-      final pending = await _localDataSource.fetchEntriesBySyncStatus({
-        FeedSyncStatus.localOnly,
-        FeedSyncStatus.pendingUpload,
-      });
-      await _remoteDataSource.backupEntries(pending);
-
-      for (final entry in pending) {
-        final syncedEntry = markSynced(entry);
-        await _localDataSource.updateEntry(syncedEntry);
-      }
-
-      return Right(pending.length);
     } catch (error, stackTrace) {
       return Left(error.toFeedFailure(stackTrace));
     }

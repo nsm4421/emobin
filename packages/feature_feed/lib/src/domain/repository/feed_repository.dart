@@ -14,6 +14,8 @@ abstract class FeedRepository {
     int offset = 0,
   });
 
+  Future<Either<FeedFailure, List<FeedEntry>>> fetchSoftDeletedLocalEntries();
+
   Future<Either<FeedFailure, FeedRecordStatus>> fetchLocalRecordStatus();
 
   Future<Either<FeedFailure, List<FeedEntry>>> fetchLocalEntriesByYearMonth({
@@ -36,6 +38,4 @@ abstract class FeedRepository {
   );
 
   Future<Either<FeedFailure, void>> deleteImageByPath(String localPath);
-
-  Future<Either<FeedFailure, int>> backupPendingLocalEntriesToRemote();
 }
